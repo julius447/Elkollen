@@ -239,9 +239,13 @@ the right. Two rules:
   elements (H1, lead `<p>`, honesty line, trust list, two CTA buttons); right =
   the shortcode `[elkollen layout="hero"]`. The plugin does NOT render the
   marketing copy or the H1 (SEO: one clean page H1 owned by Bricks). Stack to 1
-  column < 768px. The two left-column CTAs mirror the ampy.se homepage:
-  "Kontakta oss" (filled teal) → `/kontakt/` and "010-265 79 79" (outline,
-  `tel:`).
+  column < 768px. The two left-column CTAs are a 1:1 replica of the ampy.se
+  homepage hero buttons: "Kontakta oss" (solid yellow `#ffd64f`, dark text) →
+  `/offert/` and "010-265 79 79" (solid light cyan `#b8f2ff`, dark text, phone
+  icon on the right) → `tel:+46102657979`. Values were taken from the live
+  site's computed styles (8px radius, Outfit 400, the site's clamp() padding,
+  full-width stack at <=478px). In production, reuse Bricks' existing
+  `hero-1__button` / `bricks-button` classes so they stay 1:1 with the site.
 - **What `layout="hero"` changes inside the tool:** the *entry* state becomes
   compact, with a fixed top-to-bottom order:
   1. **Search** field.

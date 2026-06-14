@@ -2,6 +2,20 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 5.5.1 — CTA 1:1 with ampy.se + font fallback fix (preview only)
+- **CTA buttons made a true 1:1 replica of the ampy.se homepage hero buttons.**
+  Pulled the live site's computed styles (via its actual Bricks stylesheets):
+  "Kontakta oss" = solid yellow `#ffd64f` + dark text `#363636`; "010-265 79 79"
+  = solid light cyan `#b8f2ff` + dark text, phone icon on the right. Both: 8px
+  radius, Outfit 400, the site's exact clamp() padding/font tokens, and full-width
+  stacking at <=478px. Hrefs corrected to `/offert/` and `tel:+46102657979`.
+  (Previous version approximated these as a teal-fill + white-outline pair.)
+- **Bug fix:** `.sec-head h2` and `.step h3` in `preview/hero.html` declared
+  `'Plus Jakarta Sans'` with no fallback, so they rendered as serif whenever the
+  webfont was not applied. Added `, system-ui, sans-serif`.
+- Preview/landing-chrome only; plugin assets unchanged, so `AMPY_BK_VERSION`
+  stays 5.5.0.
+
 ## 5.5.0 — Hero refinement (entry interaction + landing trim)
 - **Hero entry restructured** (`renderHeroEntry`): the old "Se alla N jobb · Välj
   rum" disclosure row is gone. In its place:

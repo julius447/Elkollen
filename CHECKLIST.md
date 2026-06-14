@@ -62,9 +62,14 @@ Copy on the left, tool on the right. Reference design: `preview/hero.html`.
       - **H1**: **Får du fixa elen själv? Få svaret på 30 sekunder.**
       - Lead paragraph: **Elkollen ger dig ett tydligt besked, grönt eller rött, baserat på Elsäkerhetslagen. Hela svaret är gratis, ingen mejladress behövs.**
       - A short honesty line + 3 trust bullets (copy is in `preview/hero.html`).
-      - Two CTA buttons (the same pair as the ampy.se homepage): **"Kontakta oss"**
-        (filled teal) → `https://ampy.se/kontakt/` and **"010-265 79 79"** (outline,
-        phone) → `tel:0102657979`.
+      - Two CTA buttons that are the **exact same pair as the ampy.se homepage hero**:
+        **"Kontakta oss"** (solid yellow `#ffd64f`, dark text) → `https://ampy.se/offert/`
+        and **"010-265 79 79"** (solid light cyan `#b8f2ff`, dark text, phone icon on
+        the right) → `tel:+46102657979`. In Bricks, reuse the site's existing
+        `hero-1__button` / `bricks-button` button classes so they inherit the live
+        homepage styling and stay 1:1 automatically (the prototype in
+        `preview/hero.html` replicates those computed styles: 8px radius, Outfit 400,
+        the site's clamp() padding, full-width stack at <=478px).
 - [ ] **Right column**: a **Shortcode element** with `[elkollen layout="hero"]`
 - [ ] Set the column container to **stack to 1 column below 768px**.
 - [ ] Below the hero, add the **"Så funkar det"** section (3 cards, copy in
