@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "5.4",
+    "version": "5.6",
     "product_name": "Elkollen",
     "page_heading": "Koppla elen",
     "page_lead": "Se direkt vilka eljobb du får göra själv.",
@@ -13,7 +13,24 @@
     "verify_company_url": "https://www.elsakerhetsverket.se/kollaelforetaget/foretagsregister/?foretag=12047521&sok=1",
     "ampy_offert_url": "https://ampy.se/offert/",
     "contact_url": "https://ampy.se/offert/",
-    "quick_picks": ["byta-vagguttag","byta-strombrytare","byta-armatur-dcl","spotlights","golvvarme","spis-ugn","elcentral","laddbox"]
+    "privacy_url": "https://ampy.se/integritetspolicy/",
+    "cta_advice_label": "Få kostnadsfri rådgivning",
+    "lead_form": {
+      "title": "Få kostnadsfri rådgivning",
+      "intro": "En behörig elektriker hör av sig med ett förslag, oftast inom en arbetsdag. Gäller:",
+      "submit": "Skicka förfrågan",
+      "submitting": "Skickar…",
+      "foot": "Kostnadsfritt och utan förbindelse.",
+      "back": "Tillbaka till beskedet",
+      "consent": "Jag godkänner att Ampy sparar mina uppgifter för att kontakta mig med ett förslag, enligt ",
+      "consent_link": "integritetspolicyn",
+      "error_required": "Fyll i namn och e-post och godkänn villkoren.",
+      "error_send": "Något gick fel. Ring oss på 010-265 79 79 så hjälper vi dig.",
+      "success_title": "Tack! Vi hör av oss inom kort.",
+      "success_body": "En behörig elektriker återkommer med ett förslag, oftast inom en arbetsdag.",
+      "success_back": "Tillbaka till beskedet"
+    },
+    "quick_picks": ["byta-vagguttag","byta-armatur-dcl","golvvarme","laddbox","spotlights","spis-ugn","byta-strombrytare","elcentral"]
   },
 
   "verdicts": {

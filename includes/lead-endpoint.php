@@ -31,7 +31,8 @@ add_action( 'rest_api_init', function () {
             'job_id'     => array( 'required' => true, 'type' => 'string' ),
             'verdict'    => array( 'required' => true, 'type' => 'string' ),
             'namn'       => array( 'required' => true, 'type' => 'string' ),
-            'kontakt'    => array( 'required' => true, 'type' => 'string' ),
+            'kontakt'    => array( 'required' => true, 'type' => 'string' ), // e-post (eller telefon)
+            'telefon'    => array( 'required' => false, 'type' => 'string' ),
             'postnummer' => array( 'required' => false, 'type' => 'string' ),
             'meddelande' => array( 'required' => false, 'type' => 'string' ),
             'samtycke'   => array( 'required' => true, 'type' => 'boolean' ),
@@ -52,6 +53,7 @@ function ampy_bk_handle_lead( WP_REST_Request $request ) {
     $verdict    = sanitize_key( $request->get_param( 'verdict' ) );
     $namn       = sanitize_text_field( $request->get_param( 'namn' ) );
     $kontakt    = sanitize_text_field( $request->get_param( 'kontakt' ) );
+    $telefon    = sanitize_text_field( (string) $request->get_param( 'telefon' ) );
     $postnummer = preg_replace( '/[^0-9]/', '', (string) $request->get_param( 'postnummer' ) );
     $meddelande = sanitize_textarea_field( $request->get_param( 'meddelande' ) );
     $samtycke   = (bool) $request->get_param( 'samtycke' );
@@ -90,10 +92,10 @@ function ampy_bk_handle_lead( WP_REST_Request $request ) {
     $body = sprintf(
         "Ny offertförfrågan via Behörighetskollen\n\n" .
         "Jobb: %s (%s)\nBesked: %s\n\n" .
-        "Namn: %s\nKontakt: %s\nPostnummer: %s\n\nMeddelande:\n%s\n\n" .
+        "Namn: %s\nE-post: %s\nTelefon: %s\nPostnummer: %s\n\nMeddelande:\n%s\n\n" .
         "IP: %s\nTid: %s",
         $job_label, $job_id, strtoupper( $verdict ),
-        $namn, $kontakt, $postnummer ?: '–',
+        $namn, $kontakt, $telefon ?: '–', $postnummer ?: '–',
         $meddelande ?: '–',
         isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '–',
         current_time( 'mysql' )
@@ -106,6 +108,7 @@ function ampy_bk_handle_lead( WP_REST_Request $request ) {
         'verdict'    => $verdict,
         'namn'       => $namn,
         'kontakt'    => $kontakt,
+        'telefon'    => $telefon,
         'postnummer' => $postnummer,
         'meddelande' => $meddelande,
     ) );

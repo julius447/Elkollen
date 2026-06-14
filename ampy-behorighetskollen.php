@@ -3,7 +3,7 @@
  * Plugin Name:       Elkollen (Ampy)
  * Plugin URI:        https://ampy.se/
  * Description:       Elkollen — lead magnet where a homeowner picks an electrical job and gets a GREEN/YELLOW/RED verdict with a legal source. Renders in Bricks via the shortcode [elkollen] (or [behorighetskollen]). UI copy is Swedish by design.
- * Version:           5.5.0
+ * Version:           5.6.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Ampy
@@ -23,7 +23,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-define( 'AMPY_BK_VERSION',  '5.5.0' );
+define( 'AMPY_BK_VERSION',  '5.6.0' );
 define( 'AMPY_BK_FILE',     __FILE__ );
 define( 'AMPY_BK_DIR',      plugin_dir_path( __FILE__ ) );
 define( 'AMPY_BK_URL',      plugin_dir_url( __FILE__ ) );
@@ -31,10 +31,10 @@ define( 'AMPY_BK_DATA',     AMPY_BK_DIR . 'data/behorighetskollen-data.json' );
 
 require_once AMPY_BK_DIR . 'includes/render.php';
 
-// Optional inline lead endpoint (REST). NOT used by the current UI — all quote
-// CTAs link to https://ampy.se/offert/. Uncomment the line below only if/when you
-// build an embedded quote form in the tool. See HANDOVER.md, section "The lead flow".
-// require_once AMPY_BK_DIR . 'includes/lead-endpoint.php';
+// Inline lead endpoint (REST). USED by the in-tool lead form (the verdict CTA
+// "Få kostnadsfri rådgivning" opens an on-page form that POSTs here instead of
+// linking out to /offert/). See HANDOVER.md, section "The lead flow".
+require_once AMPY_BK_DIR . 'includes/lead-endpoint.php';
 
 /**
  * Load + cache the data file. Single source of truth — never hardcode rules.

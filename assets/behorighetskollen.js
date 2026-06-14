@@ -105,6 +105,21 @@
     return 'depends';
   }
 
+  /* ---------- Analytics: funnel event emitter ---------------------------- */
+  // Vendor-agnostic. Pushes to window.dataLayer (GA4/GTM) AND dispatches a
+  // DOM CustomEvent ('elkollen:track') so any analytics tool (Plausible, a
+  // server-side proxy, etc.) can subscribe. No-ops cleanly if nothing listens.
+  function track(event, props) {
+    const payload = Object.assign({ event: 'elkollen_' + event, elkollen_action: event }, props || {});
+    try {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push(payload);
+    } catch (e) { /* no-op */ }
+    try {
+      window.dispatchEvent(new CustomEvent('elkollen:track', { detail: payload }));
+    } catch (e) { /* no-op */ }
+  }
+
   /* ---------- App -------------------------------------------------------- */
   class ElkollenApp {
     constructor(mount, data) {
@@ -121,7 +136,10 @@
       this.layout = mount.dataset.layout || '';
       this.heroMode = this.layout === 'hero';
       this.heroExpanded = false;
+      this.leadOpen = false;
+      this._booted = false;
       this.bindHistory();
+      track('tool_view', { layout: this.layout || 'default', deep_link: this.state.jobId || null });
     }
 
     readUrl() {
@@ -155,9 +173,30 @@
     }
 
     navigate(next, push = true) {
+      if (next && next.jobId && next.jobId !== this.state.jobId) {
+        track('job_selected', { job_id: next.jobId });
+      }
+      if (next && Object.prototype.hasOwnProperty.call(next, 'answerIndex') && next.answerIndex != null) {
+        track('question_answered', { job_id: next.jobId || this.state.jobId, answer_index: next.answerIndex });
+      }
       this.state = { ...this.state, ...next };
       this.activeTab = 'explain';
+      this.leadOpen = false; // leaving any verdict closes the lead form
       this.writeUrl(push);
+      this.render();
+    }
+
+    openLead() {
+      const job = this.state.jobId ? this.jobsById[this.state.jobId] : null;
+      const result = resolve(job, this.state.answerIndex);
+      if (!job || result.kind !== 'verdict') return;
+      this.leadOpen = true;
+      track('lead_form_open', { job_id: job.id, verdict: result.verdictKey });
+      this.render();
+    }
+
+    closeLead() {
+      this.leadOpen = false;
       this.render();
     }
 
@@ -179,12 +218,16 @@
       const result = resolve(job, this.state.answerIndex);
 
       let block;
-      if (!job || result.kind === 'unknown') {
+      if (this.leadOpen && job && result.kind === 'verdict') {
+        block = this.renderLeadBlock(job, result.verdictKey);
+      } else if (!job || result.kind === 'unknown') {
         block = this.renderEntryBlock();
       } else if (result.kind === 'ask') {
         block = this.renderQuestionBlock(job);
+        track('question_shown', { job_id: job.id });
       } else {
         block = this.renderVerdictBlock(job, result.verdictKey);
+        track('verdict_shown', { job_id: job.id, verdict: result.verdictKey });
       }
 
       // Hero mode: anti-jump. Hold the previous height across the swap, then
@@ -199,6 +242,19 @@
       } else {
         this.mount.replaceChildren(block);
       }
+
+      // a11y: move focus to the new view's heading after each transition, so
+      // keyboard / screen-reader users land on the new content instead of being
+      // dropped at the top of the document. Skip the very first paint (booting)
+      // so we never steal focus on page load.
+      if (this._booted) {
+        const target = block.querySelector('[data-focus-target]');
+        if (target) {
+          target.setAttribute('tabindex', '-1');
+          try { target.focus({ preventScroll: false }); } catch (e) { target.focus(); }
+        }
+      }
+      this._booted = true;
     }
 
     /* ===================================================================
@@ -229,7 +285,7 @@
       block.appendChild(this.renderCrumb(job));
 
       // Frågan
-      block.appendChild(el('p', { class: 'ampy-bk__q-title', id: 'ampy-bk-q' }, job.question));
+      block.appendChild(el('p', { class: 'ampy-bk__q-title', id: 'ampy-bk-q', 'data-focus-target': '' }, job.question));
 
       // Svarsalternativ (title + clarifier subline)
       const options = el('ul', { class: 'ampy-bk__options', role: 'list' });
@@ -256,7 +312,7 @@
       block.appendChild(el('div', { class: 'ampy-bk__info', role: 'note' }, [
         el('span', { class: 'ampy-bk__info-icon', html: icon('info'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
         el('p', { class: 'ampy-bk__info-text' },
-          'Lagen skiljer på att byta något befintligt och att installera nytt — ditt svar avgör vilken regel som gäller.'
+          'Lagen skiljer på att byta något befintligt och att installera nytt. Ditt svar avgör vilken regel som gäller.'
         )
       ]));
 
@@ -277,10 +333,13 @@
       judgment.appendChild(el('div', { class: 'ampy-bk__judgment-accent', 'aria-hidden': 'true' }));
       const jbody = el('div', { class: 'ampy-bk__judgment-body' });
       const badgeIcon = verdictKey === 'green' ? 'check' : (verdictKey === 'red' ? 'ban' : 'alert');
-      jbody.appendChild(el('h1', {
+      // h2, not h1: the page H1 is owned by Bricks/hero. data-focus-target so
+      // focus lands here after the verdict renders (announced once, no aria-live
+      // shouting the heading on every paint).
+      jbody.appendChild(el('h2', {
         class: 'ampy-bk__badge',
         id: 'ampy-bk-v',
-        'aria-live': 'polite'
+        'data-focus-target': ''
       }, [
         el('span', { html: icon(badgeIcon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
         el('span', {}, v.label)
@@ -299,7 +358,20 @@
       judgment.appendChild(jbody);
       block.appendChild(judgment);
 
-      // Tabs — exakt två, verdict-anpassade
+      // RED: surface the single strongest motivator (first sentence of the
+      // consequence) by default, so it is not hidden behind the Konsekvenser tab.
+      if (verdictKey === 'red') {
+        const ctext = (job.consequence || v.consequence || '').trim();
+        const lead = ctext.split('. ')[0];
+        if (lead) {
+          block.appendChild(el('p', { class: 'ampy-bk__verdict-lead' },
+            /[.!?]$/.test(lead) ? lead : lead + '.'));
+        }
+      }
+
+      // Two segments. Rendered as plain toggle buttons (aria-pressed), NOT an
+      // ARIA tablist: we do not implement the roving-tabindex/arrow-key contract,
+      // so claiming role=tab would mislead screen-reader users.
       const secondTab = (verdictKey === 'red')
         ? { key: 'consequence', label: 'Konsekvenser' }
         : { key: 'tips', label: 'Tips' };
@@ -308,19 +380,17 @@
         secondTab
       ];
 
-      const tabs = el('div', { class: 'ampy-bk__tabs', role: 'tablist' });
+      const tabs = el('div', { class: 'ampy-bk__tabs' });
       tabDefs.forEach(def => {
         const tabBtn = el('button', {
           class: 'ampy-bk__tab',
           type: 'button',
-          role: 'tab',
-          'aria-selected': String(this.activeTab === def.key),
-          'aria-controls': 'ampy-bk-tab-body',
+          'aria-pressed': String(this.activeTab === def.key),
           data: { tab: def.key },
           onclick: () => {
             this.activeTab = def.key;
             tabs.querySelectorAll('.ampy-bk__tab').forEach(b => {
-              b.setAttribute('aria-selected', String(b.dataset.tab === def.key));
+              b.setAttribute('aria-pressed', String(b.dataset.tab === def.key));
             });
             this.renderTabBody();
           }
@@ -437,75 +507,189 @@
     renderCta(job, verdictKey) {
       const wrap = document.createDocumentFragment();
       const shortJob = this._shortLabel(job.label);
+      // One standardized advice CTA label everywhere (data file = source of truth).
+      const adviceLabel = this.data.meta.cta_advice_label || 'Få kostnadsfri rådgivning';
+
+      // The advice CTA opens the in-tool lead form (no outbound jump to /offert/).
+      const adviceBtn = (cls) => el('button', {
+        class: cls, type: 'button',
+        onclick: () => { track('cta_click', { job_id: job.id, verdict: verdictKey, cta: 'advice' }); this.openLead(); }
+      }, [
+        adviceLabel,
+        el('span', { html: icon('arrowRight'), 'aria-hidden': 'true', style: 'display:inline-flex' })
+      ]);
+      const readMore = (cls) => el('a', {
+        class: cls, href: job.service_page_url,
+        onclick: () => track('cta_click', { job_id: job.id, verdict: verdictKey, cta: 'read_more' })
+      }, [
+        `Läs mer om ${shortJob}`,
+        el('span', { html: icon('arrowRight'), 'aria-hidden': 'true', style: 'display:inline-flex' })
+      ]);
 
       if (verdictKey === 'red') {
-        // RÖD: solid teal "Få kostnadsfri offert" + outline "Läs mer..." + trust-rad
-        // med share-ikon på samma rad (v5.2 spacing-fix — share får inte ta en
-        // egen rad mellan CTA och trust).
-        wrap.appendChild(el('a', {
-          class: 'ampy-bk__cta-primary ampy-bk__cta-primary--solid',
-          href: this.data.meta.ampy_offert_url
-        }, [
-          'Få kostnadsfri offert',
-          el('span', { html: icon('arrowRight'), 'aria-hidden': 'true', style: 'display:inline-flex' })
-        ]));
+        // RÖD: solid teal advice-CTA (primary) + outline "Läs mer..." + trust-rad
+        // med share-ikon på samma rad.
+        wrap.appendChild(adviceBtn('ampy-bk__cta-primary ampy-bk__cta-primary--solid'));
+        wrap.appendChild(readMore('ampy-bk__cta-secondary'));
 
-        wrap.appendChild(el('a', {
-          class: 'ampy-bk__cta-secondary',
-          href: job.service_page_url
-        }, [
-          `Läs mer om ${shortJob}`,
-          el('span', { html: icon('arrowRight'), 'aria-hidden': 'true', style: 'display:inline-flex' })
-        ]));
-
-        // Trust-rad med share-ikon inline (flex justify-between)
         const trustRow = el('div', { class: 'ampy-bk__trust-row' });
         trustRow.appendChild(el('p', { class: 'ampy-bk__trust' }, [
-          'Ampy är registrerat hos Elsäkerhetsverket — ',
-          el('a', { href: this.data.meta.verify_company_url, target: '_blank', rel: 'noopener noreferrer' },
-            'verifiera oss'),
+          'Ampy är registrerat hos Elsäkerhetsverket, ',
+          el('a', {
+            href: this.data.meta.verify_company_url, target: '_blank', rel: 'noopener noreferrer',
+            onclick: () => track('verify_company_click', { job_id: job.id, verdict: verdictKey })
+          }, 'verifiera oss'),
           '.'
         ]));
         trustRow.appendChild(this.renderShareButton(job, verdictKey));
         wrap.appendChild(trustRow);
 
       } else if (verdictKey === 'green') {
-        // GRÖN: outline "Läs mer om..." + rad med "Anlita expert?" + share
-        wrap.appendChild(el('a', {
-          class: 'ampy-bk__cta-primary',
-          href: job.service_page_url
-        }, [
-          `Läs mer om ${shortJob}`,
-          el('span', { html: icon('arrowRight'), 'aria-hidden': 'true', style: 'display:inline-flex' })
-        ]));
-
+        // GRÖN: lugn primär "Läs mer om..." (DIY-guiden) + diskret advice-länk + share
+        wrap.appendChild(readMore('ampy-bk__cta-primary'));
         const ctaRow = el('div', { class: 'ampy-bk__cta-row' });
-        ctaRow.appendChild(el('a', {
-          class: 'ampy-bk__cta-link',
-          href: this.data.meta.ampy_offert_url
-        }, 'Anlita expert?'));
+        ctaRow.appendChild(adviceBtn('ampy-bk__cta-link'));
         ctaRow.appendChild(this.renderShareButton(job, verdictKey));
         wrap.appendChild(ctaRow);
 
       } else {
-        // GUL
-        wrap.appendChild(el('a', {
-          class: 'ampy-bk__cta-primary',
-          href: job.service_page_url
-        }, [
-          'Läs vägledning',
-          el('span', { html: icon('arrowRight'), 'aria-hidden': 'true', style: 'display:inline-flex' })
-        ]));
+        // GUL: "Läs mer om..." + advice-länk + share
+        wrap.appendChild(readMore('ampy-bk__cta-primary'));
         const ctaRow = el('div', { class: 'ampy-bk__cta-row' });
-        ctaRow.appendChild(el('a', {
-          class: 'ampy-bk__cta-link',
-          href: this.data.meta.ampy_offert_url
-        }, 'Få offert'));
+        ctaRow.appendChild(adviceBtn('ampy-bk__cta-link'));
         ctaRow.appendChild(this.renderShareButton(job, verdictKey));
         wrap.appendChild(ctaRow);
       }
 
       return wrap;
+    }
+
+    /* ===================================================================
+       LEAD FORM — in-tool capture (no outbound jump). Posts to the REST
+       endpoint when available (WordPress); in the static prototype it
+       gracefully simulates success. Copy lives in data.meta.lead_form.
+       =================================================================== */
+    renderLeadBlock(job, verdictKey) {
+      const f = (this.data.meta && this.data.meta.lead_form) || {};
+      const block = el('div', { class: 'ampy-bk__block ampy-bk__lead', role: 'region', 'aria-labelledby': 'ampy-bk-lead-h' });
+
+      // Back to the verdict
+      block.appendChild(el('button', {
+        class: 'ampy-bk__lead-back', type: 'button', onclick: () => this.closeLead()
+      }, [
+        el('span', { html: icon('arrowLeft'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
+        f.back || 'Tillbaka till beskedet'
+      ]));
+
+      block.appendChild(el('h2', { class: 'ampy-bk__lead-title', id: 'ampy-bk-lead-h', 'data-focus-target': '' },
+        f.title || 'Få kostnadsfri rådgivning'));
+      block.appendChild(el('p', { class: 'ampy-bk__lead-intro' },
+        (f.intro || 'En behörig elektriker hör av sig med ett förslag, oftast inom en arbetsdag.')
+        + ' ' + this._shortLabel(job.label) + '.'));
+
+      const form = el('form', { class: 'ampy-bk__lead-form', novalidate: 'true' });
+      const field = (name, label, type, required, inputmode) => {
+        const id = 'ampy-bk-lf-' + name;
+        const wrapF = el('div', { class: 'ampy-bk__lead-field' });
+        wrapF.appendChild(el('label', { class: 'ampy-bk__lead-label', for: id },
+          label + (required ? '' : ' (valfritt)')));
+        const input = el('input', Object.assign({
+          class: 'ampy-bk__lead-input', id: id, name: name, type: type, autocomplete: 'on'
+        }, required ? { required: 'true' } : {}, inputmode ? { inputmode: inputmode } : {}));
+        wrapF.appendChild(input);
+        return { wrapF, input };
+      };
+      const namn  = field('namn', 'Namn', 'text', true);
+      const epost = field('epost', 'E-post', 'email', true, 'email');
+      const tel   = field('telefon', 'Telefon', 'tel', false, 'tel');
+      const post  = field('postnummer', 'Postnummer', 'text', false, 'numeric');
+
+      const grid = el('div', { class: 'ampy-bk__lead-grid' });
+      grid.appendChild(namn.wrapF); grid.appendChild(epost.wrapF);
+      grid.appendChild(tel.wrapF);  grid.appendChild(post.wrapF);
+      form.appendChild(grid);
+
+      // honeypot (hidden from humans)
+      const honey = el('input', { type: 'text', name: 'webbplats', class: 'ampy-bk__lead-hp', tabindex: '-1', autocomplete: 'off', 'aria-hidden': 'true' });
+      form.appendChild(honey);
+
+      // GDPR consent
+      const consentId = 'ampy-bk-lf-consent';
+      const consent = el('input', { type: 'checkbox', id: consentId, class: 'ampy-bk__lead-check', required: 'true' });
+      const consentRow = el('div', { class: 'ampy-bk__lead-consent' }, [
+        consent,
+        el('label', { for: consentId }, [
+          (f.consent || 'Jag godkänner att Ampy sparar mina uppgifter för att kontakta mig med ett förslag, enligt '),
+          el('a', { href: this.data.meta.privacy_url || 'https://ampy.se/integritetspolicy/', target: '_blank', rel: 'noopener noreferrer' },
+            f.consent_link || 'integritetspolicyn'),
+          '.'
+        ])
+      ]);
+      form.appendChild(consentRow);
+
+      const errorBox = el('p', { class: 'ampy-bk__lead-error', role: 'alert', hidden: true });
+      form.appendChild(errorBox);
+
+      const submit = el('button', { class: 'ampy-bk__cta-primary ampy-bk__cta-primary--solid ampy-bk__lead-submit', type: 'submit' },
+        f.submit || 'Skicka förfrågan');
+      form.appendChild(submit);
+      form.appendChild(el('p', { class: 'ampy-bk__lead-foot' }, f.foot || 'Kostnadsfritt och utan förbindelse.'));
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        errorBox.hidden = true;
+        if (honey.value) return; // bot
+        if (!namn.input.value.trim() || !epost.input.value.trim() || !consent.checked) {
+          errorBox.textContent = f.error_required || 'Fyll i namn och e-post och godkänn villkoren.';
+          errorBox.hidden = false;
+          return;
+        }
+        submit.disabled = true;
+        submit.textContent = f.submitting || 'Skickar…';
+        this.submitLead(job, verdictKey, {
+          namn: namn.input.value.trim(),
+          kontakt: epost.input.value.trim(),
+          telefon: tel.input.value.trim(),
+          postnummer: post.input.value.trim(),
+          samtycke: true,
+          webbplats: honey.value
+        }).then(() => {
+          track('lead_submitted', { job_id: job.id, verdict: verdictKey });
+          block.replaceChildren(
+            el('div', { class: 'ampy-bk__lead-success', 'data-focus-target': '' }, [
+              el('span', { class: 'ampy-bk__lead-success-icon', html: icon('check'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
+              el('h2', {}, f.success_title || 'Tack! Vi hör av oss inom kort.'),
+              el('p', {}, f.success_body || 'En behörig elektriker återkommer med ett förslag, oftast inom en arbetsdag.'),
+              el('button', { class: 'ampy-bk__cta-link', type: 'button', onclick: () => this.closeLead() },
+                f.success_back || 'Tillbaka till beskedet')
+            ])
+          );
+          const t = block.querySelector('[data-focus-target]');
+          if (t) { t.setAttribute('tabindex', '-1'); try { t.focus(); } catch (e2) {} }
+        }).catch(() => {
+          submit.disabled = false;
+          submit.textContent = f.submit || 'Skicka förfrågan';
+          errorBox.textContent = f.error_send || 'Något gick fel. Ring oss på 010-265 79 79 så hjälper vi dig.';
+          errorBox.hidden = false;
+        });
+      });
+
+      block.appendChild(form);
+      return block;
+    }
+
+    submitLead(job, verdictKey, fields) {
+      const cfg = (typeof window !== 'undefined' && window.AmpyBK) ? window.AmpyBK : null;
+      const payload = Object.assign({ job_id: job.id, verdict: verdictKey, meddelande: '' }, fields);
+      // No WP endpoint (static prototype) → simulate a successful submit.
+      if (!cfg || !cfg.restUrl) {
+        return new Promise((resolve2) => setTimeout(resolve2, 600));
+      }
+      return fetch(cfg.restUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': cfg.restNonce || '' },
+        body: JSON.stringify(payload)
+      }).then(r => { if (!r.ok) throw new Error('bad status'); return r.json(); });
     }
 
     renderShareButton(job, verdictKey) {
@@ -543,7 +727,7 @@
           href: t.href,
           target: '_blank',
           rel: 'noopener noreferrer',
-          onclick: () => { closeMenu(); }
+          onclick: () => { track('share_completed', { job_id: job.id, verdict: verdictKey, channel: t.key }); closeMenu(); }
         }, [
           el('span', { class: 'ampy-bk__share-item-icon', html: icon(t.icon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
           el('span', {}, t.label)
@@ -555,8 +739,8 @@
         type: 'button',
         role: 'menuitem',
         onclick: async () => {
-          try { await navigator.clipboard.writeText(shareUrl); flash('Länk kopierad.'); }
-          catch (e) { flash('Kopiera URL:en manuellt.', '--state-warning'); }
+          try { await navigator.clipboard.writeText(shareUrl); flash('Länk kopierad.'); track('share_completed', { job_id: job.id, verdict: verdictKey, channel: 'copy' }); }
+          catch (e) { flash('Kopiera länken manuellt.', '--state-warning'); }
           closeMenu();
         }
       }, [
@@ -587,6 +771,7 @@
         'aria-expanded': 'false',
         title: 'Dela resultatet',
         onclick: async () => {
+          track('share_opened', { job_id: job.id, verdict: verdictKey });
           // Touch-enheter (mobil/platta): native share sheet — ger Instagram,
           // Meddelanden, m.m. Desktop får ALLTID vår popover (Web Share finns på
           // desktop Chrome/Edge/Safari men ger inkonsekvent UX där). Detektera
@@ -600,6 +785,7 @@
               const payload = { title: shareTitle, text: shareText, url: shareUrl };
               if (file && navigator.canShare && navigator.canShare({ files: [file] })) payload.files = [file];
               await navigator.share(payload);
+              track('share_completed', { job_id: job.id, verdict: verdictKey, channel: 'native' });
               return;
             } catch (e) { /* användaren avbröt eller share misslyckades → fall till menyn */ }
           }
@@ -756,10 +942,13 @@
       const chips = el('ul', { class: 'ampy-bk__quickpicks', role: 'list' });
       picks.forEach(j => {
         const li = el('li');
+        const grp = jobGroup(j);
         li.appendChild(el('button', {
-          class: 'ampy-bk__quickpick', type: 'button', 'aria-label': `Välj jobb: ${j.label}`,
+          class: 'ampy-bk__quickpick', type: 'button',
+          'aria-label': `Välj jobb: ${j.label} (${this._groupWord(grp)})`,
           onclick: () => this.navigate({ jobId: j.id, answerIndex: null })
         }, [
+          el('span', { class: `ampy-bk__dot ampy-bk__dot--${grp}`, 'aria-hidden': 'true' }),
           el('span', { html: icon(j.icon === 'search' ? 'felsok' : j.icon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
           el('span', {}, j.label)
         ]));
@@ -909,6 +1098,13 @@
       ]);
       li.appendChild(btn);
       return li;
+    }
+
+    /** Human word for a verdict group (used in chip aria-labels). */
+    _groupWord(group) {
+      return group === 'green' ? 'får du göra själv'
+        : group === 'red' ? 'kräver elektriker'
+        : 'det beror på';
     }
 
     /** Strip leading verb + trailing parens from label. */

@@ -2,6 +2,42 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 5.6.0 — Lead capture, analytics, CTA 1:1 redo, UX/UI pass
+Built from a multi-agent audit (UX, UI, CRO, copy). Highlights:
+- **In-tool lead form (NEW).** The verdict advice CTA now opens an on-page form
+  (Namn, E-post, Telefon, Postnummer, GDPR consent) instead of linking out to
+  `/offert/`. It prefills the job + verdict context and POSTs to the REST endpoint
+  (`includes/lead-endpoint.php`, now re-enabled; `telefon` field added). In the
+  static preview with no WordPress backend it gracefully simulates success.
+  Copy lives in `data.meta.lead_form` (source of truth).
+- **Funnel analytics (NEW).** Vendor-agnostic `track()` pushes to
+  `window.dataLayer` (GA4/GTM) and dispatches an `elkollen:track` CustomEvent.
+  Events: tool_view, job_selected, question_shown, question_answered,
+  verdict_shown, cta_click, lead_form_open, lead_submitted, share_opened,
+  share_completed (with channel), verify_company_click.
+- **CTA buttons = true 1:1 with ampy.se hero gradient buttons.** "Kontakta oss"
+  green->teal gradient `linear-gradient(120deg,#55ff9a,#5eb1bf)` + arrow-up-right
+  icon; "010-265 79 79" cyan gradient + phone icon. 16px radius, soft shadow,
+  Outfit 400, dark text, the site's clamp() padding, full-width <=478px.
+- **Standardized advice CTA label** to "Få kostnadsfri rådgivning" everywhere
+  (`data.meta.cta_advice_label`); removed the "Få offert / Anlita expert?" variants.
+- **Copy:** new H1 ("Ta reda på det innan du börjar", dropped "30 sekunder"),
+  removed the misleading "grönt eller rött" binary (the tool has a real yellow
+  path), step 3 reworded ("Följ" not "Kör med"), fixed two user-facing em-dashes
+  (question info-note, RED trust line), "Kopiera länken" (was "URL:en").
+- **UX:** focus moves to the new view's heading after each transition; verdict
+  badge is now `<h2>` (single page H1); RED surfaces a one-line consequence by
+  default; tabs are honest plain buttons (aria-pressed) not a fake ARIA tablist;
+  quick-pick chips carry a green/amber/red verdict dot; `quick_picks` reordered to
+  surface laddbox/golvvärme + one green example; drawer stays scroll-capped on
+  mobile; room chips bumped to 44px tap target.
+- **UI:** warmer leafy `--state-success` (distinct from teal action color);
+  documented teal-usage rule (solid-fill = primary CTA only); "Se alla N jobb"
+  demoted to neutral text + teal arrow; "Så funkar det" on a navy band with flat
+  white cards + flat teal-stroke icons (gradient/glow removed, subtler hover);
+  H1 top-aligned with the tool panel.
+- Version -> 5.6.0; data version -> 5.6.
+
 ## 5.5.1 — CTA 1:1 with ampy.se + font fallback fix (preview only)
 - **CTA buttons made a true 1:1 replica of the ampy.se homepage hero buttons.**
   Pulled the live site's computed styles (via its actual Bricks stylesheets):

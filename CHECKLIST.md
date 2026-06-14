@@ -63,13 +63,13 @@ Copy on the left, tool on the right. Reference design: `preview/hero.html`.
       - Lead paragraph: **Elkollen ger dig ett tydligt besked, grönt eller rött, baserat på Elsäkerhetslagen. Hela svaret är gratis, ingen mejladress behövs.**
       - A short honesty line + 3 trust bullets (copy is in `preview/hero.html`).
       - Two CTA buttons that are the **exact same pair as the ampy.se homepage hero**:
-        **"Kontakta oss"** (solid yellow `#ffd64f`, dark text) → `https://ampy.se/offert/`
-        and **"010-265 79 79"** (solid light cyan `#b8f2ff`, dark text, phone icon on
-        the right) → `tel:+46102657979`. In Bricks, reuse the site's existing
-        `hero-1__button` / `bricks-button` button classes so they inherit the live
-        homepage styling and stay 1:1 automatically (the prototype in
-        `preview/hero.html` replicates those computed styles: 8px radius, Outfit 400,
-        the site's clamp() padding, full-width stack at <=478px).
+        **"Kontakta oss"** (green->teal gradient, dark text, arrow-up-right icon) →
+        `https://ampy.se/offert/` and **"010-265 79 79"** (cyan gradient, dark text,
+        phone icon on the right) → `tel:+46102657979`. In Bricks, reuse the site's
+        existing `green-button` / `blue-cta` + `bricks-button` button classes so they
+        inherit the live homepage styling and stay 1:1 automatically (the prototype in
+        `preview/hero.html` replicates those computed styles: 16px radius, soft shadow,
+        Outfit 400, the site's clamp() padding, full-width stack at <=478px).
 - [ ] **Right column**: a **Shortcode element** with `[elkollen layout="hero"]`
 - [ ] Set the column container to **stack to 1 column below 768px**.
 - [ ] Below the hero, add the **"Så funkar det"** section (3 cards, copy in
@@ -140,16 +140,32 @@ Test on **desktop** and **mobile (360 px wide)**:
 - [ ] Source chip "Elsäkerhetsverket – Detta får du göra själv" → opens the right page.
 - [ ] Explanation: one summary line + a ✓ row + a ✗ row + a yellow caveat note.
 - [ ] Tips tab: the first three tips have ✓, the last one (the stop condition) has ✗.
-- [ ] CTA: "Läs mer om …" (calm) + "Anlita expert?" → both go to the right place
-      (Läs mer → the service page, Anlita expert → `/offert/`).
+- [ ] CTA: calm "Läs mer om …" (→ service page) + a discreet "Få kostnadsfri
+      rådgivning" link (→ opens the in-tool lead form, see below).
 
 **Red verdict (e.g. installera golvvärme / install underfloor heating):**
 - [ ] Badge "Det här kräver elektriker" (red) on **one line**.
+- [ ] A one-line consequence summary shows **above the tabs** by default.
 - [ ] Source chip "Elsäkerhetslagen (2016:732) 27 §" → opens riksdagen.se.
 - [ ] Explanation + Consequences tab.
-- [ ] CTA: solid green "Få kostnadsfri offert" → `/offert/` + outline "Läs mer om …".
-- [ ] The trust row "Ampy är registrerat hos Elsäkerhetsverket — verifiera oss"
+- [ ] CTA: solid teal "Få kostnadsfri rådgivning" (opens the lead form) + outline
+      "Läs mer om …" (→ service page).
+- [ ] The trust row "Ampy är registrerat hos Elsäkerhetsverket, verifiera oss"
       → "verifiera oss" opens Ampy's entry in the register.
+
+**The in-tool lead form (the advice CTA):**
+- [ ] Clicking "Få kostnadsfri rådgivning" opens an on-page form (does NOT leave
+      the page): Namn, E-post, Telefon, Postnummer + a GDPR consent checkbox.
+- [ ] Submitting with name + e-post + consent shows a "Tack!" success state.
+- [ ] On the live WP site, a lead e-mail reaches the admin address (the REST
+      endpoint `ampy-bk/v1/lead` is enabled). Check spam if missing.
+- [ ] "Tillbaka till beskedet" returns to the verdict.
+
+**Analytics (optional but recommended):**
+- [ ] Open the console and run `window.dataLayer` (or listen for the
+      `elkollen:track` event) — confirm events fire: tool_view, job_selected,
+      verdict_shown, cta_click, lead_form_open, lead_submitted, share_*. Wire to
+      GA4/GTM if used.
 
 **Conditional (e.g. byta vägguttag / replace an outlet):**
 - [ ] Select the job → a question step with 2 answers (each with an explanatory subline).

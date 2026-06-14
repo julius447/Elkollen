@@ -240,12 +240,14 @@ the right. Two rules:
   the shortcode `[elkollen layout="hero"]`. The plugin does NOT render the
   marketing copy or the H1 (SEO: one clean page H1 owned by Bricks). Stack to 1
   column < 768px. The two left-column CTAs are a 1:1 replica of the ampy.se
-  homepage hero buttons: "Kontakta oss" (solid yellow `#ffd64f`, dark text) →
-  `/offert/` and "010-265 79 79" (solid light cyan `#b8f2ff`, dark text, phone
-  icon on the right) → `tel:+46102657979`. Values were taken from the live
-  site's computed styles (8px radius, Outfit 400, the site's clamp() padding,
-  full-width stack at <=478px). In production, reuse Bricks' existing
-  `hero-1__button` / `bricks-button` classes so they stay 1:1 with the site.
+  homepage hero gradient buttons: "Kontakta oss" (green->teal gradient
+  `linear-gradient(120deg,#55ff9a,#5eb1bf)`, dark text, arrow-up-right icon) →
+  `/offert/` and "010-265 79 79" (cyan gradient `linear-gradient(120deg,#b6f2ff,
+  #70becb)`, dark text, phone icon on the right) → `tel:+46102657979`. Both: 16px
+  radius (the site's `--radius-m`), soft shadow `0 0 16px rgba(241,241,241,.23)`,
+  Outfit 400, the site's clamp() padding, full-width stack at <=478px. In
+  production, reuse Bricks' existing `green-button` / `blue-cta` + `bricks-button`
+  classes so they stay 1:1 with the site automatically.
 - **What `layout="hero"` changes inside the tool:** the *entry* state becomes
   compact, with a fixed top-to-bottom order:
   1. **Search** field.
@@ -268,23 +270,37 @@ the right. Two rules:
   (split hero + "Så funkar det"). The FAQ and final CTA are intentionally NOT in
   this prototype — they come from existing site blocks placed below. Use the file
   as the visual + copy source of truth when assembling the Bricks section.
-- **"Så funkar det":** 3 cards in the Ampy style (gradient icon badges + step
-  number chips + a desktop connector line). Copy is tool-specific: Välj ditt jobb
-  / Få ditt besked / Gör nästa steg.
+- **"Så funkar det":** 3 cards on a navy band (flat white cards + flat
+  teal-stroke icon tiles + step number chips + a desktop connector line). Copy is
+  tool-specific: Välj ditt jobb / Få ditt besked / Gör nästa steg.
 
 ---
 
 ## 9. The lead flow (read carefully)
 
-**Current flow:** all quote/expert CTAs are plain links to
-`https://ampy.se/offert/` (`meta.ampy_offert_url`). Leads are therefore captured
-on Ampy's existing quote page, NOT inside the tool.
+**Current flow (since 5.6.0):** the verdict advice CTA ("Få kostnadsfri
+rådgivning", `meta.cta_advice_label`) opens an **in-tool lead form** (render mode
+`leadOpen` → `renderLeadBlock`). Fields: Namn, E-post, Telefon, Postnummer + a
+required GDPR consent. It prefills the job + verdict context and POSTs JSON to
+`/wp-json/ampy-bk/v1/lead`. All form copy lives in `data.meta.lead_form`.
 
-**`includes/lead-endpoint.php`** is a finished REST endpoint (nonce + honeypot +
-GDPR consent + validation) for a future *embedded* quote form. It is **disabled
-by default** (the require line is commented out in the plugin file). Only enable
-it if you build an inline form — you'd then also need to build a UI and a call to
-`/wp-json/ampy-bk/v1/lead` in JS.
+- **`includes/lead-endpoint.php`** is now **enabled** (the `require_once` in the
+  plugin file is active). It validates nonce + honeypot + consent, verifies the
+  `job_id` against the data file, and emails the admin (`do_action
+  ampy_bk_lead_received` is the hook to also persist as a CPT / forward to a CRM).
+- **Static preview behavior:** when there is no WordPress backend (`window.AmpyBK`
+  absent), `submitLead()` resolves a simulated success so the prototype demos the
+  full flow. In production it does a real `fetch` with the `X-WP-Nonce` header.
+- The hero left-column "Kontakta oss" / phone buttons are separate top-level
+  brand CTAs and still link to `/offert/` and `tel:+46102657979`.
+
+### 9.0 Analytics (since 5.6.0)
+A vendor-agnostic `track(event, props)` emits each funnel step twice: a
+`window.dataLayer.push` (GA4 / GTM) and a DOM `CustomEvent('elkollen:track')`.
+No-ops if nothing listens. Events: `tool_view`, `job_selected`, `question_shown`,
+`question_answered`, `verdict_shown` (job + color), `cta_click`,
+`lead_form_open`, `lead_submitted`, `share_opened`, `share_completed` (+channel),
+`verify_company_click`. Wire GA4/GTM or subscribe to the CustomEvent server-side.
 
 ### 9.1 Share: touch vs desktop
 `navigator.share` now exists on desktop Chrome/Edge/Safari too, so the share
