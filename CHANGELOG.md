@@ -2,6 +2,34 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 5.7.0 — Pixel-perfect pass (client feedback + multi-agent audit)
+Eight client fixes + a 6-dimension UX/UI audit (typography, spacing, color/contrast,
+mobile, components, flows). Highlights:
+- **Accessibility / contrast (WCAG AA):** new darkened text tokens
+  `--action-primary-text` (links) and `--action-primary-strong` (the solid primary
+  CTA fill) so labels clear 4.5:1; `--text-tertiary` darkened (source line, footnote,
+  placeholder, separator now legible); tokenized `--focus-ring`; hero CTAs got a
+  focus-visible ring.
+- **CTA buttons:** corrected radius to **8px** (the real ampy.se cascade value);
+  on mobile they are full-width, 44px tall, label+icon centered (not split).
+- **Lead form:** Telefon + Postnummer now required (client); intro reworded to
+  "Ampys behöriga elektriker hör av sig..." (no job suffix); submit height matches
+  the 48px inputs; submit/foot spacing fixed.
+- **Hierarchy / rhythm:** verdict badge is now the dominant heading (fs-20/700);
+  hero `--fs-14`/`--fs-15` split back to distinct steps; even 14px rhythm between the
+  stacked entry blocks; search input unified to the 48px input size; search icon
+  centered height-independently.
+- **Consistency:** unified the go-back affordance (breadcrumb / lead / success) to one
+  calm style; back links + breadcrumb to 44px; cite-chip padding on the token scale;
+  quick-pick dot spacing via flex gap; removed dead trust-row CSS; consent checkbox
+  bound to its own class.
+- **Client copy/structure:** removed the hero honesty line; removed the RED
+  registration trust line (share kept, right-aligned); long quick-pick (DCL) shows a
+  shorter one-line chip label.
+- **Trust bullets:** consistent icon size/gap, optically aligned to the first line.
+- Yellow verdict documented as supported-but-unused (forward-ready).
+- Version -> 5.7.0; data -> 5.7.
+
 ## 5.6.0 — Lead capture, analytics, CTA 1:1 redo, UX/UI pass
 Built from a multi-agent audit (UX, UI, CRO, copy). Highlights:
 - **In-tool lead form (NEW).** The verdict advice CTA now opens an on-page form

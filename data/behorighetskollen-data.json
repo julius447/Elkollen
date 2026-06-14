@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "5.6",
+    "version": "5.7",
     "product_name": "Elkollen",
     "page_heading": "Koppla elen",
     "page_lead": "Se direkt vilka eljobb du får göra själv.",
@@ -17,14 +17,14 @@
     "cta_advice_label": "Få kostnadsfri rådgivning",
     "lead_form": {
       "title": "Få kostnadsfri rådgivning",
-      "intro": "En behörig elektriker hör av sig med ett förslag, oftast inom en arbetsdag. Gäller:",
+      "intro": "Ampys behöriga elektriker hör av sig med ett förslag, oftast inom en arbetsdag.",
       "submit": "Skicka förfrågan",
       "submitting": "Skickar…",
       "foot": "Kostnadsfritt och utan förbindelse.",
       "back": "Tillbaka till beskedet",
       "consent": "Jag godkänner att Ampy sparar mina uppgifter för att kontakta mig med ett förslag, enligt ",
       "consent_link": "integritetspolicyn",
-      "error_required": "Fyll i namn och e-post och godkänn villkoren.",
+      "error_required": "Fyll i alla fält och godkänn villkoren.",
       "error_send": "Något gick fel. Ring oss på 010-265 79 79 så hjälper vi dig.",
       "success_title": "Tack! Vi hör av oss inom kort.",
       "success_body": "En behörig elektriker återkommer med ett förslag, oftast inom en arbetsdag.",
@@ -47,6 +47,7 @@
       }
     },
     "yellow": {
+      "_status": "SUPPORTED, currently unused. No job/option resolves to 'yellow' in this dataset; the badge, tab accent and CTA branch are kept ready for future conditional jobs whose answer is a genuine gray area. Intentional, not dead code.",
       "label": "Det beror på",
       "icon": "alert",
       "token": "--state-warning",
@@ -105,6 +106,7 @@
     {
       "id": "byta-armatur-dcl",
       "label": "Byta taklampa med stickpropp (DCL)",
+      "chip_label": "Byta taklampa (DCL)",
       "icon": "lamp",
       "service_page_url": "https://ampy.se/elservice/armatur/",
       "type": "fixed",

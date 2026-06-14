@@ -57,20 +57,18 @@
       font-weight: 700; line-height: 1.08; letter-spacing: -.02em;
       margin: 0 0 2rem;
     }
-    .hero__sub { font-size: 1.8rem; line-height: 1.55; color: var(--pg-ink-2); max-width: 46ch; margin: 0 0 2rem; }
-    .hero__honesty {
-      font-size: 1.5rem; line-height: 1.5; color: var(--pg-ink);
-      border-left: 3px solid var(--pg-teal); padding: .4rem 0 .4rem 1.4rem;
-      margin: 0 0 2.8rem; font-style: italic;
-    }
-    .hero__trust { list-style:none; padding:0; margin:0 0 2.8rem; display:flex; flex-direction:column; gap:1.2rem; }
-    .hero__trust li { display:flex; align-items:flex-start; gap:1rem; font-size:1.4rem; font-weight:500; color: var(--pg-ink); }
-    .hero__trust svg { width:2rem; height:2rem; color: var(--pg-teal); flex-shrink:0; }
+    .hero__sub { font-size: 1.8rem; line-height: 1.55; color: var(--pg-ink-2); max-width: 46ch; margin: 0 0 2.8rem; }
+    /* Trust bullets: fixed-size icons, consistent gap, icon optically aligned to
+       the first text line (line-height 1.45 -> ~10px to the cap of a 2rem icon). */
+    .hero__trust { list-style:none; padding:0; margin:0 0 2.8rem; display:flex; flex-direction:column; gap:1.4rem; }
+    .hero__trust li { display:flex; align-items:flex-start; gap:1.2rem; font-size:1.5rem; line-height:1.45; font-weight:500; color: var(--pg-ink); }
+    .hero__trust svg { width:2rem; height:2rem; min-width:2rem; margin-top:.3rem; color: var(--pg-teal); flex-shrink:0; } /* optical nudge to first-line cap */
     /* Ampy homepage CTA buttons — 1:1 replica of ampy.se hero gradient buttons
        (.green-button + .blue-cta button). Values taken from the live site's CSS:
        "Kontakta oss" = green->teal gradient linear-gradient(120deg,#55ff9a,#5eb1bf)
        with an arrow-up-right icon; "010-265 79 79" = cyan gradient with phone icon.
-       Both: 16px radius (var --radius-m), soft shadow, dark text #1e1e1e, Outfit
+       Both: 8px radius (the live cascade resolves .bricks-button:not([type=submit])
+       last, so 8px wins over --radius-m), soft shadow, dark text #1e1e1e, Outfit
        400, the site's clamp() padding tokens (--apspace-xs vertical, --space-m
        horizontal), icon pushed right via space-between. Root is 62.5% (1rem=10px)
        just like ampy.se, so the clamp() formulas render identically. */
@@ -79,9 +77,10 @@
       column-gap:2rem; row-gap:1.2rem; justify-content:flex-start;
     }
     .ampy-btn {
+      box-sizing:border-box;
       display:inline-flex; align-items:center; justify-content:space-between; gap:2rem;
       padding: clamp(1.02rem, calc(0.39vw + 0.9rem), 1.4rem) clamp(2rem, calc(2rem + 0.0044 * (100vw - 380px)), 2.4rem);
-      border:0; border-radius:16px;
+      border:0; border-radius:8px;
       box-shadow: 0 0 16px 0 rgba(241,241,241,0.23);
       font-family:'Outfit', system-ui, sans-serif;
       font-size: clamp(1.4rem, calc(0.21vw + 1.33rem), 1.6rem);
@@ -89,12 +88,14 @@
       text-decoration:none; cursor:pointer; transition: opacity 150ms ease, box-shadow 150ms ease;
     }
     .ampy-btn:hover { opacity:.92; box-shadow:0 0 20px 0 rgba(9,11,50,.10); }
+    .ampy-btn:focus-visible { outline:2px solid var(--pg-teal); outline-offset:2px; }
     .ampy-btn svg { flex-shrink:0; }
     .ampy-btn--primary { background-image: linear-gradient(120deg, #55ff9a 0%, #5eb1bf 100%); }
     .ampy-btn--phone   { background-image: linear-gradient(120deg, #b6f2ff 0%, #70becb 100%); }
     @media (max-width: 478px) {
       .hero__cta-row { width:100%; }
-      .ampy-btn { width:100%; max-width:100%; }
+      /* full-width tap target >=44px; group label+icon centered (not split) */
+      .ampy-btn { width:100%; max-width:100%; min-height:4.4rem; justify-content:center; gap:1.2rem; }
     }
 
     /* ---------- SÅ FUNKAR DET (navy band, flat white cards) ---------- */
@@ -172,7 +173,6 @@
       <div class="hero__copy">
         <h1 class="hero__h1">Får du fixa elen själv? Ta reda på det innan du börjar.</h1>
         <p class="hero__sub">Elkollen ger dig ett tydligt besked direkt, baserat på Elsäkerhetslagen. Hela svaret är gratis, ingen mejladress behövs.</p>
-        <p class="hero__honesty">Vi tjänar inget på att skrämma dig. Säger Elkollen grönt, säger vi grönt, även om det betyder att du inte behöver oss.</p>
         <ul class="hero__trust">
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Lagbaserat besked, byggt på Elsäkerhetslagen och Elsäkerhetsverket</li>
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg> Registrerat elinstallationsföretag</li>

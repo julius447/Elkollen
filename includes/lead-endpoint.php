@@ -31,9 +31,9 @@ add_action( 'rest_api_init', function () {
             'job_id'     => array( 'required' => true, 'type' => 'string' ),
             'verdict'    => array( 'required' => true, 'type' => 'string' ),
             'namn'       => array( 'required' => true, 'type' => 'string' ),
-            'kontakt'    => array( 'required' => true, 'type' => 'string' ), // e-post (eller telefon)
-            'telefon'    => array( 'required' => false, 'type' => 'string' ),
-            'postnummer' => array( 'required' => false, 'type' => 'string' ),
+            'kontakt'    => array( 'required' => true, 'type' => 'string' ), // e-post
+            'telefon'    => array( 'required' => true, 'type' => 'string' ),
+            'postnummer' => array( 'required' => true, 'type' => 'string' ),
             'meddelande' => array( 'required' => false, 'type' => 'string' ),
             'samtycke'   => array( 'required' => true, 'type' => 'boolean' ),
             'webbplats'  => array( 'required' => false, 'type' => 'string' ), // honeypot
@@ -58,8 +58,8 @@ function ampy_bk_handle_lead( WP_REST_Request $request ) {
     $meddelande = sanitize_textarea_field( $request->get_param( 'meddelande' ) );
     $samtycke   = (bool) $request->get_param( 'samtycke' );
 
-    if ( ! $namn || ! $kontakt ) {
-        return new WP_Error( 'ampy_bk_missing', 'Namn och kontaktuppgift krävs.', array( 'status' => 400 ) );
+    if ( ! $namn || ! $kontakt || ! $telefon || ! $postnummer ) {
+        return new WP_Error( 'ampy_bk_missing', 'Namn, e-post, telefon och postnummer krävs.', array( 'status' => 400 ) );
     }
     if ( ! $samtycke ) {
         return new WP_Error( 'ampy_bk_consent', 'Vi behöver ditt samtycke för att höra av oss.', array( 'status' => 400 ) );

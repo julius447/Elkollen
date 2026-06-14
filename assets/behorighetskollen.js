@@ -527,22 +527,12 @@
       ]);
 
       if (verdictKey === 'red') {
-        // RÖD: solid teal advice-CTA (primary) + outline "Läs mer..." + trust-rad
-        // med share-ikon på samma rad.
+        // RÖD: solid teal advice-CTA (primary) + outline "Läs mer..." + share.
         wrap.appendChild(adviceBtn('ampy-bk__cta-primary ampy-bk__cta-primary--solid'));
         wrap.appendChild(readMore('ampy-bk__cta-secondary'));
-
-        const trustRow = el('div', { class: 'ampy-bk__trust-row' });
-        trustRow.appendChild(el('p', { class: 'ampy-bk__trust' }, [
-          'Ampy är registrerat hos Elsäkerhetsverket, ',
-          el('a', {
-            href: this.data.meta.verify_company_url, target: '_blank', rel: 'noopener noreferrer',
-            onclick: () => track('verify_company_click', { job_id: job.id, verdict: verdictKey })
-          }, 'verifiera oss'),
-          '.'
-        ]));
-        trustRow.appendChild(this.renderShareButton(job, verdictKey));
-        wrap.appendChild(trustRow);
+        const shareRow = el('div', { class: 'ampy-bk__share-row' });
+        shareRow.appendChild(this.renderShareButton(job, verdictKey));
+        wrap.appendChild(shareRow);
 
       } else if (verdictKey === 'green') {
         // GRÖN: lugn primär "Läs mer om..." (DIY-guiden) + diskret advice-länk + share
@@ -584,8 +574,7 @@
       block.appendChild(el('h2', { class: 'ampy-bk__lead-title', id: 'ampy-bk-lead-h', 'data-focus-target': '' },
         f.title || 'Få kostnadsfri rådgivning'));
       block.appendChild(el('p', { class: 'ampy-bk__lead-intro' },
-        (f.intro || 'En behörig elektriker hör av sig med ett förslag, oftast inom en arbetsdag.')
-        + ' ' + this._shortLabel(job.label) + '.'));
+        f.intro || 'Ampys behöriga elektriker hör av sig med ett förslag, oftast inom en arbetsdag.'));
 
       const form = el('form', { class: 'ampy-bk__lead-form', novalidate: 'true' });
       const field = (name, label, type, required, inputmode) => {
@@ -601,8 +590,8 @@
       };
       const namn  = field('namn', 'Namn', 'text', true);
       const epost = field('epost', 'E-post', 'email', true, 'email');
-      const tel   = field('telefon', 'Telefon', 'tel', false, 'tel');
-      const post  = field('postnummer', 'Postnummer', 'text', false, 'numeric');
+      const tel   = field('telefon', 'Telefon', 'tel', true, 'tel');
+      const post  = field('postnummer', 'Postnummer', 'text', true, 'numeric');
 
       const grid = el('div', { class: 'ampy-bk__lead-grid' });
       grid.appendChild(namn.wrapF); grid.appendChild(epost.wrapF);
@@ -639,8 +628,9 @@
         e.preventDefault();
         errorBox.hidden = true;
         if (honey.value) return; // bot
-        if (!namn.input.value.trim() || !epost.input.value.trim() || !consent.checked) {
-          errorBox.textContent = f.error_required || 'Fyll i namn och e-post och godkänn villkoren.';
+        if (!namn.input.value.trim() || !epost.input.value.trim() ||
+            !tel.input.value.trim() || !post.input.value.trim() || !consent.checked) {
+          errorBox.textContent = f.error_required || 'Fyll i alla fält och godkänn villkoren.';
           errorBox.hidden = false;
           return;
         }
@@ -660,8 +650,10 @@
               el('span', { class: 'ampy-bk__lead-success-icon', html: icon('check'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
               el('h2', {}, f.success_title || 'Tack! Vi hör av oss inom kort.'),
               el('p', {}, f.success_body || 'En behörig elektriker återkommer med ett förslag, oftast inom en arbetsdag.'),
-              el('button', { class: 'ampy-bk__cta-link', type: 'button', onclick: () => this.closeLead() },
-                f.success_back || 'Tillbaka till beskedet')
+              el('button', { class: 'ampy-bk__lead-back', type: 'button', style: 'margin:0', onclick: () => this.closeLead() }, [
+                el('span', { html: icon('arrowLeft'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
+                f.success_back || 'Tillbaka till beskedet'
+              ])
             ])
           );
           const t = block.querySelector('[data-focus-target]');
@@ -950,7 +942,7 @@
         }, [
           el('span', { class: `ampy-bk__dot ampy-bk__dot--${grp}`, 'aria-hidden': 'true' }),
           el('span', { html: icon(j.icon === 'search' ? 'felsok' : j.icon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-          el('span', {}, j.label)
+          el('span', {}, j.chip_label || j.label)
         ]));
         chips.appendChild(li);
       });
