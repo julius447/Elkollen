@@ -1,0 +1,329 @@
+# Elkollen — Technical handover (for the implementation agent)
+
+> **Reader:** Chris's Claude Code implementation agent (and any developer who
+> touches the code). This document explains *every* part of the tool:
+> architecture, data contract, engine, view, WordPress/Bricks integration, the
+> lead flow, known pitfalls, and how to extend it without breaking anything.
+>
+> **The human checklist is separate, in `CHECKLIST.md`** — that's what Chris
+> follows step by step. This document is the reference the agent looks things up in.
+>
+> **Language:** developer docs and the guidance below are in English. The product
+> UI strings live in `data/behorighetskollen-data.json` and are **Swedish** by
+> design (the tool serves Swedish homeowners). Do not translate the UI copy.
+> The inline comments inside `assets/*.css` and `assets/*.js` are still in
+> Swedish; translate on request if needed (they are implementation notes, not
+> handover documentation).
+
+---
+
+## 0. TL;DR (if you read only one thing)
+
+- This is a **standalone WordPress plugin** exposing a shortcode `[elkollen]`
+  (alias `[behorighetskollen]`). Drop the shortcode in Bricks, done.
+- **All copy, all rules, all links live in `data/behorighetskollen-data.json`.**
+  Never edit text in PHP/JS/CSS. Edit the data file.
+- **No build step, no npm deps, no external API.** Pure PHP + vanilla JS + CSS.
+- **Launch gate:** a certified electrician (auktoriserad elinstallatör) must sign
+  off on the job matrix before public launch. See `meta._pending_verification`.
+- **Bump `AMPY_BK_VERSION`** in `ampy-behorighetskollen.php` on every CSS/JS
+  change (cache-busting).
+
+---
+
+## 1. What the tool does (product summary)
+
+A homeowner selects an electrical job (e.g. "byta vägguttag" / replace a wall
+outlet) and gets a categorical verdict:
+
+- 🟢 **GREEN** — "Det här får du göra själv" (you may do this yourself)
+- 🟡 **YELLOW** — "Det beror på" (it depends; used only as an intermediate — a
+  conditional job asks a question and each answer resolves to green or red)
+- 🔴 **RED** — "Det här kräver elektriker" (requires a certified electrician)
+
+Each verdict shows the legal source, an explanation (✓ allowed / ✗ requires an
+electrician), and either **Tips** (green) or **Consequences** (red), plus a CTA
+(quote on red, "read more" on green) and a share function.
+
+The tool drives three things at once: free value (viral/shareable), SEO
+(internal links to 23 Ampy service pages), and quote leads (red verdicts).
+
+---
+
+## 2. Non-negotiable (do not touch)
+
+1. **The data file is the single source of truth.** No UI text is hardcoded in
+   PHP/JS/CSS. To change a word, edit `data/behorighetskollen-data.json`.
+2. **The verdict logic and the 26 jobs' outcomes** are verified against
+   Elsäkerhetsverket (the Swedish Electrical Safety Authority, June 2026) and
+   await the electrician's sign-off. Do not change a verdict without re-review.
+3. **No em-dashes (—) in UI text.** Use periods/commas. (Em-dashes appear only in
+   internal `_`-prefixed dev notes in the data, never in the UI.)
+4. **Color discipline:** the solid teal button (`--action-primary`) appears ONLY
+   on red ("Få kostnadsfri offert" / get a free quote). Green stays calm
+   (outline + text link).
+5. **The heading (H2 + lead) lives OUTSIDE the tool** — in Bricks as separate
+   elements above the shortcode. The tool never carries its own page H2 (for SEO).
+6. **The QA bar** ("⌘ QA-genvägar (preview only)") exists only in
+   `preview/index.html` and must NEVER ship to production. It is not part of the
+   plugin output.
+
+---
+
+## 3. File tree and what each file does
+
+```
+ampy-behorighetskollen/
+├── ampy-behorighetskollen.php      Plugin entry: shortcode, asset enqueue, OG meta
+├── data/
+│   └── behorighetskollen-data.json THE SINGLE SOURCE OF TRUTH — 26 jobs, rules, copy, links
+├── assets/
+│   ├── behorighetskollen.css       All design (tokens scoped to .ampy-bk)
+│   ├── behorighetskollen.js        The entire tool (vanilla ES6, no build)
+│   └── og/                         OG share images (designer drops PNGs here)
+│       └── README.md
+├── includes/
+│   ├── render.php                  Server-rendered mount + crawlable fallback
+│   └── lead-endpoint.php           REST endpoint for inline leads (DISABLED by default)
+├── preview/
+│   └── index.html                  Local preview (NOT for production)
+├── README.md                       Overview + pointer to this file and CHECKLIST.md
+├── HANDOVER.md                     This document
+├── CHECKLIST.md                    Human checklist for Chris
+└── CHANGELOG.md                    Version history
+```
+
+---
+
+## 4. Architecture — three layers + a PHP shell
+
+```
+DATA (truth)                ENGINE (logic)               VIEW (presentation)
+──────────────              ──────────────               ─────────────────
+behorighetskollen     ───▶  resolve(job, answer)   ───▶  ONE block, three modes:
+-data.json                  jobGroup(job)                · entry  (room picker + search)
+                            URL = state                  · question (intermediate step)
+26 jobs, rules,             adaptive opening             · verdict (the answer)
+tips, sources, rooms                                     Explanation/Tips/Consequences tabs
+        ▲                                                         │
+        │                                          PHP: shortcode + enqueue +
+  edited after                                     render.php (crawlable fallback) +
+  electrician sign-off                             dynamic OG meta per ?jobb=
+```
+
+**How it loads in WordPress (data flow):**
+1. The page contains the shortcode `[elkollen]`.
+2. `ampy_bk_shortcode()` runs: enqueues CSS+JS, and `wp_localize_script` injects
+   the ENTIRE data file as `window.AmpyBK.data` (no extra HTTP round trip).
+3. `render.php` prints the mount point `<div class="ampy-bk">` with a
+   server-rendered **crawlable fallback** (all jobs as links) inside it.
+4. JS boots on `DOMContentLoaded`, reads `window.AmpyBK.data`, removes the
+   fallback, and renders the tool.
+
+**Robustness (why uptime is high):**
+- No external runtime API. The data is a static file bundled in the plugin.
+- If JS doesn't run (old browser, JS disabled): the server-rendered fallback
+  shows all jobs as real links → search engines + no-JS users still work.
+- If the data file is missing/corrupt: PHP returns a clear error message instead
+  of a crashed page.
+- Fonts: loaded from Google Fonts via CSS but with a `system-ui` fallback → never
+  breaks if Google Fonts is blocked (see §11 on GDPR/self-hosting).
+
+---
+
+## 5. The data contract (`data/behorighetskollen-data.json`)
+
+### 5.1 `meta`
+| Field | Purpose |
+|---|---|
+| `version` | Data version. Keep in sync with `AMPY_BK_VERSION` in PHP. |
+| `product_name` | "Elkollen" — used in the OG title. |
+| `page_heading` / `page_lead` | Reference text for the H2 + lead (placed in Bricks above the tool). `page_lead` is also used in the crawlable fallback. |
+| `reviewed_by` / `last_reviewed` | Filled in by the electrician at sign-off. |
+| `_pending_verification` | **Launch-gate flag.** Read it. |
+| `disclaimer` | Persistent disclaimer. |
+| `koppla_sakert_url` | External reference. |
+| `verify_company_url` | Ampy's exact entry in Elsäkerhetsverket's company register ("verifiera oss" / verify us). |
+| `ampy_offert_url` | `https://ampy.se/offert/` — all quote/expert CTAs. |
+| `contact_url` | = the quote URL (green "Anlita expert?" / hire an expert). |
+| `quick_picks` | 8 job IDs shown as "Vanliga eljobb" (common jobs) in the entry mode. |
+
+### 5.2 `verdicts` (green / yellow / red)
+| Field | Purpose |
+|---|---|
+| `label` | The verdict wording (badge). |
+| `icon` | Icon key. |
+| `token` | Design-system token. |
+| `caveat` / `caveat_short` | The competence caveat (shown on green). |
+| `consequence` | Text in the Consequences tab (red). |
+| `_consequence_verify` | Dev note: the penalty paragraph 48§/49§ must be confirmed at sign-off. |
+| `source` | `{ text, url }` — the **per-verdict source** (green → Elsäkerhetsverket, red → Elsäkerhetslagen §27). |
+
+### 5.3 `rooms` (5 of them)
+`{ id, label, icon, jobs: [job-id, ...] }`. Drives the room chips in entry mode.
+Order in the UI = order in the array (Badrum/Bathroom first).
+
+### 5.4 `jobs` (26 of them)
+| Field | Required | Purpose |
+|---|---|---|
+| `id` | ✓ | URL slug (`?jobb=<id>`). **NOTE:** `byta-gloldlampa` is misspelled but is a stable ID — do NOT rename (it would break links). |
+| `label` | ✓ | The job's name. |
+| `icon` | ✓ | Icon key (see §7). |
+| `service_page_url` | ✓ | Absolute Ampy URL ("Läs mer om…" / read more). |
+| `type` | ✓ | `"fixed"` or `"conditional"`. |
+| `default_verdict` | (fixed) | green/yellow/red. |
+| `question` | (cond) | The question in the intermediate step. |
+| `options[]` | (cond) | 2–3 answers, each: `label`, `clarifier`, `verdict`, `summary`, `do`, `dont` (+ optional `source` override). |
+| `summary` | ✓ | **The principle** (one sentence). Must NEVER be the same as `do`. |
+| `do` | ✓ | The exact allowed action (the ✓ row). |
+| `dont` | ✓ | The boundary (the ✗ row). |
+| `tips[]` | (green jobs) | `{ text, allowed }`. `allowed:true` → ✓ (something you may do), `allowed:false` → ✗ (the stop condition). |
+| `rule_citation` | ✓ | Short legal reference (internal; the source chip shows `source.text`). |
+| `why_text` | ✓ | Longer explanation (internal reference / OG fallback). |
+| `source_quote` | – | Optional verbatim Elsäkerhetsverket quote. |
+| `related_jobs[]` | ✓ | 2–3 job IDs (internal cross-linking). |
+
+**Copywriting IA (critical — must not regress):** In the Explanation tab the
+order, top to bottom, is: `summary` (principle, bold) → ✓ `do` (exact action) →
+✗ `dont` (boundary) → (green) caveat note. **`summary` ≠ `do`** — otherwise it
+reads as a duplicate. This was an explicit client fix; guard it.
+
+---
+
+## 6. The engine (`behorighetskollen.js`)
+
+- `resolve(job, answerIndex)` — pure function: `fixed` → `default_verdict`;
+  `conditional` without an answer → `ask`; with an answer → `options[i].verdict`.
+- `jobGroup(job)` — classifies a job as green/depends/red for the grouping in the
+  entry list.
+- **URL = state:** `?jobb=<id>&svar=<index>`. Every verdict is a shareable,
+  indexable link. `popstate` is handled (the browser Back button works).
+- **Adaptive opening:** the mount attribute `data-preselect-job` (set by
+  `jobb="…"` on the shortcode) makes the tool open straight into that verdict.
+- **`backOne()`:** from a conditional verdict, "Tillbaka" (Back) goes to the
+  question step; from a fixed verdict or the question step, to the picker.
+- **Three render modes:** `renderEntryBlock` / `renderQuestionBlock` /
+  `renderVerdictBlock`.
+- **Tips ✓/✗:** `renderTips` reads `{text, allowed}` and shows a check or a cross.
+- **Share:** `renderShareButton` — on a touch device, `navigator.share` (native
+  sheet: Instagram/Messages/etc.); on desktop, a popover (Facebook/X/Reddit/
+  Email/Copy link). It also builds a canvas-based 1200×630 share card attached to
+  the native share. (See §9.1 for the touch-vs-desktop decision.)
+
+---
+
+## 7. Icons
+All icons are inline SVGs in the `ICONS` object in JS. A job's `icon` field points
+to a key there. New jobs need an existing or new key. Available job icons include:
+bulb, lamp, pendant, ceiling, spotlight, switch, outlet, panel, rcd, stove,
+appliance, outdoor, smart, heatpump, heat, balance, search, renovate, bath, cable,
+splice, kitchen, sofa, charger, solar, inspect.
+
+---
+
+## 8. WordPress / Bricks integration
+
+- **Shortcode:** `[elkollen]` (or `[behorighetskollen]`), optional `jobb="<id>"`
+  to preselect a job (the SEO lever, per service page).
+- **Enqueue:** CSS+JS load only on pages that contain the shortcode (no global weight).
+- **Heading:** add the H2 "Koppla elen" + the lead text as separate Bricks
+  elements ABOVE the shortcode element. (See CHECKLIST.md.)
+- **OG meta:** `ampy_bk_dynamic_og()` sets og:title/description/image when the URL
+  has `?jobb=`. Images: drop `green.png`/`yellow.png`/`red.png` (1200×630) in
+  `assets/og/`, optional per-job `<id>.png`.
+
+### 8.1 Hero layout (`layout="hero"`) — the split-hero landing page
+The landing page uses a **split hero**: marketing copy on the left, the tool on
+the right. Two rules:
+- **Bricks owns the split.** Build a 2-column section: left = native Bricks
+  elements (H1, lead `<p>`, trust list, micro-CTA link); right = the shortcode
+  `[elkollen layout="hero"]`. The plugin does NOT render the marketing copy or
+  the H1 (SEO: one clean page H1 owned by Bricks). Stack to 1 column < 768px.
+- **What `layout="hero"` changes inside the tool:** the *entry* state becomes
+  compact — search + 6 quick-pick chips (from `meta.quick_picks`) + a disclosure
+  row ("Se alla N jobb" · "Välj rum"). The full grouped 26-job list and the room
+  chips live in an **in-panel drawer** (progressive disclosure), so the hero
+  never grows tall. The type scale steps up one notch for hero readability.
+  Question and verdict render in the **same right panel** (no page jump; an
+  anti-collapse height floor smooths the swap). Everything is gated on
+  `this.heroMode` / scoped under `.ampy-bk--hero`; the default centered embed is
+  byte-for-byte unchanged.
+- **`jobb="…"` still works with hero:** `[elkollen jobb="golvvarme" layout="hero"]`
+  opens straight into that verdict in the hero panel.
+- **Reference implementation:** `preview/hero.html` is the full landing page
+  (split hero + trust band + "så funkar det" + FAQ + final CTA) — use it as the
+  visual + copy source of truth when assembling the Bricks section.
+- **Placeholders to replace before launch:** the trust-band numbers in the
+  reference ("4 200+ elkollar", "4,9/5") are placeholders — wire to real,
+  verifiable figures or remove.
+
+---
+
+## 9. The lead flow (read carefully)
+
+**Current flow:** all quote/expert CTAs are plain links to
+`https://ampy.se/offert/` (`meta.ampy_offert_url`). Leads are therefore captured
+on Ampy's existing quote page, NOT inside the tool.
+
+**`includes/lead-endpoint.php`** is a finished REST endpoint (nonce + honeypot +
+GDPR consent + validation) for a future *embedded* quote form. It is **disabled
+by default** (the require line is commented out in the plugin file). Only enable
+it if you build an inline form — you'd then also need to build a UI and a call to
+`/wp-json/ampy-bk/v1/lead` in JS.
+
+### 9.1 Share: touch vs desktop
+`navigator.share` now exists on desktop Chrome/Edge/Safari too, so the share
+button distinguishes by pointer type: on touch devices it uses the native share
+sheet (which surfaces Instagram, Messages, etc.); on desktop it opens the custom
+popover (Facebook / X / Reddit / Email / Copy link) for a consistent, designed
+experience. If you change this, keep the desktop popover — it is the intended UX.
+
+---
+
+## 10. How to extend (common changes)
+
+| You want to… | Do this (data file only) |
+|---|---|
+| Change a word/copy | Edit the field in `jobs[]`/`verdicts`/`meta`. Bump `version`. |
+| Add a job | Add an object to `jobs[]` (all fields per §5.4), add the ID to the right `rooms[].jobs` and optionally `quick_picks`, pick an `icon` key. |
+| Change a link | Edit `service_page_url`, `ampy_offert_url`, `source.url`, etc. |
+| Reorder rooms | Reorder `rooms[]`. |
+| Change heading/lead | `meta.page_heading` / `meta.page_lead` + update the Bricks elements. |
+
+**After changing CSS/JS:** bump `AMPY_BK_VERSION` in PHP (cache-busting).
+
+---
+
+## 11. Known pitfalls / pre-launch notes
+
+1. **Google Fonts (GDPR + uptime):** the CSS `@import`s Plus Jakarta Sans +
+   Outfit from `fonts.googleapis.com`. For a Swedish/EU site, **self-hosting** the
+   fonts is recommended (GDPR + performance + zero external dependency). The tool
+   does not break without them (system-ui fallback exists), but fix this before
+   launch. How: download the fonts, place them in `assets/fonts/`, and replace the
+   `@import` line in the CSS with local `@font-face` rules.
+2. **`AMPY_BK_VERSION`** must be bumped on every asset change, otherwise visitors
+   may get stale CSS/JS from cache.
+3. **PHP lint:** could not be run in the build environment (php was unavailable).
+   Run `php -l` on the three PHP files on staging before production.
+4. **Launch gate:** do NOT publish until the electrician has signed off. Set
+   `meta.reviewed_by` + `meta.last_reviewed` and remove `_pending_verification`.
+   Verify especially: the `fast-armatur` job (scope), the penalty paragraph
+   (48 § vs 49 §), and the 26 jobs' tips.
+5. **`byta-gloldlampa`** — misspelled ID but stable. Do not rename (breaks URLs).
+6. **The QA bar** in `preview/index.html` must never reach production (it exists
+   only there, not in the plugin output).
+
+---
+
+## 12. Verification suite (test this after installation)
+
+See `CHECKLIST.md` §7 for the full test matrix. The essentials:
+- Entry mode: search + 5 room chips + grouped list (green/depends/red).
+- Conditional (e.g. `byta-vagguttag`): question → answer → verdict. Back → the question.
+- Green verdict: the Tips tab shows ✓ for three tips and ✗ for the stop tip.
+- Red verdict: solid "Få kostnadsfri offert" + the §27 source + the trust row.
+- Share: popover on desktop, native sheet on a touch device.
+- Mobile 360 px: nothing clipped, chips scroll inside the block, badge on one line.
+- All links: quote → /offert/, "Läs mer" → the right /elservice/ page,
+  "verifiera oss" → Ampy's register entry.

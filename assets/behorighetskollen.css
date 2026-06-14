@@ -1,0 +1,1162 @@
+/* ============================================================================
+   Elkollen v5 — Craft-passet
+   Pixel-trogen översättning av godkända designreferenser.
+   Mellansteget (fråga) och beskedsskärmen (verdict) är designade om till
+   en komponerad layout: titel + klargörande underrad på svar, alltid synlig
+   informationsnotis, badge → källchip länkade av accent, summary följt av
+   ✓/✗ kontrastrader, förbehållsnotis på grön, lugn CTA på grön / solid på röd.
+
+   Rem-bas: html font-size 62.5% (= 10 px) — alla rem-värden tolkas på den basen.
+   Tokens: aldrig råa värden i komponenter; endast semantiska CSS-variabler.
+   ============================================================================ */
+html { font-size: 62.5%; }
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Outfit:wght@400;500;600&display=swap');
+
+.ampy-bk {
+  /* ---------- Color tokens ---------------------------------------------- */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f4f5fb;
+  --bg-surface: rgb(9, 11, 50);
+
+  --text-primary: rgb(9, 11, 50);
+  --text-secondary: #5a5d7a;
+  --text-tertiary: #8a8da5;
+  --text-inverse: #ffffff;
+  --text-info: rgb(10, 122, 191);
+  --text-success: rgb(15, 110, 86);
+
+  --action-primary: rgb(0, 169, 145);
+
+  --state-success: rgb(57, 194, 129);
+  --state-warning: rgb(245, 175, 25);
+  --state-error: rgb(220, 53, 69);
+
+  --border-default: #e3e5ed;
+  --border-tertiary: #ebedf3;
+  --border-focus: rgb(0, 169, 145);
+
+  /* ---------- Verdict ramps (per-verdict bindings) --------------------- */
+  --verdict-accent: var(--state-success);
+  --verdict-badge-bg: rgb(93, 202, 165);
+  --verdict-badge-fg: rgb(4, 52, 44);
+
+  /* ---------- Spacing scale (10 px rem-bas) ---------------------------- */
+  --space-1: 0.4rem;  /*  4 px */
+  --space-2: 0.6rem;  /*  6 px */
+  --space-3: 0.8rem;  /*  8 px */
+  --space-4: 1.0rem;  /* 10 px */
+  --space-5: 1.2rem;  /* 12 px */
+  --space-6: 1.4rem;  /* 14 px */
+  --space-7: 1.6rem;  /* 16 px */
+  --space-8: 1.8rem;  /* 18 px */
+  --space-9: 2.0rem;  /* 20 px */
+  --space-10: 2.2rem; /* 22 px */
+  --space-11: 2.4rem; /* 24 px */
+  --space-12: 2.8rem; /* 28 px */
+  --space-13: 3.2rem; /* 32 px */
+
+  /* ---------- Radius / shadow ------------------------------------------ */
+  --radius-sm: 0.6rem;
+  --radius-md: 1.0rem;
+  --radius-lg: 1.4rem;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(11, 13, 42, 0.04);
+  --shadow-md: 0 6px 18px rgba(11, 13, 42, 0.06);
+  --shadow-lg: 0 14px 32px rgba(11, 13, 42, 0.1);
+
+  /* ---------- Type sizes (rem på 10 px-bas — matchar mockup px) -------- */
+  --fs-12: 1.2rem;
+  --fs-13: 1.3rem;
+  --fs-14: 1.4rem;
+  --fs-15: 1.5rem;
+  --fs-16: 1.6rem;
+  --fs-18: 1.8rem;
+  --fs-20: 2.0rem;
+
+  /* ---------- Block frame ---------------------------------------------- */
+  --block-max-width: 60rem; /* v5.1 A6: 600 px @ 10 px-bas, lugnt radmått */
+  --block-padding-y: var(--space-9);
+  --block-padding-x: var(--space-10);
+
+  /* Base */
+  font-family: 'Outfit', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.ampy-bk *,
+.ampy-bk *::before,
+.ampy-bk *::after {
+  box-sizing: border-box;
+}
+
+/* ============================================================================
+   BLOCK — vit yta, hårlinje-border, fast på desktop, naturligt flöde på mobil
+   ============================================================================ */
+.ampy-bk__block {
+  max-width: var(--block-max-width);
+  margin: var(--space-7) auto;
+  padding: var(--block-padding-y) var(--block-padding-x);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-tertiary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0; /* hanteras per-element via margin-bottom enligt mockup */
+}
+
+@media (max-width: 767px) {
+  /* v5.1 A2: gutter runt blocket på mobil — blocket får inte ligga
+     kant-i-kant. Yttre marginal = spacing-lg (1.5rem ≈ 15 px). */
+  .ampy-bk__block {
+    padding: var(--space-9) var(--space-9);
+    margin: var(--space-7) var(--space-7);
+  }
+}
+
+.ampy-bk__block { animation: ampy-bk-block 240ms ease both; }
+@keyframes ampy-bk-block {
+  from { opacity: 0; transform: translateY(2px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ampy-bk__block { animation: none !important; }
+}
+
+/* ============================================================================
+   BREADCRUMB — universellt mönster: ← Tillbaka · Jobbnamn
+   ============================================================================ */
+.ampy-bk__crumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-10);
+  min-height: 4.4rem;
+}
+
+.ampy-bk__crumb-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: none;
+  border: 0;
+  padding: var(--space-2) 0;
+  margin: 0;
+  font: inherit;
+  font-size: var(--fs-13);
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: color 150ms ease;
+}
+.ampy-bk__crumb-back:hover { color: var(--action-primary); }
+.ampy-bk__crumb-back:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+.ampy-bk__crumb-back svg { width: 1.6rem; height: 1.6rem; }
+
+.ampy-bk__crumb-sep {
+  color: var(--text-tertiary);
+  font-size: var(--fs-13);
+}
+
+.ampy-bk__crumb-job {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-13);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ============================================================================
+   QUESTION MODE — mellansteget
+   ============================================================================ */
+.ampy-bk__q-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: var(--fs-18);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text-primary);
+  letter-spacing: -0.005em;
+  margin: 0 0 var(--space-9);
+}
+
+.ampy-bk__options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-9);
+}
+
+.ampy-bk__option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  text-align: left;
+  padding: var(--space-6) var(--space-7);
+  font: inherit;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-tertiary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  min-height: 6.4rem;
+  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+.ampy-bk__option:hover {
+  border-color: var(--action-primary);
+  background: var(--bg-secondary);
+}
+.ampy-bk__option:active { transform: scale(0.997); }
+.ampy-bk__option:focus-visible {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(0, 169, 145, 0.18);
+}
+
+.ampy-bk__option-body { display: block; min-width: 0; flex: 1; }
+.ampy-bk__option-title {
+  display: block;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-15);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+.ampy-bk__option-clarifier {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-13);
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+.ampy-bk__option-arrow {
+  flex-shrink: 0;
+  width: 1.8rem;
+  height: 1.8rem;
+  color: var(--text-secondary);
+}
+
+/* Informationsnotis — alltid synlig (ersätter v3.1:s expansion) */
+.ampy-bk__info {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  margin: 0;
+}
+.ampy-bk__info-icon {
+  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-top: 0.2rem;
+  color: var(--text-info);
+}
+.ampy-bk__info-text {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-13);
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ============================================================================
+   JUDGMENT — badge + cite chip länkade av vänsteraccent
+   ============================================================================ */
+.ampy-bk__judgment {
+  display: flex;
+  gap: var(--space-5);
+  margin: 0 0 var(--space-10);
+  animation: ampy-bk-judgment 280ms cubic-bezier(0.2, 0.6, 0.2, 1) both;
+}
+
+@keyframes ampy-bk-judgment {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ampy-bk__judgment-accent {
+  width: 3px;
+  background: var(--verdict-accent);
+  border-radius: 0;
+  flex-shrink: 0;
+}
+
+.ampy-bk__judgment-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Verdict-badge: pill, ikon + ord, kontrastfärg */
+.ampy-bk__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-7);
+  background: var(--verdict-badge-bg);
+  color: var(--verdict-badge-fg);
+  border-radius: var(--radius-full);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: var(--fs-16);
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 0;
+  max-width: 100%;
+}
+.ampy-bk__badge svg { width: 1.8rem; height: 1.8rem; flex-shrink: 0; }
+
+/* Per-verdict bindings */
+.ampy-bk__judgment--green {
+  --verdict-accent: rgb(15, 110, 86);
+  --verdict-badge-bg: rgb(93, 202, 165);
+  --verdict-badge-fg: rgb(4, 52, 44);
+}
+.ampy-bk__judgment--yellow {
+  --verdict-accent: rgb(135, 101, 7);
+  --verdict-badge-bg: rgb(245, 201, 122);
+  --verdict-badge-fg: rgb(61, 42, 0);
+}
+.ampy-bk__judgment--red {
+  --verdict-accent: rgb(122, 22, 35);
+  --verdict-badge-bg: rgb(240, 149, 149);
+  --verdict-badge-fg: rgb(80, 19, 19);
+}
+
+/* Cite chip — direkt under badgen, kompakt */
+.ampy-bk__cite {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding: 0.5rem var(--space-4);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-12);
+  font-weight: 400;
+  line-height: 1.45;
+  border: 1px solid transparent;
+  transition: border-color 150ms ease, color 150ms ease;
+  max-width: 100%;
+}
+.ampy-bk__cite:hover {
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+.ampy-bk__cite:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 169, 145, 0.2);
+}
+.ampy-bk__cite svg {
+  width: 1.3rem;
+  height: 1.3rem;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+/* ============================================================================
+   TABS — tunn underline, två lägen
+   ============================================================================ */
+.ampy-bk__tabs {
+  display: flex;
+  gap: var(--space-11);
+  border-bottom: 1px solid var(--border-tertiary);
+  margin: 0 0 var(--space-9);
+}
+
+.ampy-bk__tab {
+  background: none;
+  border: 0;
+  padding: 0 0 var(--space-4);
+  margin: 0 0 -1px;
+  font: inherit;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-14);
+  font-weight: 400;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 150ms ease, border-color 150ms ease;
+  min-height: 4.4rem;
+}
+.ampy-bk__tab:hover { color: var(--text-primary); }
+.ampy-bk__tab[aria-selected="true"] {
+  color: var(--text-primary);
+  font-weight: 500;
+  border-bottom-color: var(--verdict-accent, var(--action-primary));
+}
+.ampy-bk__tab:focus-visible {
+  outline: none;
+  box-shadow: 0 -2px 0 var(--border-focus) inset;
+}
+
+/* ============================================================================
+   FÖRKLARING TAB — summary + ✓/✗ kontrastrader + caveat notis (grön)
+   ============================================================================ */
+.ampy-bk__tab-body { display: block; }
+
+.ampy-bk__summary {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-16);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-7);
+}
+
+.ampy-bk__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin: 0 0 var(--space-5);
+}
+/* Bump sista raden så det finns rejäl andrum före CTA (extra viktigt på röd,
+   där det inte finns någon caveat-notis som visuell buffer). */
+.ampy-bk__row:last-of-type { margin-bottom: var(--space-12); }
+
+.ampy-bk__row-icon {
+  flex-shrink: 0;
+  width: 1.8rem;
+  height: 1.8rem;
+  margin-top: 0.1rem;
+}
+.ampy-bk__row--do .ampy-bk__row-icon { color: var(--text-success); }
+.ampy-bk__row--dont .ampy-bk__row-icon { color: var(--text-tertiary); }
+
+.ampy-bk__row-text {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-15);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Caveat notice — bara på grön. Bärnstensfärg-accent, square corners. */
+.ampy-bk__caveat {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  border-left: 3px solid rgb(186, 117, 23);
+  border-radius: 0;
+  padding: 0.2rem 0 0.2rem var(--space-5);
+  margin: 0 0 var(--space-11);
+}
+.ampy-bk__caveat-icon {
+  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-top: 0.2rem;
+  color: rgb(186, 117, 23);
+}
+.ampy-bk__caveat-text {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-13);
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ============================================================================
+   TIPS TAB — punktlista
+   ============================================================================ */
+.ampy-bk__tips {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-11);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.ampy-bk__tip {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+.ampy-bk__tip-icon {
+  flex-shrink: 0;
+  width: 1.8rem;
+  height: 1.8rem;
+  margin-top: 0.1rem;
+}
+/* ✓ = något du FÅR göra (grön bock). ✗ = stopp-villkoret (dämpad). */
+.ampy-bk__tip--do .ampy-bk__tip-icon { color: var(--text-success); }
+.ampy-bk__tip--dont .ampy-bk__tip-icon { color: var(--text-tertiary); }
+.ampy-bk__tip-text {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-15);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
+   KONSEKVENSER TAB — text-block
+   ============================================================================ */
+.ampy-bk__consequence-text {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-15);
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-12);
+}
+
+/* ============================================================================
+   CTA — grön (lugn) / röd (solid teal primär)
+   ============================================================================ */
+.ampy-bk__cta-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-5);
+  margin: 0 0 var(--space-5);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-14);
+  font-weight: 500;
+  line-height: 1.3;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 150ms ease, background 150ms ease;
+  min-height: 4.4rem;
+}
+.ampy-bk__cta-primary:hover {
+  border-color: var(--action-primary);
+  background: var(--bg-secondary);
+}
+.ampy-bk__cta-primary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 169, 145, 0.25);
+}
+.ampy-bk__cta-primary svg { width: 1.6rem; height: 1.6rem; }
+
+/* Röd primär — solid teal */
+.ampy-bk__cta-primary--solid {
+  background: var(--action-primary);
+  color: var(--text-inverse);
+  border-color: var(--action-primary);
+}
+.ampy-bk__cta-primary--solid:hover {
+  opacity: 0.92;
+  background: var(--action-primary);
+  border-color: var(--action-primary);
+}
+
+/* Sekundär outline-knapp (röd) */
+.ampy-bk__cta-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-5);
+  margin: 0 0 var(--space-5);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-14);
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 150ms ease, background 150ms ease;
+  min-height: 4.4rem;
+}
+.ampy-bk__cta-secondary:hover {
+  border-color: var(--action-primary);
+  background: var(--bg-secondary);
+}
+.ampy-bk__cta-secondary:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 169, 145, 0.25);
+}
+
+/* Sekundär rad: "Anlita expert?" + share-ikon (grön CTA) */
+.ampy-bk__cta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: var(--space-2) 0;
+}
+/* v5.1 A5: tydlig klick-affordans utan att bli en solid säljknapp.
+   Texten är i action-primary med understrykning så det läser som länk;
+   ramlös, ingen bakgrund — håller grön skärm lugn. */
+.ampy-bk__cta-link {
+  background: none;
+  border: 0;
+  padding: var(--space-2) 0;
+  margin: 0;
+  font: inherit;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-14);
+  font-weight: 500;
+  color: var(--action-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  cursor: pointer;
+  transition: color 150ms ease, text-decoration-thickness 150ms ease;
+  min-height: 4.4rem;
+  display: inline-flex;
+  align-items: center;
+}
+.ampy-bk__cta-link:hover {
+  color: var(--text-primary);
+  text-decoration-thickness: 2px;
+}
+.ampy-bk__cta-link:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+.ampy-bk__share-anchor {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ampy-bk__share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.4rem;
+  height: 4.4rem;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  transition: color 150ms ease, background 150ms ease;
+}
+.ampy-bk__share:hover { color: var(--text-primary); background: var(--bg-secondary); }
+.ampy-bk__share:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+.ampy-bk__share svg { width: 1.8rem; height: 1.8rem; }
+
+/* Share popover (desktop / ingen native share) */
+.ampy-bk__share-menu {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--space-2));
+  z-index: 20;
+  min-width: 17rem;
+  padding: var(--space-2);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  animation: ampy-bk-pop 140ms ease both;
+}
+.ampy-bk__share-menu[hidden] { display: none; }
+@keyframes ampy-bk-pop {
+  from { opacity: 0; transform: translateY(4px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ampy-bk__share-menu { animation: none; }
+}
+
+.ampy-bk__share-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-14);
+  font-weight: 500;
+  color: var(--text-primary);
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+  transition: background 150ms ease;
+  min-height: 4rem;
+}
+.ampy-bk__share-item:hover { background: var(--bg-secondary); }
+.ampy-bk__share-item:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: -2px;
+}
+.ampy-bk__share-item-icon {
+  flex-shrink: 0;
+  width: 1.8rem;
+  height: 1.8rem;
+  color: var(--text-secondary);
+}
+.ampy-bk__share-item:hover .ampy-bk__share-item-icon { color: var(--text-primary); }
+
+.ampy-bk__share-status {
+  font-size: var(--fs-12);
+  color: var(--text-success);
+  opacity: 0;
+  transition: opacity 200ms ease;
+  margin-left: var(--space-3);
+}
+.ampy-bk__share-status[data-visible="true"] { opacity: 1; }
+
+/* Trust-rad (röd CTA) — share-ikon sitter inline på samma rad (v5.2) */
+.ampy-bk__trust-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+}
+.ampy-bk__trust {
+  flex: 1;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-12);
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0;
+  min-width: 0;
+}
+.ampy-bk__trust a {
+  color: var(--action-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.ampy-bk__trust a:hover { color: var(--text-primary); }
+.ampy-bk__trust-row .ampy-bk__share { flex-shrink: 0; }
+
+/* ============================================================================
+   ENTRY MODE — väljaren (godkänd, behåller v4-strukturen)
+   ============================================================================ */
+.ampy-bk__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-7);
+  flex-wrap: wrap;
+}
+
+.ampy-bk__head-title {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: var(--fs-20);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+/* Search */
+.ampy-bk__search {
+  position: relative;
+  margin: 0 0 var(--space-7);
+}
+.ampy-bk__search-label {
+  display: block;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-13);
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-2);
+}
+.ampy-bk__search-input {
+  width: 100%;
+  font: inherit;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-14);
+  font-weight: 400;
+  padding: var(--space-5) var(--space-5) var(--space-5) calc(var(--space-5) + 1.6rem + var(--space-3));
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+  min-height: 4.4rem;
+}
+.ampy-bk__search-input::placeholder { color: var(--text-tertiary); }
+.ampy-bk__search-input:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(0, 169, 145, 0.15);
+}
+.ampy-bk__search-icon {
+  position: absolute;
+  left: var(--space-5);
+  bottom: var(--space-6);
+  color: var(--text-tertiary);
+  pointer-events: none;
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+/* Rumschips */
+.ampy-bk__rooms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-7);
+}
+.ampy-bk__room {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  min-height: 3.6rem;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-13);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+  white-space: nowrap;
+}
+.ampy-bk__room svg { width: 1.4rem; height: 1.4rem; color: var(--action-primary); }
+.ampy-bk__room:hover { border-color: var(--action-primary); }
+.ampy-bk__room:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0, 169, 145, 0.25); }
+.ampy-bk__room[aria-selected="true"] {
+  background: var(--action-primary);
+  color: var(--text-inverse);
+  border-color: var(--action-primary);
+}
+.ampy-bk__room[aria-selected="true"] svg { color: var(--text-inverse); }
+
+@media (max-width: 767px) {
+  /* v5.1 A1: chips scrollar INOM kortets innehållsbredda — får inte spilla
+     förbi padding-kanten. Dold scrollbar + mjuk högerfade som signalerar
+     att fler chips finns ute till höger. */
+  .ampy-bk__rooms {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    margin: 0 0 var(--space-7);
+    padding: 0 var(--space-7) var(--space-2) 0; /* room till höger för fade */
+    mask-image: linear-gradient(to right, #000 0%, #000 calc(100% - 2.4rem), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 calc(100% - 2.4rem), transparent 100%);
+  }
+  .ampy-bk__rooms::-webkit-scrollbar { display: none; }
+  .ampy-bk__room { scroll-snap-align: start; }
+}
+
+/* Job list (entry mode) */
+.ampy-bk__joblist-hint {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-13);
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-3);
+}
+
+.ampy-bk__joblist-group {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.ampy-bk__joblist-group:last-child { margin-bottom: 0; }
+
+.ampy-bk__joblist-group-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-13);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-2);
+}
+.ampy-bk__joblist-group-label::before {
+  content: '';
+  display: inline-block;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  background: var(--dot, var(--text-muted));
+  flex-shrink: 0;
+}
+.ampy-bk__joblist-group-label[data-group="green"]::before { background: var(--state-success); }
+.ampy-bk__joblist-group-label[data-group="depends"]::before { background: var(--state-warning); }
+.ampy-bk__joblist-group-label[data-group="red"]::before { background: var(--state-error); }
+
+.ampy-bk__joblist-group-label-count {
+  font-size: var(--fs-12);
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.ampy-bk__job-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  min-height: 4.4rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-14);
+  font-weight: 400;
+  cursor: pointer;
+  text-align: left;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+.ampy-bk__job-row:hover { background: var(--bg-secondary); border-color: var(--border-tertiary); }
+.ampy-bk__job-row:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--border-focus); }
+.ampy-bk__job-row svg { width: 1.6rem; height: 1.6rem; color: var(--action-primary); flex-shrink: 0; }
+.ampy-bk__job-row-arrow { margin-left: auto; width: 1.4rem; height: 1.4rem; color: var(--text-tertiary); flex-shrink: 0; }
+
+.ampy-bk__source-line {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-12);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+  margin: var(--space-7) 0 0;
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border-tertiary);
+}
+
+/* ============================================================================
+   UTILITIES
+   ============================================================================ */
+.ampy-bk__sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ampy-bk__empty {
+  padding: var(--space-5);
+  text-align: center;
+  color: var(--text-secondary);
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-13);
+}
+
+.ampy-bk__loading {
+  padding: var(--space-13);
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: var(--fs-14);
+}
+
+/* Crawlable fallback */
+/* Crawlbar / no-JS-fallback (render.php). Ersätts av JS direkt vid boot, men
+   stylas ändå så sökmotorer och no-JS-besökare får en ren vy. */
+.ampy-bk__noscript .ampy-bk__instrument {
+  max-width: var(--block-max-width);
+  margin: var(--space-7) auto;
+  padding: 0 var(--space-7);
+}
+.ampy-bk__noscript .ampy-bk__tagline {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-16);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-5);
+}
+.ampy-bk__noscript .ampy-bk__source-line,
+.ampy-bk__noscript .ampy-bk__disclaimer {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-12);
+  line-height: 1.5;
+  color: var(--text-tertiary);
+  margin: var(--space-5) 0 0;
+}
+
+.ampy-bk__noscript-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  list-style: none;
+  padding: 0;
+  margin: var(--space-5) 0 0;
+}
+@media (max-width: 600px) {
+  .ampy-bk__noscript-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.ampy-bk__noscript-grid a {
+  display: block;
+  padding: var(--space-3) var(--space-5);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-tertiary);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: var(--fs-13);
+}
+.ampy-bk[data-booted="true"] .ampy-bk__noscript { display: none; }
+
+/* ============================================================================
+   HERO LAYOUT (layout="hero") — split-hero landing variant.
+   Everything is scoped under .ampy-bk--hero so the default/embedded tool is
+   completely untouched. The two-column split itself lives in Bricks; this
+   only styles what is INSIDE the right column (the tool).
+   ============================================================================ */
+
+/* Larger, hero-context type ramp (the embedded "instrument" scale reads thin
+   when the tool is the page hero). One step up across the board. */
+.ampy-bk--hero {
+  --fs-12: 1.3rem;
+  --fs-13: 1.4rem;
+  --fs-14: 1.6rem;
+  --fs-15: 1.6rem;
+  --fs-16: 1.7rem;
+  --fs-18: 2.0rem;
+  --fs-20: 2.2rem;
+  display: block;
+  transition: min-height 200ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ampy-bk--hero { transition: none; }
+}
+
+/* Fill the Bricks right column instead of centering at 60rem. */
+.ampy-bk--hero .ampy-bk__block {
+  max-width: none;
+  margin: 0;
+  min-height: 52rem;            /* anti-jump floor (tallest common state) */
+  padding: var(--space-13);     /* 3.2rem — hero breathing room */
+}
+@media (max-width: 767px) {
+  .ampy-bk--hero .ampy-bk__block {
+    min-height: 0;              /* phones flow naturally; no reserved void */
+    padding: var(--space-9);
+  }
+}
+
+/* Quick-pick chips (6 popular jobs) */
+.ampy-bk__quickwrap { display: block; }
+.ampy-bk__quickpicks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+}
+.ampy-bk__quickpicks li { margin: 0; }
+.ampy-bk__quickpick {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 4.4rem;
+  padding: var(--space-3) var(--space-5);
+  background: var(--bg-secondary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-15);
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+.ampy-bk__quickpick svg { width: 1.6rem; height: 1.6rem; color: var(--action-primary); flex-shrink: 0; }
+.ampy-bk__quickpick:hover { border-color: var(--action-primary); background: var(--bg-primary); }
+.ampy-bk__quickpick:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0,169,145,0.25); }
+
+/* Disclosure row: "Se alla 26 jobb" · "Välj rum" */
+.ampy-bk__disclosure-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-7);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--border-tertiary);
+}
+.ampy-bk__disclosure-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: none;
+  border: 0;
+  padding: var(--space-2) 0;
+  min-height: 4rem;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--action-primary);
+  cursor: pointer;
+}
+.ampy-bk__disclosure-link:hover { text-decoration: underline; text-underline-offset: 3px; }
+.ampy-bk__disclosure-link:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-sm); }
+.ampy-bk__disclosure-chev { width: 1.4rem; height: 1.4rem; transition: transform 200ms ease; }
+.ampy-bk__disclosure-link[aria-expanded="true"] .ampy-bk__disclosure-chev { transform: rotate(180deg); }
+.ampy-bk__disclosure-sep { color: var(--text-tertiary); }
+
+/* Rooms row in hero entry sits just under the disclosure row */
+.ampy-bk--hero .ampy-bk__rooms { margin-top: var(--space-5); }
+
+/* The drawer: grouped list, scroll-contained so the panel never grows tall */
+.ampy-bk__drawer {
+  margin-top: var(--space-5);
+  max-height: 38rem;
+  overflow-y: auto;
+  padding-right: var(--space-2);
+}
+.ampy-bk__drawer[hidden] { display: none; }
+.ampy-bk__drawer > * { animation: ampy-bk-fade 200ms ease both; }
+@media (max-width: 767px) {
+  .ampy-bk__drawer { max-height: none; overflow: visible; }
+}
+
+/* Verdict/question in hero: a touch more air, fill the column */
+.ampy-bk--hero .ampy-bk__judgment { margin-bottom: var(--space-9); }
+
+/* Fix: [hidden] must beat the base display:flex on rooms in hero entry */
+.ampy-bk__rooms[hidden] { display: none; }
+.ampy-bk__quickwrap[hidden] { display: none; }

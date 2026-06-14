@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Får du fixa elen själv? | Elkollen — Ampy</title>
+  <meta name="description" content="Elkollen ger dig ett tydligt besked, grönt eller rött, baserat på Elsäkerhetslagen. Hela svaret är gratis, ingen mejladress behövs." />
+
+  <link rel="stylesheet" href="../assets/behorighetskollen.css" />
+
+  <style>
+    /* ====================================================================
+       PAGE CHROME — this is what Bricks owns in production (the split grid +
+       the marketing sections). The plugin only owns what's inside .ampy-bk.
+       Prototype here so the whole landing page can be judged as one piece.
+       ==================================================================== */
+    :root {
+      --pg-ink: rgb(9, 11, 50);
+      --pg-ink-2: #5a5d7a;
+      --pg-bg: #f4f5fb;
+      --pg-teal: rgb(0, 169, 145);
+      --pg-line: #e3e5ed;
+      --pg-maxw: 118rem;
+    }
+    html { font-size: 62.5%; }
+    body {
+      margin: 0;
+      background: var(--pg-bg);
+      color: var(--pg-ink);
+      font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+    .wrap { max-width: var(--pg-maxw); margin: 0 auto; padding: 0 2.4rem; }
+
+    /* QA bar — preview only, never ships */
+    .qa-bar { position: sticky; top: 0; z-index: 40; background: rgba(9,11,50,.96); color:#fff; padding:.5rem 1.25rem; font-size:1.2rem; backdrop-filter: blur(6px); }
+    .qa-bar details { display:inline-block; }
+    .qa-bar summary { cursor:pointer; list-style:none; color:rgba(255,255,255,.7); font-weight:500; }
+    .qa-bar summary::before { content:'⌘ '; opacity:.5; }
+    .qa-bar nav { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.5rem; }
+    .qa-bar a { color: rgb(57,194,129); text-decoration:none; padding:.2rem .6rem; border:1px solid rgba(255,255,255,.14); border-radius:999px; font-size:1.1rem; }
+
+    /* ---------- HERO (split) ---------- */
+    .hero { padding: clamp(4.8rem, 6vw, 8rem) 0; }
+    .hero__grid {
+      display: grid;
+      grid-template-columns: minmax(38rem, 44fr) minmax(46rem, 56fr);
+      gap: 6.4rem;
+      align-items: start;
+    }
+    .hero__copy { padding-top: 1.2rem; }
+    .hero__eyebrow {
+      display: inline-flex; align-items: center; gap: .8rem;
+      font-size: 1.4rem; font-weight: 600; color: var(--pg-teal);
+      letter-spacing: .02em; margin: 0 0 1.6rem;
+    }
+    .hero__eyebrow::before { content:''; width:.8rem; height:.8rem; border-radius:50%; background: var(--pg-teal); }
+    .hero__h1 {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: clamp(3.2rem, 4vw, 4.4rem);
+      font-weight: 700; line-height: 1.08; letter-spacing: -.02em;
+      margin: 0 0 2rem;
+    }
+    .hero__sub { font-size: 1.8rem; line-height: 1.55; color: var(--pg-ink-2); max-width: 46ch; margin: 0 0 2rem; }
+    .hero__honesty {
+      font-size: 1.5rem; line-height: 1.5; color: var(--pg-ink);
+      border-left: 3px solid var(--pg-teal); padding: .4rem 0 .4rem 1.4rem;
+      margin: 0 0 2.8rem; font-style: italic;
+    }
+    .hero__trust { list-style:none; padding:0; margin:0 0 2.8rem; display:flex; flex-direction:column; gap:1.2rem; }
+    .hero__trust li { display:flex; align-items:flex-start; gap:1rem; font-size:1.4rem; font-weight:500; color: var(--pg-ink); }
+    .hero__trust svg { width:2rem; height:2rem; color: var(--pg-teal); flex-shrink:0; }
+    .hero__microcta {
+      display:inline-flex; align-items:center; gap:.8rem; min-height:4.4rem;
+      padding:1.1rem 1.8rem; border:1px solid var(--pg-line); border-radius:1rem;
+      background:#fff; color: var(--pg-ink); text-decoration:none; font-size:1.4rem; font-weight:600;
+      transition: border-color 150ms ease;
+    }
+    .hero__microcta:hover { border-color: var(--pg-teal); }
+    .hero__microcta svg { width:1.6rem; height:1.6rem; }
+
+    /* ---------- TRUST BAND ---------- */
+    .band { background:#fff; border-top:1px solid var(--pg-line); border-bottom:1px solid var(--pg-line); }
+    .band__inner { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:2.4rem 4rem; padding:2.4rem; }
+    .band__item { display:flex; align-items:center; gap:1rem; font-size:1.4rem; color: var(--pg-ink-2); }
+    .band__item strong { color: var(--pg-ink); font-weight:600; }
+    .band__item svg { width:2rem; height:2rem; color: var(--pg-teal); }
+    .band__item a { color: var(--pg-teal); text-decoration: underline; text-underline-offset:3px; }
+
+    /* ---------- SÅ FUNKAR DET ---------- */
+    section.steps { padding: 6.4rem 0; }
+    .sec-head { text-align:center; margin:0 auto 4rem; max-width:60rem; }
+    .sec-head h2 { font-family:'Plus Jakarta Sans'; font-size:clamp(2.6rem,3vw,3.4rem); font-weight:600; letter-spacing:-.01em; margin:0 0 1rem; }
+    .sec-head p { font-size:1.7rem; color:var(--pg-ink-2); margin:0; }
+    .steps__grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2.4rem; }
+    .step { background:#fff; border:1px solid var(--pg-line); border-radius:1.4rem; padding:3.2rem 2.8rem; }
+    .step__n { display:inline-flex; align-items:center; justify-content:center; width:3.6rem; height:3.6rem; border-radius:50%; background:var(--pg-teal); color:#fff; font-weight:700; font-size:1.6rem; margin-bottom:1.6rem; }
+    .step h3 { font-family:'Plus Jakarta Sans'; font-size:1.9rem; font-weight:600; margin:0 0 .8rem; }
+    .step p { font-size:1.5rem; color:var(--pg-ink-2); margin:0; line-height:1.55; }
+
+    /* ---------- FAQ ---------- */
+    section.faq { padding: 2rem 0 6.4rem; }
+    .faq__list { max-width:76rem; margin:0 auto; }
+    .faq__item { background:#fff; border:1px solid var(--pg-line); border-radius:1.2rem; margin-bottom:1.2rem; overflow:hidden; }
+    .faq__item summary { cursor:pointer; list-style:none; padding:2rem 2.4rem; font-family:'Plus Jakarta Sans'; font-size:1.7rem; font-weight:600; display:flex; justify-content:space-between; align-items:center; gap:1.6rem; }
+    .faq__item summary::-webkit-details-marker { display:none; }
+    .faq__item summary::after { content:'+'; color:var(--pg-teal); font-size:2.4rem; font-weight:300; line-height:1; }
+    .faq__item[open] summary::after { content:'–'; }
+    .faq__item .faq__a { padding:0 2.4rem 2.2rem; font-size:1.5rem; line-height:1.6; color:var(--pg-ink-2); }
+
+    /* ---------- FINAL CTA ---------- */
+    section.final { padding: 6.4rem 0 8rem; }
+    .final__card { background: var(--pg-ink); color:#fff; border-radius:2rem; padding:clamp(4rem,5vw,6.4rem); text-align:center; }
+    .final__card h2 { font-family:'Plus Jakarta Sans'; font-size:clamp(2.6rem,3vw,3.6rem); font-weight:700; margin:0 0 1.2rem; }
+    .final__card p { font-size:1.7rem; color:rgba(255,255,255,.8); max-width:56rem; margin:0 auto 2.8rem; line-height:1.55; }
+    .final__btn { display:inline-flex; align-items:center; gap:.8rem; min-height:5.2rem; padding:1.4rem 3.2rem; background:var(--pg-teal); color:#fff; text-decoration:none; border-radius:1rem; font-size:1.7rem; font-weight:600; }
+    .final__btn svg { width:1.8rem; height:1.8rem; }
+
+    /* ---------- RESPONSIVE: stack the split ---------- */
+    @media (max-width: 1023px) {
+      .hero__grid { grid-template-columns: minmax(0,40fr) minmax(0,60fr); gap: 4rem; }
+    }
+    @media (max-width: 767px) {
+      .hero__grid { grid-template-columns: 1fr; gap: 3.2rem; }
+      .hero { padding: 3.2rem 0; }
+      .wrap { padding: 0 1.6rem; }
+      .steps__grid { grid-template-columns: 1fr; }
+      .hero__h1 { font-size: 3.2rem; }
+    }
+
+    /* checkmark icon helper */
+    .ic-check { color: var(--pg-teal); }
+  </style>
+</head>
+<body>
+  <div class="qa-bar">
+    <details>
+      <summary>QA-genvägar (preview only)</summary>
+      <nav aria-label="Genvägar">
+        <a href="./hero.html">Hero / start</a>
+        <a href="./hero.html?jobb=byta-vagguttag">Fråga (conditional)</a>
+        <a href="./hero.html?jobb=byta-vagguttag&amp;svar=0">Besked grön</a>
+        <a href="./hero.html?jobb=golvvarme">Besked röd</a>
+        <a href="./hero.html?jobb=laddbox">Laddbox röd</a>
+        <a href="./index.html">← gamla layouten</a>
+      </nav>
+    </details>
+  </div>
+
+  <!-- ============ HERO (split) ============ -->
+  <header class="hero">
+    <div class="wrap hero__grid">
+
+      <!-- LEFT: marketing copy (Bricks-owned in production) -->
+      <div class="hero__copy">
+        <p class="hero__eyebrow">Koppla elen</p>
+        <h1 class="hero__h1">Får du fixa elen själv? Få svaret på 30 sekunder.</h1>
+        <p class="hero__sub">Elkollen ger dig ett tydligt besked, grönt eller rött, baserat på Elsäkerhetslagen. Hela svaret är gratis, ingen mejladress behövs.</p>
+        <p class="hero__honesty">Vi tjänar inget på att skrämma dig. Säger Elkollen grönt, säger vi grönt, även om det betyder att du inte behöver oss.</p>
+        <ul class="hero__trust">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Lagbaserat besked, byggt på Elsäkerhetslagen och Elsäkerhetsverket</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg> Registrerat elinstallationsföretag, verifiera oss hos Elsäkerhetsverket</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Helt gratis. Inget mejl, ingen inloggning, ingen hake</li>
+        </ul>
+        <a class="hero__microcta" href="https://ampy.se/offert/">
+          Hellre prata med en elektriker?
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+
+      <!-- RIGHT: the tool (plugin-owned), hero layout -->
+      <div class="hero__tool">
+        <div class="ampy-bk ampy-bk--hero" data-layout="hero" data-data-url="../data/behorighetskollen-data.json">
+          <div class="ampy-bk__noscript">
+            <div class="ampy-bk__block">
+              <p class="ampy-bk__joblist-hint">Sök eljobb eller välj nedan</p>
+              <ul class="ampy-bk__noscript-grid" role="list">
+                <li><a href="?jobb=byta-vagguttag">Byta vägguttag</a></li>
+                <li><a href="?jobb=byta-strombrytare">Byta strömbrytare</a></li>
+                <li><a href="?jobb=golvvarme">Installera golvvärme</a></li>
+                <li><a href="?jobb=laddbox">Installera laddbox</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ============ TRUST BAND ============ -->
+  <div class="band">
+    <div class="wrap band__inner">
+      <span class="band__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg> <span><strong>Registrerat</strong> hos Elsäkerhetsverket · <a href="https://www.elsakerhetsverket.se/kollaelforetaget/foretagsregister/?foretag=12047521&amp;sok=1" target="_blank" rel="noopener">verifiera oss</a></span></span>
+      <span class="band__item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> <span><strong>4 200+</strong> elkollar gjorda</span></span>
+      <span class="band__item"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.9 6.3 6.9.6-5.2 4.6 1.6 6.8L12 17.3 5.8 20.9l1.6-6.8L2.2 8.9l6.9-.6z"/></svg> <span><strong>4,9 av 5</strong> i kundbetyg</span></span>
+    </div>
+  </div>
+
+  <!-- ============ SÅ FUNKAR DET ============ -->
+  <section class="steps">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Så funkar det</h2>
+        <p>Tre steg till ett tryggt besked.</p>
+      </div>
+      <div class="steps__grid">
+        <div class="step"><div class="step__n">1</div><h3>Välj jobbet</h3><p>Klicka på det eljobb du tänkt göra, från uttag till laddbox.</p></div>
+        <div class="step"><div class="step__n">2</div><h3>Få ditt besked</h3><p>Grönt eller rött direkt, med motiveringen och lagrummet bakom.</p></div>
+        <div class="step"><div class="step__n">3</div><h3>Gör eller boka</h3><p>Grönt? Kör med våra säkerhetstips. Rött? Få en kostnadsfri offert.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ ============ -->
+  <section class="faq">
+    <div class="wrap">
+      <div class="sec-head"><h2>Vanliga frågor</h2></div>
+      <div class="faq__list">
+        <details class="faq__item"><summary>Är Elkollen verkligen gratis?</summary><div class="faq__a">Ja. Hela beskedet är gratis och du behöver varken lämna mejl eller logga in. Vi vill att fler eljobb görs säkert och lagligt, så enkelt är det.</div></details>
+        <details class="faq__item"><summary>Kan jag lita på beskedet?</summary><div class="faq__a">Beskedet bygger på Elsäkerhetslagen och Elsäkerhetsverkets riktlinjer för vad en privatperson får göra själv. Det är vägledning, inte juridisk rådgivning. Är du det minsta osäker, ta in ett registrerat företag.</div></details>
+        <details class="faq__item"><summary>Vilka eljobb får jag göra själv?</summary><div class="faq__a">Du får till exempel byta en glödlampa, en DCL-taklampa eller en befintlig strömbrytare för högst 16 A, om du vet hur. Att dra ny ledning, jobba i våtrum eller ändra den fasta installationen kräver alltid elektriker.</div></details>
+        <details class="faq__item"><summary>Vad händer om jag gör ett behörighetskrävande jobb ändå?</summary><div class="faq__a">Att utföra elinstallationsarbete utan behörighet är ett brott enligt Elsäkerhetslagen och kan ge böter eller fängelse. Din hemförsäkring kan dessutom neka ersättning om en skada beror på arbete som inte gjorts fackmannamässigt.</div></details>
+        <details class="faq__item"><summary>Vad gör jag om jag ändå vill ha hjälp, även vid grönt besked?</summary><div class="faq__a">Helt okej. Vill du hellre att en elektriker tar jobbet kan du när som helst be om en kostnadsfri offert, utan att du binder dig till något.</div></details>
+        <details class="faq__item"><summary>Är Ampy ett riktigt elföretag?</summary><div class="faq__a">Ja, Ampy är ett registrerat elinstallationsföretag. Du kan verifiera oss direkt i Elsäkerhetsverkets företagsregister innan du bokar något.</div></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FINAL CTA ============ -->
+  <section class="final">
+    <div class="wrap">
+      <div class="final__card">
+        <h2>Fick du rött, eller vill du bara göra det tryggt?</h2>
+        <p>Beskriv jobbet så återkommer vi med en kostnadsfri offert. Inga förpliktelser, inga dolda avgifter, bara ett tydligt pris från ett registrerat elföretag.</p>
+        <a class="final__btn" href="https://ampy.se/offert/">Få kostnadsfri offert
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <script src="../assets/behorighetskollen.js"></script>
+</body>
+</html>

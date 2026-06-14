@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Koppla elen — din guide till vad du får och inte får göra | Ampy</title>
+  <meta name="description" content="Får du göra eljobbet själv eller kräver det en registrerad elektriker? Snabbt besked baserat på Elsäkerhetslagen." />
+
+  <link rel="stylesheet" href="../assets/behorighetskollen.css" />
+
+  <style>
+    /* Page heading — H2 OVANFÖR verktyget (motsvarande Bricks-rubriken
+       i WordPress). Två delar: kort namn + tagline för tydlig hierarki.
+       Verktyget bär aldrig sin egen page-heading.                          */
+    .ampy-bk__page-head {
+      max-width: 60rem;
+      margin: 3.2rem auto 1.6rem;
+      padding: 0 1.6rem;
+    }
+    .ampy-bk__page-heading {
+      font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+      font-size: clamp(2.8rem, 2rem + 2.5vw, 4rem);
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.015em;
+      color: rgb(9, 11, 50);
+      margin: 0 0 0.6rem;
+    }
+    .ampy-bk__page-lead {
+      font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+      font-size: clamp(1.5rem, 1.2rem + 0.5vw, 1.8rem);
+      font-weight: 400;
+      line-height: 1.45;
+      color: #5a5d7a;
+      margin: 0;
+      max-width: 52rem;
+    }
+    @media (max-width: 767px) {
+      .ampy-bk__page-head { padding: 0 1.4rem; margin: 2rem auto 0.8rem; }
+    }
+    /* PAGE CHROME — endast för localhost-preview. Inte en del av plugin:en.
+       I WordPress kommer mount-punkten från shortcoden, utan denna QA-bar. */
+    html, body { margin: 0; padding: 0; min-height: 100%; background: #f4f5fb; }
+    body { font-family: 'Outfit', system-ui, sans-serif; }
+
+    /* QA-scaffolding — diskret, samlas i en summary/details så den inte
+       konkurrerar med instrumentet. */
+    .qa-bar {
+      position: sticky; top: 0; z-index: 10;
+      background: rgba(9, 11, 50, 0.96);
+      color: #fff;
+      padding: 0.5rem 1.25rem;
+      font-size: 0.78rem;
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .qa-bar details { display: inline-block; }
+    .qa-bar summary {
+      cursor: pointer;
+      list-style: none;
+      color: rgba(255,255,255,0.7);
+      font-weight: 500;
+    }
+    .qa-bar summary::-webkit-details-marker { display: none; }
+    .qa-bar summary::before { content: '⌘ '; opacity: 0.5; }
+    .qa-bar nav {
+      display: flex; gap: 0.5rem; flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+    .qa-bar a {
+      color: rgb(57, 194, 129);
+      text-decoration: none;
+      padding: 0.2rem 0.55rem;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 999px;
+      font-size: 0.7rem;
+    }
+    .qa-bar a:hover { background: rgba(255,255,255,0.06); }
+    .qa-bar small { color: rgba(255,255,255,0.5); margin-left: 0.5rem; }
+
+    main { padding-top: 1rem; }
+  </style>
+</head>
+<body>
+  <!-- QA-scaffolding för localhost-preview. Tas inte med i WordPress. -->
+  <div class="qa-bar">
+    <details>
+      <summary>QA-genvägar (preview only)</summary>
+      <nav aria-label="Genvägar för testning">
+        <a href="./">Start</a>
+        <a href="./?jobb=byta-gloldlampa">GRÖN fixed</a>
+        <a href="./?jobb=byta-vagguttag">Fråga (conditional)</a>
+        <a href="./?jobb=byta-vagguttag&amp;svar=0">GRÖN svar</a>
+        <a href="./?jobb=byta-vagguttag&amp;svar=1">RÖD svar</a>
+        <a href="./?jobb=golvvarme">RÖD fixed</a>
+        <a href="./?jobb=badrum">RÖD våtrum</a>
+        <a href="./?jobb=smarta-hem">3-svars conditional</a>
+      </nav>
+      <small>Bar:en skickas inte ut till live — endast preview/.</small>
+    </details>
+  </div>
+
+  <main>
+    <!-- Page heading (H2 + tagline). I Bricks: lägg ett Heading-element OVAN
+         shortcoden med "Koppla elen" + ett Paragraph-element under med
+         taglinen. Tool:en bär aldrig sin egen page-heading. -->
+    <header class="ampy-bk__page-head">
+      <h2 class="ampy-bk__page-heading">Koppla elen</h2>
+      <p class="ampy-bk__page-lead">Se direkt vilka eljobb du får göra själv.</p>
+    </header>
+
+    <!-- DEN ENA mount-punkten. I WordPress kommer den från shortcoden.
+         Här finns crawlbar fallback inuti — JS bootar och ersätter den. -->
+    <div class="ampy-bk"
+         data-data-url="../data/behorighetskollen-data.json">
+      <div class="ampy-bk__noscript">
+        <div class="ampy-bk__instrument">
+          <p class="ampy-bk__tagline">Elkollen</p>
+          <ul class="ampy-bk__noscript-grid" role="list">
+            <li><a href="?jobb=byta-gloldlampa">Byta glödlampa eller ljuskälla</a></li>
+            <li><a href="?jobb=byta-armatur-dcl">Byta taklampa med stickpropp (DCL)</a></li>
+            <li><a href="?jobb=fast-armatur">Byta fast monterad armatur</a></li>
+            <li><a href="?jobb=spotlights">Installera spotlights</a></li>
+            <li><a href="?jobb=byta-strombrytare">Byta strömbrytare</a></li>
+            <li><a href="?jobb=byta-vagguttag">Byta vägguttag</a></li>
+            <li><a href="?jobb=elcentral">Arbete i elcentralen</a></li>
+            <li><a href="?jobb=jordfelsbrytare">Installera jordfelsbrytare</a></li>
+            <li><a href="?jobb=spis-ugn">Ansluta spis eller ugn</a></li>
+            <li><a href="?jobb=vitvaror">Ansluta vitvaror</a></li>
+            <li><a href="?jobb=utomhusbelysning">Utomhusbelysning</a></li>
+            <li><a href="?jobb=inomhusbelysning">Inomhusbelysning</a></li>
+            <li><a href="?jobb=smarta-hem">Smarta hem</a></li>
+            <li><a href="?jobb=luftvarmepump">Luftvärmepump</a></li>
+            <li><a href="?jobb=laddbox">Installera laddbox</a></li>
+            <li><a href="?jobb=solcellsbatterier">Solceller och batteri</a></li>
+            <li><a href="?jobb=golvvarme">Installera golvvärme</a></li>
+            <li><a href="?jobb=lastbalansering">Lastbalansering</a></li>
+            <li><a href="?jobb=elbesiktning">Elbesiktning</a></li>
+            <li><a href="?jobb=felsokning">Felsökning av el</a></li>
+            <li><a href="?jobb=elrenovering">Elrenovering</a></li>
+            <li><a href="?jobb=koksrenovering">Köksrenovering</a></li>
+            <li><a href="?jobb=badrum">El i badrum</a></li>
+            <li><a href="?jobb=badrumsrenovering">Badrumsrenovering</a></li>
+            <li><a href="?jobb=dra-ny-kabel">Dra ny kabel</a></li>
+            <li><a href="?jobb=skarva-fast">Skarva eller förlänga fast installation</a></li>
+          </ul>
+          <p class="ampy-bk__source-line">Källa: Elsäkerhetsverket &amp; Elsäkerhetslagen (2016:732) · Vägledning, inte juridisk rådgivning.</p>
+          <p class="ampy-bk__disclaimer">Vägledning baserad på Elsäkerhetsverkets regler (juni 2026) – inte juridisk rådgivning. Är du osäker, verifiera i Koppla säkert eller anlita ett registrerat elinstallationsföretag.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../assets/behorighetskollen.js"></script>
+</body>
+</html>
