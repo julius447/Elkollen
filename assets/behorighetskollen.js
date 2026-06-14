@@ -18,6 +18,7 @@
     info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
     arrowLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>',
     arrowRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
+    chevron: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>',
     external: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/></svg>',
     share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>',
     search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
@@ -699,7 +700,7 @@
       const data = this.data;
       const block = el('div', { class: 'ampy-bk__block', role: 'region', 'aria-label': 'Elkollen' });
 
-      // --- Search ---
+      // --- 1. Search ---
       const searchId = 'ampy-bk-search';
       const searchInput = el('input', {
         type: 'search', id: searchId, class: 'ampy-bk__search-input',
@@ -711,10 +712,47 @@
         searchInput
       ]));
 
-      // --- Quick picks (6) ---
+      // --- 2. "Välj rum" standing dropdown (always between search and list) ---
+      const roomToggleLabel = el('span', { class: 'ampy-bk__roomtoggle-label' }, 'Välj rum');
+      const roomToggle = el('button', {
+        class: 'ampy-bk__roomtoggle', type: 'button', 'aria-expanded': 'false', 'aria-controls': 'ampy-bk-roompanel'
+      }, [
+        el('span', { class: 'ampy-bk__roomtoggle-icon', html: icon('panel'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
+        roomToggleLabel,
+        el('span', { class: 'ampy-bk__roomtoggle-chev', html: icon('chevron'), 'aria-hidden': 'true', style: 'display:inline-flex' })
+      ]);
+      const roomPanel = el('ul', { class: 'ampy-bk__roompanel', id: 'ampy-bk-roompanel', role: 'list', hidden: true });
+      (data.rooms || []).forEach(room => {
+        const li = el('li');
+        li.appendChild(el('button', {
+          class: 'ampy-bk__roomitem', type: 'button', 'aria-pressed': 'false',
+          'aria-label': `Visa eljobb i ${room.label}`, data: { room: room.id },
+          onclick: () => {
+            this.activeRoom = (this.activeRoom === room.id) ? null : room.id;
+            this.searchQuery = ''; searchInput.value = ''; this.heroExpanded = false;
+            roomPanel.hidden = true; roomToggle.setAttribute('aria-expanded', 'false');
+            roomToggleLabel.textContent = this.activeRoom ? `Rum: ${room.label}` : 'Välj rum';
+            roomPanel.querySelectorAll('.ampy-bk__roomitem').forEach(b =>
+              b.setAttribute('aria-pressed', String(b.dataset.room === this.activeRoom)));
+            updateDrawer();
+          }
+        }, [
+          el('span', { class: 'ampy-bk__roomitem-icon', html: icon(room.icon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
+          el('span', {}, room.label)
+        ]));
+        roomPanel.appendChild(li);
+      });
+      roomToggle.addEventListener('click', () => {
+        const open = roomPanel.hidden;
+        roomPanel.hidden = !open;
+        roomToggle.setAttribute('aria-expanded', String(open));
+      });
+      block.appendChild(el('div', { class: 'ampy-bk__roomselect' }, [roomToggle, roomPanel]));
+
+      // --- 3. "Vanliga eljobb": 6 quick picks + "Se alla N jobb" row ---
       const picks = (data.meta.quick_picks || []).slice(0, 6).map(id => this.jobsById[id]).filter(Boolean);
-      const quickWrap = el('div', { class: 'ampy-bk__quickwrap' });
-      quickWrap.appendChild(el('p', { class: 'ampy-bk__joblist-hint' }, 'Vanliga eljobb'));
+      const commonWrap = el('div', { class: 'ampy-bk__commonwrap' });
+      commonWrap.appendChild(el('p', { class: 'ampy-bk__joblist-hint' }, 'Vanliga eljobb'));
       const chips = el('ul', { class: 'ampy-bk__quickpicks', role: 'list' });
       picks.forEach(j => {
         const li = el('li');
@@ -727,65 +765,39 @@
         ]));
         chips.appendChild(li);
       });
-      quickWrap.appendChild(chips);
-      block.appendChild(quickWrap);
-
-      // --- Rooms row (revealed by "Välj rum") ---
-      const roomsRow = el('ul', { class: 'ampy-bk__rooms', role: 'tablist', hidden: true });
-      (data.rooms || []).forEach(room => {
-        const li = el('li');
-        li.appendChild(el('button', {
-          class: 'ampy-bk__room', type: 'button', role: 'tab', 'aria-selected': 'false',
-          'aria-label': `Visa eljobb i ${room.label}`, data: { room: room.id },
-          onclick: () => {
-            this.activeRoom = (this.activeRoom === room.id) ? null : room.id;
-            this.searchQuery = ''; searchInput.value = ''; this.heroExpanded = false;
-            allBtn.setAttribute('aria-expanded', 'false');
-            roomsRow.querySelectorAll('.ampy-bk__room').forEach(b =>
-              b.setAttribute('aria-selected', String(b.dataset.room === this.activeRoom)));
-            updateDrawer();
-          }
-        }, [
-          el('span', { html: icon(room.icon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-          el('span', {}, room.label)
-        ]));
-        roomsRow.appendChild(li);
-      });
-
-      // --- Disclosure controls ---
-      const allBtn = el('button', { class: 'ampy-bk__disclosure-link', type: 'button', 'aria-expanded': 'false' }, [
-        `Se alla ${data.jobs.length} jobb`,
-        el('span', { class: 'ampy-bk__disclosure-chev', html: icon('chevron'), 'aria-hidden': 'true', style: 'display:inline-flex' })
-      ]);
-      const roomBtn = el('button', { class: 'ampy-bk__disclosure-link', type: 'button', 'aria-expanded': 'false' }, 'Välj rum');
-      allBtn.addEventListener('click', () => {
-        this.heroExpanded = !this.heroExpanded;
-        this.activeRoom = null; this.searchQuery = ''; searchInput.value = '';
-        roomsRow.hidden = true; roomBtn.setAttribute('aria-expanded', 'false');
-        roomsRow.querySelectorAll('.ampy-bk__room').forEach(b => b.setAttribute('aria-selected', 'false'));
-        allBtn.setAttribute('aria-expanded', String(this.heroExpanded));
-        updateDrawer();
-      });
-      roomBtn.addEventListener('click', () => {
-        const open = roomsRow.hidden;
-        roomsRow.hidden = !open;
-        roomBtn.setAttribute('aria-expanded', String(open));
-      });
-      block.appendChild(el('div', { class: 'ampy-bk__disclosure-row' }, [
-        allBtn,
-        el('span', { class: 'ampy-bk__disclosure-sep', 'aria-hidden': 'true' }, '·'),
-        roomBtn
+      commonWrap.appendChild(chips);
+      // "Se alla N jobb" as its own tappable row inside the common section
+      commonWrap.appendChild(el('button', {
+        class: 'ampy-bk__seeall', type: 'button',
+        onclick: () => {
+          this.heroExpanded = true; this.activeRoom = null; this.searchQuery = ''; searchInput.value = '';
+          roomPanel.hidden = true; roomToggle.setAttribute('aria-expanded', 'false');
+          roomToggleLabel.textContent = 'Välj rum';
+          roomPanel.querySelectorAll('.ampy-bk__roomitem').forEach(b => b.setAttribute('aria-pressed', 'false'));
+          updateDrawer();
+        }
+      }, [
+        el('span', { class: 'ampy-bk__seeall-label' }, `Se alla ${data.jobs.length} jobb`),
+        el('span', { class: 'ampy-bk__seeall-arrow', html: icon('arrowRight'), 'aria-hidden': 'true', style: 'display:inline-flex' })
       ]));
-      block.appendChild(roomsRow);
+      block.appendChild(commonWrap);
 
-      // --- Drawer (grouped list, hidden until search/room/expand) ---
+      // --- 4. Drawer (results) — hidden until search/room/see-all ---
       this.swapNode = el('div', { class: 'ampy-bk__drawer', role: 'region', 'aria-live': 'polite', hidden: true });
       block.appendChild(this.swapNode);
 
-      // --- Source line ---
+      // --- 5. Source line ---
       block.appendChild(el('p', { class: 'ampy-bk__source-line' },
         'Källa: Elsäkerhetsverket & Elsäkerhetslagen (2016:732). ' + (data.meta.disclaimer || '')
       ));
+
+      const resetToCommon = () => {
+        this.searchQuery = ''; searchInput.value = ''; this.activeRoom = null; this.heroExpanded = false;
+        roomPanel.hidden = true; roomToggle.setAttribute('aria-expanded', 'false');
+        roomToggleLabel.textContent = 'Välj rum';
+        roomPanel.querySelectorAll('.ampy-bk__roomitem').forEach(b => b.setAttribute('aria-pressed', 'false'));
+        updateDrawer();
+      };
 
       const updateDrawer = () => {
         const q = (this.searchQuery || '').trim().toLowerCase();
@@ -798,26 +810,30 @@
 
         if (jobs === null) {
           this.swapNode.hidden = true; this.swapNode.replaceChildren();
-          quickWrap.hidden = false;
+          commonWrap.hidden = false;
           return;
         }
-        quickWrap.hidden = true; // focus on the browse surface while searching/expanded
+        commonWrap.hidden = true; // results replace the common-jobs surface
         this.swapNode.hidden = false;
+        const back = el('button', { class: 'ampy-bk__drawer-back', type: 'button', onclick: resetToCommon }, [
+          el('span', { html: icon('arrowLeft'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
+          'Visa vanliga eljobb'
+        ]);
         if (!jobs.length) {
-          this.swapNode.replaceChildren(el('p', { class: 'ampy-bk__empty' },
+          this.swapNode.replaceChildren(back, el('p', { class: 'ampy-bk__empty' },
             'Inget jobb matchar. Prova ett annat ord eller välj ett rum.'));
           return;
         }
-        this.swapNode.replaceChildren(this.renderGroupedJobs(jobs, null));
+        this.swapNode.replaceChildren(back, this.renderGroupedJobs(jobs, null));
       };
 
       searchInput.addEventListener('input', (e) => {
         this.searchQuery = e.target.value;
         if (this.searchQuery) {
           this.activeRoom = null; this.heroExpanded = false;
-          roomsRow.hidden = true; roomBtn.setAttribute('aria-expanded', 'false');
-          roomsRow.querySelectorAll('.ampy-bk__room').forEach(b => b.setAttribute('aria-selected', 'false'));
-          allBtn.setAttribute('aria-expanded', 'false');
+          roomPanel.hidden = true; roomToggle.setAttribute('aria-expanded', 'false');
+          roomToggleLabel.textContent = 'Välj rum';
+          roomPanel.querySelectorAll('.ampy-bk__roomitem').forEach(b => b.setAttribute('aria-pressed', 'false'));
         }
         updateDrawer();
       });

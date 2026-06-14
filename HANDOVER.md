@@ -236,26 +236,37 @@ splice, kitchen, sofa, charger, solar, inspect.
 The landing page uses a **split hero**: marketing copy on the left, the tool on
 the right. Two rules:
 - **Bricks owns the split.** Build a 2-column section: left = native Bricks
-  elements (H1, lead `<p>`, trust list, micro-CTA link); right = the shortcode
-  `[elkollen layout="hero"]`. The plugin does NOT render the marketing copy or
-  the H1 (SEO: one clean page H1 owned by Bricks). Stack to 1 column < 768px.
+  elements (H1, lead `<p>`, honesty line, trust list, two CTA buttons); right =
+  the shortcode `[elkollen layout="hero"]`. The plugin does NOT render the
+  marketing copy or the H1 (SEO: one clean page H1 owned by Bricks). Stack to 1
+  column < 768px. The two left-column CTAs mirror the ampy.se homepage:
+  "Kontakta oss" (filled teal) → `/kontakt/` and "010-265 79 79" (outline,
+  `tel:`).
 - **What `layout="hero"` changes inside the tool:** the *entry* state becomes
-  compact — search + 6 quick-pick chips (from `meta.quick_picks`) + a disclosure
-  row ("Se alla N jobb" · "Välj rum"). The full grouped 26-job list and the room
-  chips live in an **in-panel drawer** (progressive disclosure), so the hero
-  never grows tall. The type scale steps up one notch for hero readability.
-  Question and verdict render in the **same right panel** (no page jump; an
-  anti-collapse height floor smooths the swap). Everything is gated on
-  `this.heroMode` / scoped under `.ampy-bk--hero`; the default centered embed is
-  byte-for-byte unchanged.
+  compact, with a fixed top-to-bottom order:
+  1. **Search** field.
+  2. **"Välj rum" standing dropdown** (always visible, between search and the
+     common list). Tapping it drops down the 5 rooms; selecting one filters the
+     list into the results drawer and the toggle label shows the active room.
+  3. **"Vanliga eljobb"**: 6 quick-pick chips (from `meta.quick_picks`) followed
+     by a full-width **"Se alla N jobb"** row that opens the full grouped list.
+  4. **Results drawer** (hidden until a search/room/see-all action). It carries a
+     **"Visa vanliga eljobb"** back link to return to the compact view. Scroll is
+     contained so the hero never grows tall.
+
+  The type scale steps up one notch for hero readability. Question and verdict
+  render in the **same right panel** (no page jump; an anti-collapse height floor
+  smooths the swap). Everything is gated on `this.heroMode` / scoped under
+  `.ampy-bk--hero`; the default centered embed is byte-for-byte unchanged.
 - **`jobb="…"` still works with hero:** `[elkollen jobb="golvvarme" layout="hero"]`
   opens straight into that verdict in the hero panel.
-- **Reference implementation:** `preview/hero.html` is the full landing page
-  (split hero + trust band + "så funkar det" + FAQ + final CTA) — use it as the
-  visual + copy source of truth when assembling the Bricks section.
-- **Placeholders to replace before launch:** the trust-band numbers in the
-  reference ("4 200+ elkollar", "4,9/5") are placeholders — wire to real,
-  verifiable figures or remove.
+- **Reference implementation:** `preview/hero.html` is the landing page reference
+  (split hero + "Så funkar det"). The FAQ and final CTA are intentionally NOT in
+  this prototype — they come from existing site blocks placed below. Use the file
+  as the visual + copy source of truth when assembling the Bricks section.
+- **"Så funkar det":** 3 cards in the Ampy style (gradient icon badges + step
+  number chips + a desktop connector line). Copy is tool-specific: Välj ditt jobb
+  / Få ditt besked / Gör nästa steg.
 
 ---
 

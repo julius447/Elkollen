@@ -2,6 +2,32 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 5.5.0 — Hero refinement (entry interaction + landing trim)
+- **Hero entry restructured** (`renderHeroEntry`): the old "Se alla N jobb · Välj
+  rum" disclosure row is gone. In its place:
+  - **"Välj rum" is now a standing dropdown header** that always sits between the
+    search field and "Vanliga eljobb". Tapping it drops down the 5 rooms; picking
+    one filters the list and the toggle label reflects the active room.
+  - **"Se alla N jobb" is its own tappable row** at the end of the "Vanliga eljobb"
+    list (full-width box, not a text link).
+  - The results drawer now carries a **"Visa vanliga eljobb" back link** to return
+    to the compact common-jobs view.
+  - New `chevron` icon added (the old disclosure code referenced a missing key and
+    silently fell back to the info icon).
+- **`preview/hero.html` landing trimmed** to match the production block plan:
+  - Removed the "Koppla elen" eyebrow.
+  - Trust bullet shortened to "Registrerat elinstallationsföretag" (dropped the
+    "verifiera oss hos Elsäkerhetsverket" tail).
+  - Micro-CTA replaced with a 1:1 replica of ampy.se's two homepage CTAs:
+    **"Kontakta oss"** (filled teal pill) + **"010-265 79 79"** (outline, `tel:`).
+  - Removed the trust band, the FAQ section and the final CTA section, so
+    **"Så funkar det" follows immediately after the tool**. FAQ + final CTA are
+    expected to come from existing site blocks below.
+  - **"Så funkar det" redesigned** in the Ampy card style (gradient icon badges,
+    step number chips, connector line on desktop). Three steps, tool-specific copy:
+    Välj ditt jobb / Få ditt besked / Gör nästa steg.
+- Version bumped to 5.5.0 (cache-busting; CSS+JS changed). Data file unchanged.
+
 ## 5.4.0 — Split-hero landing layout
 - **New `layout="hero"` shortcode mode** for the landing page split hero (copy
   left, tool right). Bricks owns the split; the plugin's entry state becomes

@@ -1109,42 +1109,107 @@ html { font-size: 62.5%; }
 .ampy-bk__quickpick:hover { border-color: var(--action-primary); background: var(--bg-primary); }
 .ampy-bk__quickpick:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0,169,145,0.25); }
 
-/* Disclosure row: "Se alla 26 jobb" · "Välj rum" */
-.ampy-bk__disclosure-row {
+/* "Välj rum" standing dropdown — always between search and "Vanliga eljobb" */
+.ampy-bk__roomselect { margin-top: var(--space-6); position: relative; }
+.ampy-bk__roomtoggle {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  margin-top: var(--space-7);
-  padding-top: var(--space-5);
-  border-top: 1px solid var(--border-tertiary);
-}
-.ampy-bk__disclosure-link {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: none;
-  border: 0;
-  padding: var(--space-2) 0;
-  min-height: 4rem;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 4.8rem;
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-tertiary);
+  border-radius: var(--radius-md);
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-14);
+  font-size: var(--fs-15);
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+.ampy-bk__roomtoggle:hover { border-color: var(--action-primary); }
+.ampy-bk__roomtoggle:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0,169,145,0.25); }
+.ampy-bk__roomtoggle-icon { width: 1.8rem; height: 1.8rem; color: var(--action-primary); flex-shrink: 0; }
+.ampy-bk__roomtoggle-icon svg { width: 100%; height: 100%; }
+.ampy-bk__roomtoggle-label { flex: 1; text-align: left; }
+.ampy-bk__roomtoggle-chev { width: 1.6rem; height: 1.6rem; color: var(--text-tertiary); transition: transform 200ms ease; flex-shrink: 0; }
+.ampy-bk__roomtoggle-chev svg { width: 100%; height: 100%; }
+.ampy-bk__roomtoggle[aria-expanded="true"] .ampy-bk__roomtoggle-chev { transform: rotate(180deg); }
+
+/* The dropdown panel: room options */
+.ampy-bk__roompanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: var(--space-3);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-tertiary);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 24px rgba(13,28,38,0.08);
+}
+.ampy-bk__roompanel[hidden] { display: none; }
+.ampy-bk__roompanel li { margin: 0; }
+.ampy-bk__roomitem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 4.4rem;
+  padding: var(--space-3) var(--space-4);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-15);
+  font-weight: 500;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+.ampy-bk__roomitem:hover { background: var(--bg-secondary); }
+.ampy-bk__roomitem:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0,169,145,0.25); }
+.ampy-bk__roomitem-icon { width: 1.8rem; height: 1.8rem; color: var(--action-primary); flex-shrink: 0; }
+.ampy-bk__roomitem-icon svg { width: 100%; height: 100%; }
+.ampy-bk__roomitem[aria-pressed="true"] { background: var(--bg-secondary); border-color: var(--action-primary); font-weight: 600; }
+
+/* "Vanliga eljobb" wrap */
+.ampy-bk__commonwrap { display: block; }
+.ampy-bk--hero .ampy-bk__commonwrap { margin-top: var(--space-6); }
+.ampy-bk__commonwrap[hidden] { display: none; }
+
+/* "Se alla N jobb" — its own tappable row at the end of the common list */
+.ampy-bk__seeall {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 4.8rem;
+  margin-top: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-tertiary);
+  border-radius: var(--radius-md);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-15);
   font-weight: 600;
   color: var(--action-primary);
   cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
 }
-.ampy-bk__disclosure-link:hover { text-decoration: underline; text-underline-offset: 3px; }
-.ampy-bk__disclosure-link:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-sm); }
-.ampy-bk__disclosure-chev { width: 1.4rem; height: 1.4rem; transition: transform 200ms ease; }
-.ampy-bk__disclosure-link[aria-expanded="true"] .ampy-bk__disclosure-chev { transform: rotate(180deg); }
-.ampy-bk__disclosure-sep { color: var(--text-tertiary); }
-
-/* Rooms row in hero entry sits just under the disclosure row */
-.ampy-bk--hero .ampy-bk__rooms { margin-top: var(--space-5); }
+.ampy-bk__seeall:hover { border-color: var(--action-primary); background: var(--bg-secondary); }
+.ampy-bk__seeall:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(0,169,145,0.25); }
+.ampy-bk__seeall-arrow { width: 1.6rem; height: 1.6rem; flex-shrink: 0; }
+.ampy-bk__seeall-arrow svg { width: 100%; height: 100%; }
 
 /* The drawer: grouped list, scroll-contained so the panel never grows tall */
 .ampy-bk__drawer {
   margin-top: var(--space-5);
-  max-height: 38rem;
+  max-height: 40rem;
   overflow-y: auto;
   padding-right: var(--space-2);
 }
@@ -1154,9 +1219,25 @@ html { font-size: 62.5%; }
   .ampy-bk__drawer { max-height: none; overflow: visible; }
 }
 
+/* "Visa vanliga eljobb" back link inside the results drawer */
+.ampy-bk__drawer-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  padding: var(--space-2) 0;
+  min-height: 4rem;
+  background: none;
+  border: 0;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--action-primary);
+  cursor: pointer;
+}
+.ampy-bk__drawer-back svg { width: 1.6rem; height: 1.6rem; }
+.ampy-bk__drawer-back:hover { text-decoration: underline; text-underline-offset: 3px; }
+.ampy-bk__drawer-back:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-sm); }
+
 /* Verdict/question in hero: a touch more air, fill the column */
 .ampy-bk--hero .ampy-bk__judgment { margin-bottom: var(--space-9); }
-
-/* Fix: [hidden] must beat the base display:flex on rooms in hero entry */
-.ampy-bk__rooms[hidden] { display: none; }
-.ampy-bk__quickwrap[hidden] { display: none; }

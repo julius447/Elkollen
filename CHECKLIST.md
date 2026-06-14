@@ -59,14 +59,17 @@ Copy on the left, tool on the right. Reference design: `preview/hero.html`.
 
 - [ ] Add a **Section** → inside it a **2-column Container** (left ~44%, right ~56%).
 - [ ] **Left column** (native Bricks elements):
-      - Eyebrow text: **Koppla elen**
       - **H1**: **Får du fixa elen själv? Få svaret på 30 sekunder.**
       - Lead paragraph: **Elkollen ger dig ett tydligt besked, grönt eller rött, baserat på Elsäkerhetslagen. Hela svaret är gratis, ingen mejladress behövs.**
-      - A short honesty line + 3 trust bullets + a micro-CTA link "Hellre prata med en elektriker?" → `https://ampy.se/offert/` (copy is in `preview/hero.html`).
+      - A short honesty line + 3 trust bullets (copy is in `preview/hero.html`).
+      - Two CTA buttons (the same pair as the ampy.se homepage): **"Kontakta oss"**
+        (filled teal) → `https://ampy.se/kontakt/` and **"010-265 79 79"** (outline,
+        phone) → `tel:0102657979`.
 - [ ] **Right column**: a **Shortcode element** with `[elkollen layout="hero"]`
 - [ ] Set the column container to **stack to 1 column below 768px**.
-- [ ] Below the hero, add the trust band, "Så funkar det", FAQ and final-CTA
-      sections (all copy is in `preview/hero.html`).
+- [ ] Below the hero, add the **"Så funkar det"** section (3 cards, copy in
+      `preview/hero.html`). The FAQ and final-CTA come from your existing site
+      blocks — they are intentionally not part of this prototype anymore.
 
 > Why the H1 is a Bricks element, not in the tool: Google should read the page
 > H1 from the page, not from inside the widget. The tool never carries its own
