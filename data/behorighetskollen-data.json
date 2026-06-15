@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "5.7.5",
+    "version": "5.7.6",
     "product_name": "Elkollen",
     "page_heading": "Koppla elen",
     "page_lead": "Se direkt vilka eljobb du får göra själv.",
@@ -20,7 +20,6 @@
       "intro": "Ampys behöriga elektriker hör av sig med ett förslag, oftast inom en arbetsdag.",
       "submit": "Skicka förfrågan",
       "submitting": "Skickar…",
-      "foot": "Kostnadsfritt och utan förbindelse.",
       "back": "Tillbaka till beskedet",
       "consent": "Jag godkänner att Ampy sparar mina uppgifter för att kontakta mig med ett förslag, enligt ",
       "consent_link": "integritetspolicyn",

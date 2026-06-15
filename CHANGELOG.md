@@ -2,6 +2,17 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 5.7.6 — Lead-form polish
+- Removed the "Kostnadsfritt och utan förbindelse." footnote from the lead form
+  (markup, CSS rule, and the `meta.lead_form.foot` data field).
+- Rebalanced the form's vertical rhythm: intro 20px below, 16px row-gap between
+  field rows (8px label->input), 18px above the consent, 16px above the submit —
+  so the fields breathe and no longer feel stacked.
+- **Cross-device hardening:** pinned the search + lead-form inputs to a 16px floor
+  so iOS Safari does not auto-zoom on focus (the embedded layout's token is 15px);
+  added `-webkit-overflow-scrolling: touch` to the results drawer for iOS momentum.
+- Version -> 5.7.6.
+
 ## 5.7.5 — Final detail pass
 - **Removed the "Så funkar det" section** (markup + CSS) per client; the page now
   ends with the hero.

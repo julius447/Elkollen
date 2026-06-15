@@ -620,7 +620,6 @@
       const submit = el('button', { class: 'ampy-bk__cta-primary ampy-bk__cta-primary--solid ampy-bk__lead-submit', type: 'submit' },
         f.submit || 'Skicka förfrågan');
       form.appendChild(submit);
-      form.appendChild(el('p', { class: 'ampy-bk__lead-foot' }, f.foot || 'Kostnadsfritt och utan förbindelse.'));
 
       form.addEventListener('submit', (e) => {
         e.preventDefault();
