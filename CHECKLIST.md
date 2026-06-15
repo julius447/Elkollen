@@ -4,11 +4,14 @@
 > **Step 8 (the launch gate)** — the tool gives legal guidance and must not go
 > public before a certified electrician (auktoriserad elinstallatör) has signed off.
 >
-> Deep technical docs are in `HANDOVER.md` (for your Claude Code agent). This file
-> is for you, the human.
+> Deep technical docs are in `HANDOVER.md`; your Claude Code agent should read
+> `CLAUDE.md` first (its rules + architecture brief). This file is for you, the human.
 >
 > **Language note:** the tool's UI is in Swedish (it serves Swedish homeowners).
 > The text you type into Bricks below is the literal Swedish copy — use it as-is.
+>
+> **New since the prototype handover:** the verdict CTA now opens an in-tool **lead
+> form** that emails leads to your WP admin (see **Step 4b** — do it before launch).
 
 Estimated time: **30–45 min** for install + test. The sign-off gate is separate.
 
@@ -96,6 +99,32 @@ On each electrical service page that matches a job, add the shortcode with
 - [ ] Outlet/switch page: `[elkollen jobb="byta-vagguttag"]`
 - [ ] EV charger page: `[elkollen jobb="laddbox"]`
 - [ ] …and so on. Job IDs are in `HANDOVER.md` §5 / in the data file's `jobs[]`.
+
+---
+
+## Step 4b — Lead form & email setup (REQUIRED — the form is live)
+
+The verdict CTA "Få kostnadsfri rådgivning" opens an on-page form that POSTs to a
+REST endpoint and **emails the lead to your WP admin address**. Set this up before
+launch or leads will not arrive:
+
+- [ ] **Admin email:** confirm WP admin email (Settings → General) is a monitored
+      inbox — that's where leads land. (To send elsewhere, hook
+      `ampy_bk_lead_received` or filter `wp_mail`.)
+- [ ] **Real mail provider:** install/confirm an authenticated **SMTP / transactional**
+      mail plugin (e.g. provider's SMTP). Raw PHP `mail()` will land leads in spam.
+- [ ] **Caching:** exclude `/wp-json/ampy-bk/` from full-page cache (Cloudflare / WP
+      Rocket / LiteSpeed). The form fetches a fresh nonce from
+      `GET /wp-json/ampy-bk/v1/nonce`; if that GET is cached, submits can 403.
+- [ ] **Verify on staging:** as a logged-out visitor, on a **cached** page, fill the
+      form and submit → you get the "Tack!" success and an email arrives. Re-test
+      after the page has been cached > 24 h.
+- [ ] **(Recommended) durable storage:** have your agent hook
+      `ampy_bk_lead_received` to store leads as a CPT or push to your CRM, so a mail
+      hiccup never loses a lead. (On mail failure the payload is written to the PHP
+      error log as a fallback.)
+- [ ] **(Optional) abuse:** the endpoint has a built-in per-IP rate limit (15/10 min).
+      Behind Cloudflare, prefer edge rate limiting too.
 
 ---
 

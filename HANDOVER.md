@@ -19,15 +19,20 @@
 
 ## 0. TL;DR (if you read only one thing)
 
+- Current version **5.7.9**. The prototype is feature-complete and pixel-reviewed;
+  remaining work is Bricks/WordPress implementation + the launch gate.
 - This is a **standalone WordPress plugin** exposing a shortcode `[elkollen]`
-  (alias `[behorighetskollen]`). Drop the shortcode in Bricks, done.
+  (alias `[behorighetskollen]`); `[elkollen layout="hero"]` is the split-hero
+  landing variant; `[elkollen jobb="<id>"]` preselects a verdict.
 - **All copy, all rules, all links live in `data/behorighetskollen-data.json`.**
   Never edit text in PHP/JS/CSS. Edit the data file.
 - **No build step, no npm deps, no external API.** Pure PHP + vanilla JS + CSS.
+- The verdict CTA opens an **in-tool lead form** that POSTs to the REST endpoint
+  (§9). There is a backend setup checklist (nonce/caching, SMTP) Chris must do.
 - **Launch gate:** a certified electrician (auktoriserad elinstallatör) must sign
   off on the job matrix before public launch. See `meta._pending_verification`.
 - **Bump `AMPY_BK_VERSION`** in `ampy-behorighetskollen.php` on every CSS/JS
-  change (cache-busting).
+  change (cache-busting). The agent should also read **`CLAUDE.md`** first.
 
 ---
 
@@ -42,11 +47,13 @@ outlet) and gets a categorical verdict:
 - 🔴 **RED** — "Det här kräver elektriker" (requires a certified electrician)
 
 Each verdict shows the legal source, an explanation (✓ allowed / ✗ requires an
-electrician), and either **Tips** (green) or **Consequences** (red), plus a CTA
-(quote on red, "read more" on green) and a share function.
+electrician), and either **Tips** (green) or **Consequences** (red), plus the CTAs:
+"Läs mer om {jobb}" (the service page) and **"Få kostnadsfri rådgivning"** which
+opens the in-tool lead form. (The share button was removed in 5.7.1; the share
+code remains but is not surfaced — see §9.1.)
 
-The tool drives three things at once: free value (viral/shareable), SEO
-(internal links to 23 Ampy service pages), and quote leads (red verdicts).
+The tool drives three things at once: free value, SEO (internal links to the Ampy
+service pages via `?jobb=`), and qualified leads (the in-tool form).
 
 ---
 
@@ -59,11 +66,13 @@ The tool drives three things at once: free value (viral/shareable), SEO
    await the electrician's sign-off. Do not change a verdict without re-review.
 3. **No em-dashes (—) in UI text.** Use periods/commas. (Em-dashes appear only in
    internal `_`-prefixed dev notes in the data, never in the UI.)
-4. **Color discipline:** the solid teal button (`--action-primary`) appears ONLY
-   on red ("Få kostnadsfri offert" / get a free quote). Green stays calm
-   (outline + text link).
-5. **The heading (H2 + lead) lives OUTSIDE the tool** — in Bricks as separate
-   elements above the shortcode. The tool never carries its own page H2 (for SEO).
+4. **Color discipline:** solid teal FILL (`--action-primary-strong`) is the primary
+   CTA ("Få kostnadsfri rådgivning"), strongest on red; teal TEXT links use
+   `--action-primary-text` (AA). The green verdict ramp (`--state-success`) is a
+   warmer leafy green, kept visually distinct from teal.
+5. **The page H1 + lead live OUTSIDE the tool** — native Bricks elements above/left
+   of the shortcode. The tool's verdict badge is an `<h2>`, so the page keeps a
+   single H1 (SEO + a11y).
 6. **The QA bar** ("⌘ QA-genvägar (preview only)") exists in BOTH
    `preview/index.html` and `preview/hero.html` and must NEVER ship to production.
    Neither preview file ships — only the `.ampy-bk` mount from the shortcode
@@ -85,10 +94,12 @@ ampy-behorighetskollen/
 │       └── README.md
 ├── includes/
 │   ├── render.php                  Server-rendered mount + crawlable fallback
-│   └── lead-endpoint.php           REST endpoint for inline leads (DISABLED by default)
+│   └── lead-endpoint.php           REST: POST /lead + GET /nonce (ACTIVE — the lead form posts here)
 ├── preview/
-│   └── index.html                  Local preview (NOT for production)
-├── README.md                       Overview + pointer to this file and CHECKLIST.md
+│   ├── hero.html                   Landing-page (split-hero) prototype — Bricks reference (NOT production)
+│   └── index.html                  Embedded-layout prototype (NOT production)
+├── CLAUDE.md                       Brief for the Claude Code agent (rules + architecture + commands)
+├── README.md                       Overview + reader-routing + 60-second handover
 ├── HANDOVER.md                     This document
 ├── CHECKLIST.md                    Human checklist for Chris
 └── CHANGELOG.md                    Version history

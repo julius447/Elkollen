@@ -23,6 +23,10 @@ Applied the launch QA findings across JS/CSS/PHP/markup:
 - **Prototype/docs:** hero.html no-JS fallback aligned to production; HANDOVER updated
   (nonce/caching + rate-limit + SMTP notes for Chris; QA bar noted in both preview files).
 - Version -> 5.7.9.
+- **Handover docs finalized** (no code change): added `CLAUDE.md` (agent brief —
+  rules, architecture, lead flow, commands), rewrote `README.md` (human handover +
+  reader routing), and refreshed `HANDOVER.md` + `CHECKLIST.md` (lead-form/email
+  backend setup as Step 4b, current file tree, the 5.7.x state).
 
 ## 5.7.8 — Hero headline copy
 - H1 -> "Får du fixa elen själv? Få svaret innan du börjar."
