@@ -174,11 +174,6 @@ Test on **desktop** and **mobile (360 px wide)**:
 - [ ] "Tillbaka" (Back) from the verdict goes to the **question step**, not all the
       way back to the start.
 
-**The share button:**
-- [ ] Desktop: click → a popover with Facebook / X / Reddit / Email / Copy link.
-      Test "Copy link" and one of the social options (opens a share window in a new tab).
-- [ ] Mobile: click → the phone's own share sheet.
-
 **General:**
 - [ ] Nothing is clipped on mobile. The block has breathing room around it.
 - [ ] No errors in the browser console (F12 → Console).

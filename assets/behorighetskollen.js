@@ -506,7 +506,9 @@
        =================================================================== */
     renderCta(job, verdictKey) {
       const wrap = document.createDocumentFragment();
-      const shortJob = this._shortLabel(job.label);
+      // Per-job override when the auto-shortened label would be illogical
+      // (e.g. "Felsökning av el" -> "el"); else strip the leading verb.
+      const shortJob = job.cta_short || this._shortLabel(job.label);
       // One standardized advice CTA label everywhere (data file = source of truth).
       const adviceLabel = this.data.meta.cta_advice_label || 'Få kostnadsfri rådgivning';
 
@@ -526,28 +528,24 @@
         el('span', { html: icon('arrowRight'), 'aria-hidden': 'true', style: 'display:inline-flex' })
       ]);
 
+      // The verdict ends with the CTAs (no share button, per client).
       if (verdictKey === 'red') {
-        // RÖD: solid teal advice-CTA (primary) + outline "Läs mer..." + share.
+        // RÖD: solid teal advice-CTA (primary) + outline "Läs mer...".
         wrap.appendChild(adviceBtn('ampy-bk__cta-primary ampy-bk__cta-primary--solid'));
         wrap.appendChild(readMore('ampy-bk__cta-secondary'));
-        const shareRow = el('div', { class: 'ampy-bk__share-row' });
-        shareRow.appendChild(this.renderShareButton(job, verdictKey));
-        wrap.appendChild(shareRow);
 
       } else if (verdictKey === 'green') {
-        // GRÖN: lugn primär "Läs mer om..." (DIY-guiden) + diskret advice-länk + share
+        // GRÖN: lugn primär "Läs mer om..." (DIY-guiden) + diskret advice-länk.
         wrap.appendChild(readMore('ampy-bk__cta-primary'));
         const ctaRow = el('div', { class: 'ampy-bk__cta-row' });
         ctaRow.appendChild(adviceBtn('ampy-bk__cta-link'));
-        ctaRow.appendChild(this.renderShareButton(job, verdictKey));
         wrap.appendChild(ctaRow);
 
       } else {
-        // GUL: "Läs mer om..." + advice-länk + share
+        // GUL: "Läs mer om..." + advice-länk.
         wrap.appendChild(readMore('ampy-bk__cta-primary'));
         const ctaRow = el('div', { class: 'ampy-bk__cta-row' });
         ctaRow.appendChild(adviceBtn('ampy-bk__cta-link'));
-        ctaRow.appendChild(this.renderShareButton(job, verdictKey));
         wrap.appendChild(ctaRow);
       }
 
@@ -824,8 +822,10 @@
       });
       const search = el('div', { class: 'ampy-bk__search' }, [
         el('label', { class: 'ampy-bk__search-label', for: searchId }, 'Sök eljobb'),
-        el('span', { class: 'ampy-bk__search-icon', html: icon('search'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-        searchInput
+        el('div', { class: 'ampy-bk__search-field' }, [
+          el('span', { class: 'ampy-bk__search-icon', html: icon('search'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
+          searchInput
+        ])
       ]);
       block.appendChild(search);
 
@@ -886,8 +886,10 @@
       });
       block.appendChild(el('div', { class: 'ampy-bk__search' }, [
         el('label', { class: 'ampy-bk__search-label', for: searchId }, 'Sök eljobb'),
-        el('span', { class: 'ampy-bk__search-icon', html: icon('search'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-        searchInput
+        el('div', { class: 'ampy-bk__search-field' }, [
+          el('span', { class: 'ampy-bk__search-icon', html: icon('search'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
+          searchInput
+        ])
       ]));
 
       // --- 2. "Välj rum" standing dropdown (always between search and list) ---

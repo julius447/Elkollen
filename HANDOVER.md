@@ -270,9 +270,11 @@ the right. Two rules:
   (split hero + "Så funkar det"). The FAQ and final CTA are intentionally NOT in
   this prototype — they come from existing site blocks placed below. Use the file
   as the visual + copy source of truth when assembling the Bricks section.
-- **"Så funkar det":** 3 cards on a navy band (flat white cards + flat
-  teal-stroke icon tiles + step number chips + a desktop connector line). Copy is
-  tool-specific: Välj ditt jobb / Få ditt besked / Gör nästa steg.
+- **"Så funkar det":** ampy.se-homepage style — a light section (`#eef2f9`),
+  borderless columns (no cards), large gradient navy->teal line-icons, numbered
+  inline titles ("1. Välj ditt jobb"), and a green accent on "det" in the heading.
+  Tool-specific copy: Välj ditt jobb / Få ditt besked / Gör nästa steg. Desktop is a
+  3-column row (left-aligned); mobile stacks centered.
 
 ---
 
@@ -299,15 +301,16 @@ A vendor-agnostic `track(event, props)` emits each funnel step twice: a
 `window.dataLayer.push` (GA4 / GTM) and a DOM `CustomEvent('elkollen:track')`.
 No-ops if nothing listens. Events: `tool_view`, `job_selected`, `question_shown`,
 `question_answered`, `verdict_shown` (job + color), `cta_click`,
-`lead_form_open`, `lead_submitted`, `share_opened`, `share_completed` (+channel),
-`verify_company_click`. Wire GA4/GTM or subscribe to the CustomEvent server-side.
+`lead_form_open`, `lead_submitted`, `verify_company_click`. Wire GA4/GTM or
+subscribe to the CustomEvent server-side.
 
-### 9.1 Share: touch vs desktop
-`navigator.share` now exists on desktop Chrome/Edge/Safari too, so the share
-button distinguishes by pointer type: on touch devices it uses the native share
-sheet (which surfaces Instagram, Messages, etc.); on desktop it opens the custom
-popover (Facebook / X / Reddit / Email / Copy link) for a consistent, designed
-experience. If you change this, keep the desktop popover — it is the intended UX.
+### 9.1 Share (currently not surfaced)
+As of 5.7.1 the share button was removed from the verdict screen (per client) so the
+verdict ends with the CTAs. The capability remains in the code (`renderShareButton`
++ `generateShareImage`, which builds a 1200x630 verdict card; touch -> native share
+sheet, desktop -> a Facebook/X/Reddit/Email/Copy popover) but is no longer called.
+To re-enable, append `this.renderShareButton(job, verdictKey)` in `renderCta` and
+re-add the `share_opened`/`share_completed` tracking.
 
 ---
 

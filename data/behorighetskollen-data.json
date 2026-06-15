@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "5.7",
+    "version": "5.7.1",
     "product_name": "Elkollen",
     "page_heading": "Koppla elen",
     "page_lead": "Se direkt vilka eljobb du får göra själv.",
@@ -612,6 +612,7 @@
     {
       "id": "felsokning",
       "label": "Felsökning av el",
+      "cta_short": "felsökning",
       "icon": "search",
       "service_page_url": "https://ampy.se/elservice/felsokning-av-el/",
       "type": "conditional",
@@ -704,6 +705,7 @@
     {
       "id": "dra-ny-kabel",
       "label": "Dra ny kabel",
+      "cta_short": "att dra ny kabel",
       "icon": "cable",
       "service_page_url": "https://ampy.se/elservice/elrenovering/",
       "type": "fixed",

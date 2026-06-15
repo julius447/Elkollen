@@ -2,6 +2,26 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 5.7.1 — Second client polish round
+- **"Så funkar det" redesigned** to match the ampy.se homepage style: light section
+  (was navy), borderless columns (no cards), large gradient navy->teal line-icons,
+  numbered inline titles ("1. Välj ditt jobb"), heading accent on "det". My 3-step
+  copy kept. Desktop row left-aligned, mobile stacked centered.
+- **Search icon alignment fixed:** icon + input now wrapped in `.ampy-bk__search-field`
+  so the magnifier centers on the input (it was centering on label+input and floating
+  high). Desktop + mobile.
+- **Share button removed from the verdict** (all colors, both breakpoints) — the
+  verdict now ends with the CTAs.
+- **Lead form:** removed (the share-row); Telefon + Postnummer already required.
+- **Internal link copy:** per-job `cta_short` so "Felsökning av el" -> "Läs mer om
+  felsökning" (was "...om el") and "Dra ny kabel" -> "...om att dra ny kabel". All 26
+  audited.
+- **Mobile badge:** stepped down (fs-16) so "Det här kräver elektriker" stays on one
+  line instead of wrapping.
+- **Hero copy:** trust bullet 1 shortened to "Byggt på Elsäkerhetslagen och
+  Elsäkerhetsverket"; trust-bullet icon/text spacing equalized.
+- Version -> 5.7.1.
+
 ## 5.7.0 — Pixel-perfect pass (client feedback + multi-agent audit)
 Eight client fixes + a 6-dimension UX/UI audit (typography, spacing, color/contrast,
 mobile, components, flows). Highlights:
