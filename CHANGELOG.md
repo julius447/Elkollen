@@ -2,6 +2,11 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 5.7.4 — Sticky hero copy (desktop)
+- The hero copy column is now `position: sticky` (top: 2.4rem) on desktop (>=768px)
+  so it stays pinned in view while the tool panel changes height / the user scrolls,
+  instead of appearing to move. Static (normal flow) on mobile.
+
 ## 5.7.3 — "Så funkar det" 1:1 + final pixel pass
 - **"Så funkar det" is now a true 1:1 of ampy.se's `.our-process`** (values pulled
   from the live site): light section, gradient-text heading

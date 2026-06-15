@@ -53,6 +53,12 @@
       align-items: start;
     }
     .hero__copy { padding-top: 0; overflow-wrap: break-word; }
+    /* Desktop: pin the marketing copy so it stays put (sticky) while the tool
+       panel on the right changes height / the user scrolls. align-self:start keeps
+       it at its natural height so sticky can engage inside the grid cell. */
+    @media (min-width: 768px) {
+      .hero__copy { position: sticky; top: 2.4rem; align-self: start; }
+    }
     .hero__h1 {
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       font-size: clamp(3.2rem, 4vw, 4.4rem);
