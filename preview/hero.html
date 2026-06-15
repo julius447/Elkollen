@@ -47,9 +47,10 @@
       display: grid;
       grid-template-columns: minmax(38rem, 44fr) minmax(46rem, 56fr);
       gap: 6.4rem;
-      /* vertically center the (shorter) copy column against the tool panel,
-         so it sits with equal space above and below */
-      align-items: center;
+      /* Anchor the copy to the top so it stays STILL as the tool panel changes
+         height between slides. Centering against a variable-height panel made the
+         left column jump around between steps (poor UX). */
+      align-items: start;
     }
     .hero__copy { padding-top: 0; overflow-wrap: break-word; }
     .hero__h1 {
@@ -61,7 +62,10 @@
     .hero__sub { font-size: 1.8rem; line-height: 1.55; color: var(--pg-ink-2); max-width: 46ch; margin: 0 0 2.8rem; }
     /* Trust bullets: fixed-size icons, consistent gap, icon optically aligned to
        the first text line (line-height 1.45 -> ~10px to the cap of a 2rem icon). */
-    .hero__trust { list-style:none; padding:0; margin:0 0 2.8rem; display:flex; flex-direction:column; gap:1.4rem; }
+    .hero__trust { list-style:none; padding:0; margin:0 0 2.8rem; display:flex; flex-direction:column; gap:1.6rem; }
+    /* Let each row hug its content; the list gap (1.6rem) gives a uniform gap
+       between bullets. (A min-height here would add dead space under the
+       single-line bullet and double the gap before the next on mobile.) */
     .hero__trust li { display:flex; align-items:flex-start; gap:1.2rem; font-size:1.5rem; line-height:1.45; font-weight:500; color: var(--pg-ink); }
     .hero__trust svg { width:2rem; height:2rem; min-width:2rem; margin-top:.3rem; color: var(--pg-teal); flex-shrink:0; } /* optical nudge to first-line cap */
     /* Ampy homepage CTA buttons — 1:1 replica of ampy.se hero gradient buttons
@@ -80,6 +84,7 @@
     .ampy-btn {
       box-sizing:border-box;
       display:inline-flex; align-items:center; justify-content:space-between; gap:2rem;
+      min-height:4.4rem; /* >=44px tap target at every width, not just <=478px */
       padding: clamp(1.02rem, calc(0.39vw + 0.9rem), 1.4rem) clamp(2rem, calc(2rem + 0.0044 * (100vw - 380px)), 2.4rem);
       border:0; border-radius:8px;
       box-shadow: 0 0 16px 0 rgba(241,241,241,0.23);
@@ -95,28 +100,47 @@
     .ampy-btn--phone   { background-image: linear-gradient(120deg, #b6f2ff 0%, #70becb 100%); }
     @media (max-width: 478px) {
       .hero__cta-row { width:100%; }
-      /* full-width tap target >=44px; group label+icon centered (not split) */
-      .ampy-btn { width:100%; max-width:100%; min-height:4.4rem; justify-content:center; gap:1.2rem; }
+      /* full-width; group label+icon centered (not split) */
+      .ampy-btn { width:100%; max-width:100%; justify-content:center; gap:1.2rem; }
     }
 
-    /* ---------- SÅ FUNKAR DET (ampy.se-stil: ljus sektion, ramlösa kolumner,
-       stora gradient-linjeikoner, numrerade titlar) ---------- */
+    /* ---------- SÅ FUNKAR DET — 1:1 med ampy.se ".our-process" ----------
+       Exakta värden hämtade från ampy.se: ljus sektion, gradient-textrubrik
+       (#1e1e1e -> #1d2f52 -> #33995c), stora gradient-linjeikoner
+       (#1B1D4A -> #5EB1BF), Outfit-titlar (vikt 400), tunn brödtext (vikt 200),
+       vänsterställda kolumner (max 25rem), sajtens egna clamp()-tokens. Root är
+       62.5% precis som ampy.se, så clamp()-värdena renderar identiskt. */
     section.steps { padding: clamp(5.6rem, 7vw, 9rem) 0; background: #eef2f9; }
-    .sec-head { text-align:center; margin:0 auto 5.6rem; max-width:64rem; }
-    .sec-head h2 { font-family:'Plus Jakarta Sans', system-ui, sans-serif; font-size:clamp(2.8rem,3.4vw,3.8rem); font-weight:700; letter-spacing:-.02em; margin:0 0 1.4rem; color:var(--pg-ink); }
-    .sec-head h2 .accent { color: var(--pg-teal); }
-    .sec-head p { font-size:1.8rem; color:var(--pg-ink-2); margin:0; line-height:1.55; }
-    .steps__grid { display:grid; grid-template-columns:repeat(3,1fr); gap:4.8rem; }
-    .step { text-align:left; }
-    .step__icon { display:block; width:6.4rem; height:6.4rem; margin:0 0 2.4rem; }
-    .step__icon svg { width:100%; height:100%; display:block; }
-    .step h3 { font-family:'Plus Jakarta Sans', system-ui, sans-serif; font-size:2.1rem; font-weight:600; margin:0 0 1rem; color:var(--pg-ink); letter-spacing:-.01em; }
-    .step p { font-size:1.6rem; color:var(--pg-ink-2); margin:0; line-height:1.6; max-width:34ch; }
+    .sec-head { text-align:center; margin:0 auto 4.8rem; max-width:66rem; }
+    .sec-head h2 {
+      font-family:'Plus Jakarta Sans', system-ui, sans-serif;
+      font-size: clamp(2.6rem, calc(1.04vw + 2.27rem), 3.6rem); /* --aptext-2xl */
+      font-weight: 400; letter-spacing:-.01em; margin:0 0 1.4rem;
+      background-image: linear-gradient(90deg, #1e1e1e 30%, #1d2f52, #33995c);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent; color: transparent;
+      display:inline-block;
+    }
+    .sec-head p { font-size: clamp(1.8rem, calc(0.21vw + 1.73rem), 2rem); color:var(--pg-ink-2); margin:0; line-height:1.55; font-weight:400; }
+    .steps__grid { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:4rem; justify-items:start; max-width:90rem; margin:0 auto; }
+    .step { text-align:left; max-width:25rem; }
+    .step__icon { display:block; height:8rem; margin:0 0 1.4rem; }
+    .step__icon svg { height:100%; width:auto; display:block; }
+    .step h3 {
+      font-family:'Outfit', system-ui, sans-serif;
+      font-size: clamp(2rem, calc(0.21vw + 1.93rem), 2.2rem); /* --aptext-ml */
+      font-weight: 400; margin:0 0 .8rem; color:var(--pg-ink); text-align:left;
+    }
+    .step p {
+      font-family:'Outfit', system-ui, sans-serif;
+      font-size: clamp(1.6rem, calc(0.21vw + 1.53rem), 1.8rem); /* --aptext-m */
+      font-weight: 200; line-height:1.3; color:var(--pg-ink-2); margin:0;
+    }
     @media (max-width: 767px) {
-      .steps__grid { grid-template-columns:1fr; gap:4.8rem; }
-      .step { text-align:center; }
+      .steps__grid { grid-template-columns:1fr; gap:4.8rem; justify-items:center; }
+      .step { text-align:center; max-width:34rem; }
       .step__icon { margin-left:auto; margin-right:auto; }
-      .step p { margin-left:auto; margin-right:auto; }
+      .step h3 { text-align:center; }
     }
 
     /* ---------- RESPONSIVE: stack the split ---------- */
@@ -196,22 +220,22 @@
   <section class="steps">
     <div class="wrap">
       <div class="sec-head">
-        <h2>Så funkar <span class="accent">det</span></h2>
+        <h2>Så funkar det</h2>
         <p>Inget mejl, ingen väntan. Du får svaret på sekunden, helt gratis.</p>
       </div>
       <div class="steps__grid">
         <div class="step">
-          <span class="step__icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#elkg1)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="elkg1" x1="3" y1="21" x2="21" y2="3" gradientUnits="userSpaceOnUse"><stop stop-color="#16235c"/><stop offset="1" stop-color="#5eb1bf"/></linearGradient></defs><circle cx="10.5" cy="10.5" r="7"/><line x1="21" y1="21" x2="15.6" y2="15.6"/></svg></span>
+          <span class="step__icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#elkg1)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="elkg1" x1="3" y1="21" x2="21" y2="3" gradientUnits="userSpaceOnUse"><stop stop-color="#1B1D4A"/><stop offset="1" stop-color="#5eb1bf"/></linearGradient></defs><circle cx="10.5" cy="10.5" r="7"/><line x1="21" y1="21" x2="15.6" y2="15.6"/></svg></span>
           <h3>1. Välj ditt jobb</h3>
           <p>Peka ut elarbetet du funderar på att göra hemma.</p>
         </div>
         <div class="step">
-          <span class="step__icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#elkg2)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="elkg2" x1="3" y1="21" x2="21" y2="3" gradientUnits="userSpaceOnUse"><stop stop-color="#16235c"/><stop offset="1" stop-color="#5eb1bf"/></linearGradient></defs><path d="M12 2.5l7 2.6v5.6c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V5.1z"/><path d="M9 11.7l2.1 2.1 4.1-4.2"/></svg></span>
+          <span class="step__icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#elkg2)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="elkg2" x1="3" y1="21" x2="21" y2="3" gradientUnits="userSpaceOnUse"><stop stop-color="#1B1D4A"/><stop offset="1" stop-color="#5eb1bf"/></linearGradient></defs><path d="M12 2.5l7 2.6v5.6c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V5.1z"/><path d="M9 11.7l2.1 2.1 4.1-4.2"/></svg></span>
           <h3>2. Få ditt besked</h3>
           <p>Ett tydligt besked direkt, med källan i lagen bredvid.</p>
         </div>
         <div class="step">
-          <span class="step__icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#elkg3)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="elkg3" x1="3" y1="21" x2="21" y2="3" gradientUnits="userSpaceOnUse"><stop stop-color="#16235c"/><stop offset="1" stop-color="#5eb1bf"/></linearGradient></defs><path d="M21 16.4v2.7a1.8 1.8 0 0 1-2 1.8 17.8 17.8 0 0 1-7.8-2.8 17.5 17.5 0 0 1-5.4-5.4A17.8 17.8 0 0 1 3 4.9 1.8 1.8 0 0 1 4.8 3h2.7a1.8 1.8 0 0 1 1.8 1.5c.1.9.3 1.7.6 2.5a1.8 1.8 0 0 1-.4 1.9L8.4 10a14.4 14.4 0 0 0 5.4 5.4l1.1-1.1a1.8 1.8 0 0 1 1.9-.4c.8.3 1.6.5 2.5.6A1.8 1.8 0 0 1 21 16.4z"/></svg></span>
+          <span class="step__icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#elkg3)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="elkg3" x1="3" y1="21" x2="21" y2="3" gradientUnits="userSpaceOnUse"><stop stop-color="#1B1D4A"/><stop offset="1" stop-color="#5eb1bf"/></linearGradient></defs><path d="M21 16.4v2.7a1.8 1.8 0 0 1-2 1.8 17.8 17.8 0 0 1-7.8-2.8 17.5 17.5 0 0 1-5.4-5.4A17.8 17.8 0 0 1 3 4.9 1.8 1.8 0 0 1 4.8 3h2.7a1.8 1.8 0 0 1 1.8 1.5c.1.9.3 1.7.6 2.5a1.8 1.8 0 0 1-.4 1.9L8.4 10a14.4 14.4 0 0 0 5.4 5.4l1.1-1.1a1.8 1.8 0 0 1 1.9-.4c.8.3 1.6.5 2.5.6A1.8 1.8 0 0 1 21 16.4z"/></svg></span>
           <h3>3. Gör nästa steg</h3>
           <p>Grönt? Följ våra säkerhetstips. Rött? Få kostnadsfri rådgivning.</p>
         </div>

@@ -2,6 +2,25 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 5.7.3 — "Så funkar det" 1:1 + final pixel pass
+- **"Så funkar det" is now a true 1:1 of ampy.se's `.our-process`** (values pulled
+  from the live site): light section, gradient-text heading
+  `linear-gradient(90deg,#1e1e1e 30%,#1d2f52,#33995c)` weight 400, large gradient
+  line-icons `#1B1D4A -> #5EB1BF` (thin 1.25 stroke), Outfit titles (400) + thin
+  weight-200 body, ampy's clamp() type tokens, ~25rem left-aligned columns
+  (centered on mobile).
+- **Hero copy column is top-anchored** (`align-items: start`) so it no longer jumps
+  vertically as the tool panel changes height between slides.
+- **Removed the color dots** from the quick-pick chips.
+- **Final multi-agent pixel audit applied:** even trust-bullet rhythm (removed a
+  min-height that doubled the gap on mobile); RED's two stacked CTAs equal height
+  (added line-height to the secondary); hero CTA 44px tap target at all widths;
+  step columns to the ~25rem spec; room-panel + job-row use the shared shadow /
+  focus-ring tokens; mobile verdict badge restored to fs-18 (dominant, still one
+  line); drawer on the 14px rhythm; lead-form disabled-state contrast (AA) and
+  consent-label pointer; fixed an undefined `--text-muted` fallback.
+- Version -> 5.7.3.
+
 ## 5.7.2 — Mobile overflow fix + chip/centering polish
 - **Mobile horizontal-overflow fixed (critical).** The hero grid used
   `grid-template-columns: 1fr`, whose min-content floor let the longest Swedish
