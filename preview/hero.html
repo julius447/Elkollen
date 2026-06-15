@@ -165,15 +165,24 @@
       <!-- RIGHT: the tool (plugin-owned), hero layout -->
       <div class="hero__tool">
         <div class="ampy-bk ampy-bk--hero" data-layout="hero" data-data-url="../data/behorighetskollen-data.json">
+          <!-- No-JS / crawlable fallback. Mirrors production (includes/render.php):
+               ampy-bk__instrument + tagline + job grid + source/disclaimer. The
+               live plugin emits the full 26-job list; a representative set here. -->
           <div class="ampy-bk__noscript">
-            <div class="ampy-bk__block">
-              <p class="ampy-bk__joblist-hint">Sök eljobb eller välj nedan</p>
+            <div class="ampy-bk__instrument">
+              <p class="ampy-bk__tagline">Se direkt vilka eljobb du får göra själv.</p>
               <ul class="ampy-bk__noscript-grid" role="list">
                 <li><a href="?jobb=byta-vagguttag">Byta vägguttag</a></li>
                 <li><a href="?jobb=byta-strombrytare">Byta strömbrytare</a></li>
+                <li><a href="?jobb=byta-gloldlampa">Byta glödlampa eller ljuskälla</a></li>
                 <li><a href="?jobb=golvvarme">Installera golvvärme</a></li>
                 <li><a href="?jobb=laddbox">Installera laddbox</a></li>
+                <li><a href="?jobb=spotlights">Installera spotlights</a></li>
+                <li><a href="?jobb=spis-ugn">Ansluta spis eller ugn</a></li>
+                <li><a href="?jobb=elcentral">Arbete i elcentralen</a></li>
               </ul>
+              <p class="ampy-bk__source-line">Källa: Elsäkerhetsverket &amp; Elsäkerhetslagen (2016:732) · Vägledning, inte juridisk rådgivning.</p>
+              <p class="ampy-bk__disclaimer">Vägledning, inte juridisk rådgivning. Är du osäker, anlita ett registrerat elinstallationsföretag.</p>
             </div>
           </div>
         </div>

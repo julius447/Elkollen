@@ -1,25 +1,32 @@
 <?php
 /**
- * REST endpoint: POST /wp-json/ampy-bk/v1/lead
+ * REST endpoints (ampy-bk/v1):
+ *   POST /lead   — the in-tool lead form posts here (see the verdict CTA "Få
+ *                  kostnadsfri rådgivning"). ACTIVE — required by the plugin.
+ *   GET  /nonce  — returns a FRESH wp_rest nonce. The JS fetches this on form
+ *                  open before POSTing, so a stale nonce baked into a
+ *                  full-page-cached HTML page never breaks anonymous submits.
  *
- * DISABLED BY DEFAULT — not loaded by the plugin (see the commented require in
- * ampy-behorighetskollen.php). The current UI links quote CTAs to /offert/
- * instead. This file is kept ready for a future embedded quote form.
+ * Protections: fresh-nonce check, honeypot (`webbplats`), per-IP rate limit,
+ * server-side validation + sanitization, GDPR consent required. Emails the admin
+ * (no DB table by design); on mail failure the payload is written to the PHP
+ * error log so a lead is never silently lost.
  *
- * Deliberately minimal in scope:
- *  - nonce verification (wp_rest)
- *  - honeypot field (`webbplats`) that must be empty
- *  - server-side validation + sanitization
- *  - GDPR consent required
- *  - emails the admin + (optionally) stores as a CPT
- *
- * Note: the field names in this endpoint are Swedish (namn, kontakt, meddelande,
- * samtycke, webbplats) to match a Swedish-language form. Keep them if you wire it up.
+ * Field names are Swedish (namn, kontakt, telefon, postnummer, samtycke, webbplats).
  */
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 add_action( 'rest_api_init', function () {
+    // Fresh nonce for the form (uncached GET — survives page caching).
+    register_rest_route( 'ampy-bk/v1', '/nonce', array(
+        'methods'             => WP_REST_Server::READABLE,
+        'permission_callback' => '__return_true',
+        'callback'            => function () {
+            return new WP_REST_Response( array( 'nonce' => wp_create_nonce( 'wp_rest' ) ), 200 );
+        },
+    ) );
+
     register_rest_route( 'ampy-bk/v1', '/lead', array(
         'methods'             => WP_REST_Server::CREATABLE,
         'callback'            => 'ampy_bk_handle_lead',
@@ -48,6 +55,19 @@ function ampy_bk_handle_lead( WP_REST_Request $request ) {
         return new WP_REST_Response( array( 'ok' => true ), 200 );
     }
 
+    // 1b. Lightweight per-IP rate limit so the public endpoint can't be used to
+    // mail-bomb the admin. NOTE: behind a CDN/proxy (e.g. Cloudflare) REMOTE_ADDR
+    // is the edge IP — prefer enforcing this at the edge/WAF and/or reading the
+    // real client IP from a trusted forwarded header. Generous threshold to avoid
+    // false positives on a shared edge IP.
+    $ip  = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : '0';
+    $rk  = 'ampy_bk_rl_' . md5( $ip );
+    $hits = (int) get_transient( $rk );
+    if ( $hits >= 15 ) {
+        return new WP_Error( 'ampy_bk_rate', 'För många förfrågningar. Försök igen om en stund.', array( 'status' => 429 ) );
+    }
+    set_transient( $rk, $hits + 1, 10 * MINUTE_IN_SECONDS );
+
     // 2. Sanitize + validate.
     $job_id     = sanitize_key( $request->get_param( 'job_id' ) );
     $verdict    = sanitize_key( $request->get_param( 'verdict' ) );
@@ -64,10 +84,14 @@ function ampy_bk_handle_lead( WP_REST_Request $request ) {
     if ( ! $samtycke ) {
         return new WP_Error( 'ampy_bk_consent', 'Vi behöver ditt samtycke för att höra av oss.', array( 'status' => 400 ) );
     }
-    $is_email = is_email( $kontakt );
-    $is_phone = preg_match( '/^[\d\s\+\-\(\)]{6,}$/', $kontakt );
-    if ( ! $is_email && ! $is_phone ) {
-        return new WP_Error( 'ampy_bk_kontakt', 'Ange en giltig e-postadress eller telefonnummer.', array( 'status' => 400 ) );
+    if ( ! is_email( $kontakt ) ) {
+        return new WP_Error( 'ampy_bk_epost', 'Ange en giltig e-postadress.', array( 'status' => 400 ) );
+    }
+    if ( ! preg_match( '/^[\d\s\+\-\(\)]{6,}$/', $telefon ) ) {
+        return new WP_Error( 'ampy_bk_telefon', 'Ange ett giltigt telefonnummer.', array( 'status' => 400 ) );
+    }
+    if ( ! preg_match( '/^\d{5}$/', $postnummer ) ) {
+        return new WP_Error( 'ampy_bk_postnummer', 'Ange ett giltigt postnummer (5 siffror).', array( 'status' => 400 ) );
     }
     if ( ! in_array( $verdict, array( 'green', 'yellow', 'red' ), true ) ) {
         return new WP_Error( 'ampy_bk_verdict', 'Okänt verdict.', array( 'status' => 400 ) );
@@ -114,7 +138,14 @@ function ampy_bk_handle_lead( WP_REST_Request $request ) {
     ) );
 
     if ( ! $sent ) {
-        return new WP_Error( 'ampy_bk_mail', 'Kunde inte skicka mejlet just nu. Försök igen om en stund.', array( 'status' => 500 ) );
+        // Don't lose the lead if wp_mail fails (SMTP hiccup, greylisting). Persist
+        // a structured line to the error log as a safety net; a CRM/CPT listener on
+        // ampy_bk_lead_received (above) is the recommended durable sink.
+        error_log( sprintf(
+            'AMPY_BK LEAD (mail failed) | jobb=%s verdict=%s | namn=%s | epost=%s | tel=%s | postnr=%s | tid=%s',
+            $job_id, $verdict, $namn, $kontakt, $telefon, $postnummer, current_time( 'mysql' )
+        ) );
+        return new WP_Error( 'ampy_bk_mail', 'Kunde inte skicka mejlet just nu. Ring oss på 010-265 79 79 så hjälper vi dig.', array( 'status' => 500 ) );
     }
     return new WP_REST_Response( array( 'ok' => true, 'message' => 'Tack! Vi hör av oss inom kort.' ), 200 );
 }

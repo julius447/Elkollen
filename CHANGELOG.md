@@ -2,6 +2,28 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 5.7.9 — Launch-readiness QA pass (6-agent audit applied)
+Applied the launch QA findings across JS/CSS/PHP/markup:
+- **Lead form:** field-specific `autocomplete` tokens (name/email/tel/postal-code)
+  for one-tap mobile autofill + WCAG 1.3.5; validation errors now set `aria-invalid`
+  on failing fields, move focus to the first one, and link it via `aria-describedby`.
+- **Nonce + caching (backend):** added `GET /wp-json/ampy-bk/v1/nonce`; the JS now
+  fetches a fresh nonce right before POST so a stale nonce on a full-page-cached page
+  can't 403 anonymous submits.
+- **Endpoint hardening:** per-IP rate limit (15/10 min), server-side format checks
+  (is_email, telefon pattern, 5-digit postnummer), and an error-log fallback so a
+  `wp_mail` failure never silently loses a lead.
+- **JS:** Back/Forward now closes the lead form (popstate resets `leadOpen`);
+  `verdict_shown`/`question_shown` fire once per distinct view (no double-count).
+- **Accessibility/motion:** added the missing `ampy-bk-fade` keyframe and disabled
+  `.ampy-bk__judgment` + drawer animations under `prefers-reduced-motion`; focus-visible
+  ring on the lead-form back button.
+- **Cross-device:** `-webkit-tap-highlight-color: transparent`; search input
+  `appearance: none` + hidden native clear button (iOS/Safari).
+- **Prototype/docs:** hero.html no-JS fallback aligned to production; HANDOVER updated
+  (nonce/caching + rate-limit + SMTP notes for Chris; QA bar noted in both preview files).
+- Version -> 5.7.9.
+
 ## 5.7.8 — Hero headline copy
 - H1 -> "Får du fixa elen själv? Få svaret innan du börjar."
 - Version -> 5.7.8.

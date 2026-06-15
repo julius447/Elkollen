@@ -64,9 +64,10 @@ The tool drives three things at once: free value (viral/shareable), SEO
    (outline + text link).
 5. **The heading (H2 + lead) lives OUTSIDE the tool** — in Bricks as separate
    elements above the shortcode. The tool never carries its own page H2 (for SEO).
-6. **The QA bar** ("⌘ QA-genvägar (preview only)") exists only in
-   `preview/index.html` and must NEVER ship to production. It is not part of the
-   plugin output.
+6. **The QA bar** ("⌘ QA-genvägar (preview only)") exists in BOTH
+   `preview/index.html` and `preview/hero.html` and must NEVER ship to production.
+   Neither preview file ships — only the `.ampy-bk` mount from the shortcode
+   reaches production (the QA bar + page chrome are prototype-only).
 
 ---
 
@@ -286,10 +287,24 @@ rådgivning", `meta.cta_advice_label`) opens an **in-tool lead form** (render mo
 required GDPR consent. It prefills the job + verdict context and POSTs JSON to
 `/wp-json/ampy-bk/v1/lead`. All form copy lives in `data.meta.lead_form`.
 
-- **`includes/lead-endpoint.php`** is now **enabled** (the `require_once` in the
-  plugin file is active). It validates nonce + honeypot + consent, verifies the
-  `job_id` against the data file, and emails the admin (`do_action
-  ampy_bk_lead_received` is the hook to also persist as a CPT / forward to a CRM).
+- **`includes/lead-endpoint.php`** is **enabled** (the `require_once` is active). It
+  validates a fresh nonce + honeypot + per-IP rate limit + format-checks
+  (e-post via `is_email`, telefon, 5-digit postnummer) + consent, verifies the
+  `job_id` against the data file, and emails the admin. `do_action
+  ampy_bk_lead_received` is the hook to also persist as a CPT / forward to a CRM.
+- **Nonce + full-page caching (IMPORTANT for Chris):** WordPress nonces are
+  time-bound. To stop a stale nonce (baked into a cached page) from 403-ing
+  anonymous submits, the JS fetches a FRESH nonce from `GET /wp-json/ampy-bk/v1/
+  nonce` right before POSTing. Still **verify on staging** that a logged-out
+  visitor on a *cached* page can submit > 24 h after the page was cached; if your
+  cache also caches the REST GET, exclude `/wp-json/ampy-bk/` from caching.
+- **Durability:** if `wp_mail` fails the payload is written to the PHP error log
+  as a safety net, but email is the only sink by default — for a paid lead magnet,
+  hook `ampy_bk_lead_received` to a CPT/CRM and confirm an authenticated SMTP /
+  transactional provider on staging (raw `mail()` will hurt deliverability).
+- **Rate limit:** 15 submits / 10 min per IP (transient). Behind Cloudflare,
+  REMOTE_ADDR is the edge IP — prefer edge/WAF rate limiting; the `IP:` line in the
+  lead email is the edge IP on such stacks (informational only, never for blocking).
 - **Static preview behavior:** when there is no WordPress backend (`window.AmpyBK`
   absent), `submitLead()` resolves a simulated success so the prototype demos the
   full flow. In production it does a real `fetch` with the `X-WP-Nonce` header.
@@ -345,8 +360,8 @@ re-add the `share_opened`/`share_completed` tracking.
    Verify especially: the `fast-armatur` job (scope), the penalty paragraph
    (48 § vs 49 §), and the 26 jobs' tips.
 5. **`byta-gloldlampa`** — misspelled ID but stable. Do not rename (breaks URLs).
-6. **The QA bar** in `preview/index.html` must never reach production (it exists
-   only there, not in the plugin output).
+6. **The QA bar** in both `preview/index.html` and `preview/hero.html` must never
+   reach production (it exists only in the preview files, not in the plugin output).
 
 ---
 

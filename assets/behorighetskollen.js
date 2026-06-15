@@ -138,6 +138,7 @@
       this.heroExpanded = false;
       this.leadOpen = false;
       this._booted = false;
+      this._lastShownKey = null;
       this.bindHistory();
       track('tool_view', { layout: this.layout || 'default', deep_link: this.state.jobId || null });
     }
@@ -168,8 +169,17 @@
       window.addEventListener('popstate', () => {
         this.state = this.readUrl();
         this.activeTab = 'explain';
+        this.leadOpen = false; // Back/Forward must not leave the lead form stuck open
         this.render();
       });
+    }
+
+    /* Fire an impression event only when the distinct view changes, so opening/
+       closing the lead form and Back/Forward to an unchanged view don't inflate it. */
+    _trackShown(event, props, key) {
+      if (key === this._lastShownKey) return;
+      this._lastShownKey = key;
+      track(event, props);
     }
 
     navigate(next, push = true) {
@@ -220,14 +230,17 @@
       let block;
       if (this.leadOpen && job && result.kind === 'verdict') {
         block = this.renderLeadBlock(job, result.verdictKey);
+        // do not touch _lastShownKey: closing the form returns to the same verdict
+        // without re-firing verdict_shown.
       } else if (!job || result.kind === 'unknown') {
         block = this.renderEntryBlock();
+        this._lastShownKey = null; // leaving the verdict/question resets the impression
       } else if (result.kind === 'ask') {
         block = this.renderQuestionBlock(job);
-        track('question_shown', { job_id: job.id });
+        this._trackShown('question_shown', { job_id: job.id }, 'q:' + job.id);
       } else {
         block = this.renderVerdictBlock(job, result.verdictKey);
-        track('verdict_shown', { job_id: job.id, verdict: result.verdictKey });
+        this._trackShown('verdict_shown', { job_id: job.id, verdict: result.verdictKey }, 'v:' + job.id + ':' + result.verdictKey);
       }
 
       // Hero mode: anti-jump. Hold the previous height across the swap, then
@@ -575,21 +588,23 @@
         f.intro || 'Ampys behöriga elektriker hör av sig med ett förslag, oftast inom en arbetsdag.'));
 
       const form = el('form', { class: 'ampy-bk__lead-form', novalidate: 'true' });
-      const field = (name, label, type, required, inputmode) => {
+      const field = (name, label, type, required, inputmode, autocomplete) => {
         const id = 'ampy-bk-lf-' + name;
         const wrapF = el('div', { class: 'ampy-bk__lead-field' });
         wrapF.appendChild(el('label', { class: 'ampy-bk__lead-label', for: id },
           label + (required ? '' : ' (valfritt)')));
+        // Field-specific autocomplete tokens drive the one-tap contact autofill
+        // chip on iOS/Android and satisfy WCAG 1.3.5 (Identify Input Purpose).
         const input = el('input', Object.assign({
-          class: 'ampy-bk__lead-input', id: id, name: name, type: type, autocomplete: 'on'
+          class: 'ampy-bk__lead-input', id: id, name: name, type: type, autocomplete: autocomplete || 'on'
         }, required ? { required: 'true' } : {}, inputmode ? { inputmode: inputmode } : {}));
         wrapF.appendChild(input);
         return { wrapF, input };
       };
-      const namn  = field('namn', 'Namn', 'text', true);
-      const epost = field('epost', 'E-post', 'email', true, 'email');
-      const tel   = field('telefon', 'Telefon', 'tel', true, 'tel');
-      const post  = field('postnummer', 'Postnummer', 'text', true, 'numeric');
+      const namn  = field('namn', 'Namn', 'text', true, null, 'name');
+      const epost = field('epost', 'E-post', 'email', true, 'email', 'email');
+      const tel   = field('telefon', 'Telefon', 'tel', true, 'tel', 'tel');
+      const post  = field('postnummer', 'Postnummer', 'text', true, 'numeric', 'postal-code');
 
       const grid = el('div', { class: 'ampy-bk__lead-grid' });
       grid.appendChild(namn.wrapF); grid.appendChild(epost.wrapF);
@@ -614,21 +629,39 @@
       ]);
       form.appendChild(consentRow);
 
-      const errorBox = el('p', { class: 'ampy-bk__lead-error', role: 'alert', hidden: true });
+      const errorId = 'ampy-bk-lf-error';
+      const errorBox = el('p', { class: 'ampy-bk__lead-error', id: errorId, role: 'alert', hidden: true });
       form.appendChild(errorBox);
 
       const submit = el('button', { class: 'ampy-bk__cta-primary ampy-bk__cta-primary--solid ampy-bk__lead-submit', type: 'submit' },
         f.submit || 'Skicka förfrågan');
       form.appendChild(submit);
 
+      // Clear the invalid state on a field as soon as the user edits it.
+      [namn, epost, tel, post].forEach(({ input }) => {
+        input.addEventListener('input', () => { input.removeAttribute('aria-invalid'); input.removeAttribute('aria-describedby'); });
+      });
+      consent.addEventListener('change', () => consent.removeAttribute('aria-invalid'));
+
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         errorBox.hidden = true;
         if (honey.value) return; // bot
-        if (!namn.input.value.trim() || !epost.input.value.trim() ||
-            !tel.input.value.trim() || !post.input.value.trim() || !consent.checked) {
+        const checks = [
+          [namn.input, !!namn.input.value.trim()],
+          [epost.input, !!epost.input.value.trim()],
+          [tel.input, !!tel.input.value.trim()],
+          [post.input, !!post.input.value.trim()],
+          [consent, consent.checked]
+        ];
+        checks.forEach(([el2]) => el2.removeAttribute('aria-invalid'));
+        const failed = checks.filter(([, ok]) => !ok).map(([el2]) => el2);
+        if (failed.length) {
+          failed.forEach(el2 => el2.setAttribute('aria-invalid', 'true'));
+          failed[0].setAttribute('aria-describedby', errorId);
           errorBox.textContent = f.error_required || 'Fyll i alla fält och godkänn villkoren.';
           errorBox.hidden = false;
+          try { failed[0].focus(); } catch (e2) {}
           return;
         }
         submit.disabled = true;
@@ -674,11 +707,19 @@
       if (!cfg || !cfg.restUrl) {
         return new Promise((resolve2) => setTimeout(resolve2, 600));
       }
-      return fetch(cfg.restUrl, {
+      // Fetch a FRESH nonce right before POST. The nonce baked into the page can be
+      // stale if the page is served from full-page cache; this uncached GET avoids
+      // a 403 on submit. Falls back to the localized nonce if the GET fails.
+      const nonceUrl = cfg.restUrl.replace(/\/lead\/?$/, '/nonce');
+      const freshNonce = fetch(nonceUrl, { headers: { 'X-WP-Nonce': cfg.restNonce || '' } })
+        .then(r => (r.ok ? r.json() : null))
+        .then(j => (j && j.nonce) || cfg.restNonce || '')
+        .catch(() => cfg.restNonce || '');
+      return freshNonce.then(nonce => fetch(cfg.restUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': cfg.restNonce || '' },
+        headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': nonce },
         body: JSON.stringify(payload)
-      }).then(r => { if (!r.ok) throw new Error('bad status'); return r.json(); });
+      })).then(r => { if (!r.ok) throw new Error('bad status'); return r.json(); });
     }
 
     renderShareButton(job, verdictKey) {

@@ -97,6 +97,9 @@ html { font-size: 62.5%; }
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* The tool provides its own :active / :focus-visible feedback, so suppress the
+     default grey/blue tap flash on iOS Safari / Android Chrome. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .ampy-bk *,
@@ -135,8 +138,15 @@ html { font-size: 62.5%; }
   from { opacity: 0; transform: translateY(2px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+/* Staggered fade for drawer results (was referenced but undefined). */
+@keyframes ampy-bk-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .ampy-bk__block { animation: none !important; }
+  .ampy-bk__block,
+  .ampy-bk__judgment,
+  .ampy-bk__drawer > * { animation: none !important; }
 }
 
 /* ============================================================================
@@ -815,6 +825,10 @@ html { font-size: 62.5%; }
 .ampy-bk__search-input {
   width: 100%;
   font: inherit;
+  /* Strip Safari/WebKit native search chrome (pill shape + clear-x) so the field
+     keeps the custom radius/height/padding on iOS + desktop Safari. */
+  -webkit-appearance: none;
+  appearance: none;
   font-family: 'Outfit', system-ui, sans-serif;
   font-size: 1.6rem; /* 16px floor so iOS Safari doesn't auto-zoom on focus */
   font-weight: 400;
@@ -828,6 +842,8 @@ html { font-size: 62.5%; }
   min-height: 4.8rem;
 }
 .ampy-bk__search-input::placeholder { color: var(--text-tertiary); }
+.ampy-bk__search-input::-webkit-search-cancel-button,
+.ampy-bk__search-input::-webkit-search-decoration { -webkit-appearance: none; display: none; }
 .ampy-bk__search-input:focus {
   outline: none;
   border-color: var(--border-focus);
@@ -1317,6 +1333,7 @@ html { font-size: 62.5%; }
 }
 .ampy-bk__lead-back svg { width: 1.6rem; height: 1.6rem; }
 .ampy-bk__lead-back:hover { color: var(--action-primary-text); }
+.ampy-bk__lead-back:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-sm); }
 .ampy-bk__lead-title {
   margin: 0 0 var(--space-3);
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
