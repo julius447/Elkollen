@@ -2,6 +2,18 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 5.7.5 — Final detail pass
+- **Removed the "Så funkar det" section** (markup + CSS) per client; the page now
+  ends with the hero.
+- **Mobile verdict badge** stepped to fs-15 (+ tighter pill padding) so both the
+  longest labels ("Det här får du göra själv" / "Det här kräver elektriker") stay
+  on one line on phones.
+- **Verdict icon alignment fixed** for every icon variation (do/don't rows, ✓/✗
+  tips, caveat): the icon box is now exactly one text-line tall with the glyph
+  centered, so it aligns to the first line of the text (verified delta 0) instead
+  of relying on a fixed margin-top nudge.
+- Version -> 5.7.5.
+
 ## 5.7.4 — Sticky hero copy (desktop)
 - The hero copy column is now `position: sticky` (top: 2.4rem) on desktop (>=768px)
   so it stays pinned in view while the tool panel changes height / the user scrolls,

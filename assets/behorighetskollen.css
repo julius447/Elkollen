@@ -340,7 +340,9 @@ html { font-size: 62.5%; }
 /* On narrow screens the full badge label ("Det här kräver elektriker") must stay
    on one line, so step the badge down a size. */
 @media (max-width: 767px) {
-  .ampy-bk__badge { font-size: var(--fs-18); padding: var(--space-3) var(--space-6); }
+  /* Keep the longest verdict label ("Det här får du göra själv" /
+     "Det här kräver elektriker") on ONE line within the narrow card. */
+  .ampy-bk__badge { font-size: var(--fs-15); padding: var(--space-3) var(--space-5); }
 }
 
 /* Per-verdict bindings */
@@ -461,9 +463,13 @@ html { font-size: 62.5%; }
 .ampy-bk__row-icon {
   flex-shrink: 0;
   width: 1.8rem;
-  height: 1.8rem;
-  margin-top: 0.1rem;
+  /* Box = one text line tall, glyph centered, so the icon optically aligns to the
+     first line of the row text (robust vs a fixed margin-top nudge). */
+  height: calc(var(--fs-15) * 1.5);
+  align-items: center;
+  justify-content: center;
 }
+.ampy-bk__row-icon svg { width: 1.8rem; height: 1.8rem; }
 .ampy-bk__row--do .ampy-bk__row-icon { color: var(--text-success); }
 .ampy-bk__row--dont .ampy-bk__row-icon { color: var(--text-tertiary); }
 
@@ -489,10 +495,12 @@ html { font-size: 62.5%; }
 .ampy-bk__caveat-icon {
   flex-shrink: 0;
   width: 1.6rem;
-  height: 1.6rem;
-  margin-top: 0.2rem;
+  height: calc(var(--fs-13) * 1.55); /* one line tall, glyph centered -> aligns to first line */
+  align-items: center;
+  justify-content: center;
   color: rgb(186, 117, 23);
 }
+.ampy-bk__caveat-icon svg { width: 1.6rem; height: 1.6rem; }
 .ampy-bk__caveat-text {
   font-family: 'Outfit', system-ui, sans-serif;
   font-size: var(--fs-13);
@@ -521,9 +529,11 @@ html { font-size: 62.5%; }
 .ampy-bk__tip-icon {
   flex-shrink: 0;
   width: 1.8rem;
-  height: 1.8rem;
-  margin-top: 0.1rem;
+  height: calc(var(--fs-15) * 1.5); /* one line tall, glyph centered -> aligns to first text line */
+  align-items: center;
+  justify-content: center;
 }
+.ampy-bk__tip-icon svg { width: 1.8rem; height: 1.8rem; }
 /* ✓ = något du FÅR göra (grön bock). ✗ = stopp-villkoret (dämpad). */
 .ampy-bk__tip--do .ampy-bk__tip-icon { color: var(--text-success); }
 .ampy-bk__tip--dont .ampy-bk__tip-icon { color: var(--text-tertiary); }
