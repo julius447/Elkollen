@@ -2,6 +2,19 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 5.7.2 — Mobile overflow fix + chip/centering polish
+- **Mobile horizontal-overflow fixed (critical).** The hero grid used
+  `grid-template-columns: 1fr`, whose min-content floor let the longest Swedish
+  word / nowrap chip force the column wider than the screen, clipping content.
+  Changed to `minmax(0, 1fr)`; quick-pick chips wrap (`white-space: normal`)
+  below 768px; verdict tabs use a tighter gap on mobile; hero copy gets
+  `overflow-wrap: break-word`. Result: zero horizontal overflow on entry,
+  question, verdict, lead and "Så funkar det" at mobile widths.
+- **Removed the color dots** next to the quick-pick chips (client).
+- **Hero columns vertically centered** (`align-items: center`) so the left copy
+  sits with equal space above and below the tool panel on desktop.
+- Version -> 5.7.2.
+
 ## 5.7.1 — Second client polish round
 - **"Så funkar det" redesigned** to match the ampy.se homepage style: light section
   (was navy), borderless columns (no cards), large gradient navy->teal line-icons,

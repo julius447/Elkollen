@@ -404,6 +404,9 @@ html { font-size: 62.5%; }
   border-bottom: 1px solid var(--border-tertiary);
   margin: 0 0 var(--space-9);
 }
+@media (max-width: 767px) {
+  .ampy-bk__tabs { gap: var(--space-9); }
+}
 
 .ampy-bk__tab {
   background: none;
@@ -1109,12 +1112,17 @@ html { font-size: 62.5%; }
   font-weight: 500;
   color: var(--text-primary);
   cursor: pointer;
-  white-space: nowrap; /* chip text stays on one line; chips wrap as a group */
+  white-space: nowrap; /* desktop: chip text stays on one line; chips wrap as a group */
   max-width: 100%;
   transition: background 150ms ease, border-color 150ms ease;
 }
 .ampy-bk__quickpick svg { width: 1.6rem; height: 1.6rem; color: var(--action-primary); flex-shrink: 0; }
 .ampy-bk__quickpick > span:last-child { overflow: hidden; text-overflow: ellipsis; }
+/* On narrow screens let chip text wrap rather than force horizontal overflow. */
+@media (max-width: 767px) {
+  .ampy-bk__quickpick { white-space: normal; }
+  .ampy-bk__quickpick > span:last-child { overflow: visible; text-overflow: clip; }
+}
 .ampy-bk__quickpick:hover { border-color: var(--action-primary); background: var(--bg-primary); }
 .ampy-bk__quickpick:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 
@@ -1268,15 +1276,6 @@ html { font-size: 62.5%; }
      warmer leafy green (--state-success) so "you may do it yourself" never reads
      as the teal "hire us" action.
    ============================================================================ */
-
-/* ---------- Quick-pick verdict dots (pre-answer signal) -------------------- */
-.ampy-bk__dot {
-  width: 1rem; height: 1rem; border-radius: 50%; flex-shrink: 0;
-  display: inline-block; /* spacing owned by the chip's flex gap, no extra margin */
-}
-.ampy-bk__dot--green   { background: var(--state-success); }
-.ampy-bk__dot--red     { background: var(--state-error); }
-.ampy-bk__dot--depends { background: var(--state-warning); }
 
 /* ---------- RED: one-line consequence surfaced by default ------------------ */
 .ampy-bk__verdict-lead {

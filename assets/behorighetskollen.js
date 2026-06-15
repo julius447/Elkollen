@@ -936,13 +936,11 @@
       const chips = el('ul', { class: 'ampy-bk__quickpicks', role: 'list' });
       picks.forEach(j => {
         const li = el('li');
-        const grp = jobGroup(j);
         li.appendChild(el('button', {
           class: 'ampy-bk__quickpick', type: 'button',
-          'aria-label': `Välj jobb: ${j.label} (${this._groupWord(grp)})`,
+          'aria-label': `Välj jobb: ${j.label} (${this._groupWord(jobGroup(j))})`,
           onclick: () => this.navigate({ jobId: j.id, answerIndex: null })
         }, [
-          el('span', { class: `ampy-bk__dot ampy-bk__dot--${grp}`, 'aria-hidden': 'true' }),
           el('span', { html: icon(j.icon === 'search' ? 'felsok' : j.icon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
           el('span', {}, j.chip_label || j.label)
         ]));

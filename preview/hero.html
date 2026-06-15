@@ -47,10 +47,11 @@
       display: grid;
       grid-template-columns: minmax(38rem, 44fr) minmax(46rem, 56fr);
       gap: 6.4rem;
-      align-items: start;
+      /* vertically center the (shorter) copy column against the tool panel,
+         so it sits with equal space above and below */
+      align-items: center;
     }
-    /* Top-align the H1 with the tool panel's top edge (both columns start flush). */
-    .hero__copy { padding-top: 0; }
+    .hero__copy { padding-top: 0; overflow-wrap: break-word; }
     .hero__h1 {
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       font-size: clamp(3.2rem, 4vw, 4.4rem);
@@ -123,7 +124,10 @@
       .hero__grid { grid-template-columns: minmax(0,40fr) minmax(0,60fr); gap: 4rem; }
     }
     @media (max-width: 767px) {
-      .hero__grid { grid-template-columns: 1fr; gap: 3.2rem; }
+      /* minmax(0,1fr), NOT 1fr: 1fr's min-content floor would let the longest
+         word / nowrap chip force the column wider than the screen (horizontal
+         overflow). minmax(0,...) lets the column track the viewport. */
+      .hero__grid { grid-template-columns: minmax(0, 1fr); gap: 3.2rem; }
       .hero { padding: 3.2rem 0; }
       .wrap { padding: 0 1.6rem; }
       .steps__grid { grid-template-columns: 1fr; }
