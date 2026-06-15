@@ -2,6 +2,10 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 5.7.7 — Hero headline copy
+- H1 -> "Får du fixa elen själv? Ta reda på vad du får och inte får göra." (mirrors the tool's du-får / inte-får logic).
+- Version -> 5.7.7.
+
 ## 5.7.6 — Lead-form polish
 - Removed the "Kostnadsfritt och utan förbindelse." footnote from the lead form
   (markup, CSS rule, and the `meta.lead_form.foot` data field).
