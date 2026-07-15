@@ -41,6 +41,10 @@ html { font-size: 62.5%; }
   --action-primary-strong: rgb(0, 122, 105);
   --focus-ring: 0 0 0 3px rgba(0, 169, 145, 0.25);
 
+  /* v7.1 (§4A/§4B): sticky site-header height hook. Bricks overrides this to its
+     real header px so the tool card anchors BELOW it; 0 in the static prototype. */
+  --ampy-header-h: 0px;
+
   /* Leafier green, deliberately warmer than the teal --action-primary so the
      "green = you may do it yourself" verdict never reads as the teal "hire us"
      action color (the two must stay visually distinct). */
@@ -170,8 +174,14 @@ html { font-size: 62.5%; }
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  margin: 0 0 var(--space-7); /* v7: the crumb is a single small control now */
-  min-height: 4.4rem;
+  /* v7.1 (M4): the container min-height is dropped (the 44px tap target lives on
+     the button); the crumb sits tight and consistent across every slide. */
+  min-height: 0;
+  margin: 0 0 var(--space-6);
+}
+@media (max-width: 767px) {
+  /* v7.1 (M4): pull the crumb up into the card's top padding on mobile. */
+  .ampy-bk__crumb { margin: calc(var(--space-3) * -1) 0 var(--space-5); }
 }
 
 .ampy-bk__crumb-back {
@@ -195,8 +205,19 @@ html { font-size: 62.5%; }
 .ampy-bk__crumb-back:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
 .ampy-bk__crumb-back svg { width: 1.6rem; height: 1.6rem; }
 
-/* v7 (V1): the crumb separator + job-name span are gone; the kicker on the
-   question/verdict screens carries the job name. */
+/* v7.1 (D5b): the crumb carries the job title on the verdict screen
+   (← Tillbaka · {job}). The separator + job-name span. */
+.ampy-bk__crumb-sep { color: var(--text-tertiary); font-size: var(--fs-14); }
+.ampy-bk__crumb-job {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-14);
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 /* ============================================================================
    QUESTION MODE — mellansteget
@@ -387,37 +408,15 @@ html { font-size: 62.5%; }
 }
 
 /* ============================================================================
-   MERGED LAW BOX (v7, V3) — ONE element replaces BOTH the cite chip and the
-   old red lead box: claim + citation visually fused. RED (and future YELLOW)
-   verdicts only; GREEN renders no source element at all (V4).
+   VERDICT SOURCE REF (v7.1, M7) — a minimal muted legal reference under the
+   red/yellow verdict board. Replaces the deleted merged law box; the
+   consequence now lives only in the Konsekvenser tab. GREEN gets none.
    ============================================================================ */
-.ampy-bk__lawnote {
-  margin: 0 0 var(--space-9);
-  padding: var(--space-5) var(--space-6);
-  border-radius: var(--radius-md);
-  background: rgba(214, 64, 64, 0.05);
-  border: 1px solid rgba(214, 64, 64, 0.16);
-}
-.ampy-bk__lawnote--yellow {
-  background: rgba(245, 175, 25, 0.07);
-  border-color: rgba(245, 175, 25, 0.28);
-}
-.ampy-bk__lawnote-text {
-  margin: 0;
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-14);
-  font-weight: 500;
-  line-height: 1.5;
-  color: var(--text-primary);
-}
-.ampy-bk__lawnote-src {
+.ampy-bk__verdict-src {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   margin-top: var(--space-3);
-  padding-top: var(--space-3);
-  width: 100%;
-  border-top: 1px solid rgba(214, 64, 64, 0.14);
   font-family: 'Outfit', system-ui, sans-serif;
   font-size: var(--fs-12);
   font-weight: 400;
@@ -425,11 +424,10 @@ html { font-size: 62.5%; }
   text-decoration: none;
   transition: color 150ms ease;
 }
-.ampy-bk__lawnote--yellow .ampy-bk__lawnote-src { border-top-color: rgba(245, 175, 25, 0.24); }
-.ampy-bk__lawnote-src:hover { color: var(--text-primary); }
-.ampy-bk__lawnote-src:hover span:first-child { text-decoration: underline; text-underline-offset: 2px; }
-.ampy-bk__lawnote-src:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
-.ampy-bk__lawnote-src svg { width: 1.3rem; height: 1.3rem; opacity: 0.75; flex-shrink: 0; }
+.ampy-bk__verdict-src:hover { color: var(--text-primary); }
+.ampy-bk__verdict-src:hover span:first-child { text-decoration: underline; text-underline-offset: 2px; }
+.ampy-bk__verdict-src:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+.ampy-bk__verdict-src svg { width: 1.3rem; height: 1.3rem; opacity: 0.75; flex-shrink: 0; }
 
 /* ============================================================================
    TABS — thin underline, two states
@@ -473,7 +471,9 @@ html { font-size: 62.5%; }
 /* ============================================================================
    FÖRKLARING TAB — summary + ✓/✗ contrast rows + caveat notice (green)
    ============================================================================ */
-.ampy-bk__tab-body { display: block; }
+/* v7.1 (M6): indent the tab panel inward, clearing the full-height accent rule. */
+.ampy-bk__tab-body { display: block; padding-left: var(--space-4); }
+@media (max-width: 767px) { .ampy-bk__tab-body { padding-left: var(--space-5); } }
 
 .ampy-bk__summary {
   font-family: 'Outfit', system-ui, sans-serif;
@@ -1058,12 +1058,18 @@ html { font-size: 62.5%; }
 .ampy-bk--hero .ampy-bk__block {
   max-width: none;
   margin: 0;
-  min-height: 52rem;            /* anti-jump floor (tallest common state) */
+  /* v7.1 (§4A): raised 52->56rem so S1-S4 share one height, keeping the centered
+     left column (§2B) stable and the chrome out of view. */
+  min-height: 56rem;
   padding: var(--space-13);     /* 3.2rem — hero breathing room */
 }
 @media (max-width: 767px) {
   .ampy-bk--hero .ampy-bk__block {
-    min-height: 0;              /* phones flow naturally; no reserved void */
+    /* v7.1 (M3): fill the small-viewport minus the Bricks sticky header + a
+       3.2rem breathing gap, with a 52rem floor so short slides never collapse.
+       This is what keeps the H1/paragraph/foot out of view while on the tool.
+       svh (small-viewport) is stable when the mobile URL bar shows/hides. */
+    min-height: max(52rem, calc(100svh - var(--ampy-header-h, 0px) - 3.2rem));
     /* v7: 16px side padding buys one extra word per line at 375px */
     padding: var(--space-9) var(--space-7);
   }
@@ -1156,7 +1162,9 @@ html { font-size: 62.5%; }
   gap: var(--space-5);
   list-style: none;
   padding: 0;
-  margin: 0;
+  /* v7.1 (M2): a guaranteed tiles->source gap so the divider never touches the
+     last tiles (the mobile fill would otherwise collapse the auto-margin to 0). */
+  margin: 0 0 var(--space-9);
 }
 .ampy-bk__roomgrid[hidden] { display: none; }
 .ampy-bk__roomgrid li { margin: 0; }
@@ -1236,8 +1244,13 @@ html { font-size: 62.5%; }
   .ampy-bk__roomtile-chip svg { width: 1.8rem; height: 1.8rem; }
 }
 
-/* Pin the source line to the card floor so the 520px never reads half-empty */
+/* Pin the source line to the card floor so the desktop card never reads half-empty */
 .ampy-bk--hero .ampy-bk__source-line { margin-top: auto; }
+@media (max-width: 767px) {
+  /* v7.1 (M2): unpin from the floor on mobile (the tall fill would shove it far
+     down); a fixed 20px gap keeps tiles->source symmetric with heading->tiles. */
+  .ampy-bk--hero .ampy-bk__source-line { margin-top: var(--space-9); }
+}
 
 /* Required-field asterisk (small, black) */
 .ampy-bk__req { color: #000; margin-left: 0.2rem; }
@@ -1271,9 +1284,9 @@ html { font-size: 62.5%; }
 }
 /* Retire the 3px judgment sliver — the full-height rule replaces it */
 .ampy-bk--hero .ampy-bk__block[data-verdict] .ampy-bk__judgment-accent { display: none; }
-.ampy-bk__block[data-verdict="green"]  { --verdict-accent: rgb(15, 110, 86);  --verdict-wash: rgba(15, 110, 86, 0.07); }
-.ampy-bk__block[data-verdict="red"]    { --verdict-accent: rgb(122, 22, 35);  --verdict-wash: rgba(214, 64, 64, 0.07); }
-.ampy-bk__block[data-verdict="yellow"] { --verdict-accent: rgb(135, 101, 7);  --verdict-wash: rgba(245, 175, 25, 0.09); }
+.ampy-bk__block[data-verdict="green"]  { --verdict-accent: rgb(15, 110, 86);  --verdict-wash: rgba(15, 110, 86, 0.07);  --verdict-board-bg: rgba(15, 110, 86, 0.08); }
+.ampy-bk__block[data-verdict="red"]    { --verdict-accent: rgb(122, 22, 35);  --verdict-wash: rgba(214, 64, 64, 0.07);  --verdict-board-bg: rgba(214, 64, 64, 0.06); }
+.ampy-bk__block[data-verdict="yellow"] { --verdict-accent: rgb(135, 101, 7);  --verdict-wash: rgba(245, 175, 25, 0.09);  --verdict-board-bg: rgba(245, 175, 25, 0.08); }
 /* Interior wash: top-anchored, fades to white (never dark) */
 .ampy-bk--hero .ampy-bk__block[data-verdict]::after {
   content: '';
@@ -1288,47 +1301,35 @@ html { font-size: 62.5%; }
 @media (max-width: 767px) {
   .ampy-bk--hero .ampy-bk__block[data-verdict]::after { height: 12rem; }
 }
-/* v7 (V2): the giant cover line is retired. Refined headline: 30/24px, 700
-   (the ONLY 700 on the surface), generous 1.15 leading. The drama lives in the
-   full-height accent rule + top wash, which stay unchanged. */
+/* v7.1 (D5c): the verdict label returns to a bordered green/red "board" (owner:
+   the old bordered treatment beat the giant plain headline). The icon is back.
+   The drama still lives in the full-height accent rule + top wash. */
 .ampy-bk--hero .ampy-bk__badge {
-  display: block;
-  background: none;
-  padding: 0;
-  border-radius: 0;
-  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-6);
+  border: 1.5px solid var(--verdict-accent);
+  border-radius: var(--radius-md);
+  background: var(--verdict-board-bg);
+  color: var(--text-primary);
   font-family: 'Outfit', system-ui, sans-serif;
   font-weight: 700;
-  font-size: var(--fs-30);
-  line-height: 1.15;
-  letter-spacing: -0.015em;
-  color: var(--text-primary);
-  text-wrap: balance;
-  max-width: 22ch;
+  font-size: var(--fs-20);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  max-width: 100%;
+  margin: 0;
 }
-.ampy-bk--hero .ampy-bk__badge svg { display: none; }
-@media (max-width: 767px) {
-  .ampy-bk--hero .ampy-bk__badge { font-size: var(--fs-24); line-height: 1.2; max-width: none; }
-}
-/* Kicker: the job name in caps, tinted to the verdict accent.
-   Unscoped so the embedded layout styles it too (never an unstyled line). */
-.ampy-bk__verdict-kicker {
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-weight: 600;
-  font-size: var(--fs-12);
-  letter-spacing: 0.10em; /* v7: Outfit caps are wide; 0.14 gapped */
-  text-transform: uppercase;
+.ampy-bk--hero .ampy-bk__badge svg {
+  display: inline-flex;
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
   color: var(--verdict-accent);
-  margin: 0 0 var(--space-1);
 }
-/* v7: personalisation subline under the kicker — "Ditt val: {option}" */
-.ampy-bk__verdict-choice {
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-13);
-  font-weight: 400;
-  line-height: 1.4;
-  color: var(--text-secondary);
-  margin: 0 0 var(--space-3);
+@media (max-width: 767px) {
+  .ampy-bk--hero .ampy-bk__badge { font-size: var(--fs-15); padding: var(--space-4) var(--space-5); }
 }
 /* The lead form sets no data-verdict, so the wash/rule never fire there. */
 
@@ -1343,8 +1344,9 @@ html { font-size: 62.5%; }
      as the teal "hire us" action.
    ============================================================================ */
 
-/* v7 (V3): the old .ampy-bk__verdict-lead red box is deleted — merged into
-   .ampy-bk__lawnote together with the cite chip. */
+/* v7.1 (M7): the merged law box is deleted; red/yellow now show only a minimal
+   source ref under the board (.ampy-bk__verdict-src) and the consequence lives
+   in the Konsekvenser tab. */
 
 
 /* ---------- IN-TOOL LEAD FORM ---------------------------------------------- */
@@ -1357,6 +1359,10 @@ html { font-size: 62.5%; }
   font-family: 'Outfit', system-ui, sans-serif; font-size: var(--fs-14); font-weight: 500;
   color: var(--text-secondary);
   transition: color 150ms ease;
+}
+@media (max-width: 767px) {
+  /* v7.1 (M8): match the M4 crumb pull so the back affordance is identical at every step. */
+  .ampy-bk__lead-back { margin: calc(var(--space-3) * -1) 0 var(--space-4); }
 }
 .ampy-bk__lead-back svg { width: 1.6rem; height: 1.6rem; }
 .ampy-bk__lead-back:hover { color: var(--action-primary-text); }
@@ -1419,7 +1425,8 @@ html { font-size: 62.5%; }
    ============================================================================ */
 @media (max-width: 767px) {
   .ampy-bk__block { scroll-margin-top: 1.2rem; }
-  .ampy-bk__entry-title { font-size: var(--fs-20); }
+  /* v7.1 (M2): 16px heading->tiles on mobile (symmetric with the 20px tiles->source). */
+  .ampy-bk__entry-title { font-size: var(--fs-20); margin: 0 0 var(--space-7); }
   .ampy-bk__drawer-title { font-size: var(--fs-20); }
   .ampy-bk__roomtile-label { font-size: var(--fs-16); }
   .ampy-bk__roomtile-sub { font-size: var(--fs-13); }

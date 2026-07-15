@@ -6,7 +6,7 @@
   <title>Får du göra eljobbet själv? | Elkollen, Ampy</title>
   <meta name="description" content="Välj eljobbet du funderar på och få ett tydligt besked direkt, byggt på Elsäkerhetslagen." />
 
-  <link rel="stylesheet" href="../assets/behorighetskollen.css?v=703" />
+  <link rel="stylesheet" href="../assets/behorighetskollen.css?v=710" />
 
   <style>
     /* ====================================================================
@@ -23,6 +23,10 @@
        data-file edit only. The static strings below are the same defaults.
        ==================================================================== */
     html { font-size: 62.5%; }
+    /* PREVIEW ONLY: the QA bar is a sticky ~4.4rem header, so tell the tool's
+       scroll-anchor to land the card below it. In production Bricks sets
+       --ampy-header-h to the real sticky-header height (0 if none). Never ships. */
+    :root { --ampy-header-h: 4.4rem; }
     body {
       margin: 0;
       font-family: 'Outfit', system-ui, -apple-system, sans-serif;
@@ -90,9 +94,23 @@
     .hero__tool { grid-area: tool; }
     .hero__foot { grid-area: foot; align-self: start; }
     @media (min-width: 768px) {
-      /* Pin the head so it stays STILL as the tool panel changes height. */
-      .hero__head { position: sticky; top: 2.4rem; align-self: start; }
-      .hero__foot { margin-top: 2.8rem; }
+      /* v7.1 (D4): vertically center the left column against the card via a
+         4-row grid (spacer / head / foot / spacer), held stable by the card's
+         56rem min-height. Sticky is removed — centering + the card floor hold it. */
+      .hero__grid {
+        grid-template-columns: minmax(38rem, 44fr) minmax(46rem, 56fr);
+        grid-template-rows: 1fr auto auto 1fr;
+        grid-template-areas:
+          ".    tool"
+          "head tool"
+          "foot tool"
+          ".    tool";
+        column-gap: 6.4rem;
+        row-gap: 0;
+        align-items: start;
+      }
+      .hero__head { position: static; }
+      .hero__foot { margin-top: 3.2rem; } /* was 2.8rem: more air paragraph->bullets */
     }
 
     /* v7 (H1a): Outfit 600, one size step down, opened leading, wider measure */
@@ -102,7 +120,7 @@
          desktop column (~25ch/line), not three. Mobile keeps the 3.4rem floor. */
       font-size: clamp(3.4rem, 3vw, 3.7rem);
       font-weight: 600;
-      line-height: 1.12;
+      line-height: 1.18; /* v7.1 (D4): airier */
       letter-spacing: -.015em;
       color: var(--pg-ink);
       margin: 0 0 2rem;
@@ -111,38 +129,47 @@
     .hero__h1-key { color: var(--pg-teal-strong); }
     .hero__sub {
       font-size: 1.8rem;
-      line-height: 1.55;
+      line-height: 1.6; /* v7.1 (D4) */
       color: var(--pg-ink-2);
       max-width: 46ch;
       margin: 0;
     }
-    .hero__trust { list-style:none; padding:0; margin:0 0 2.8rem; display:flex; flex-direction:column; gap:1.2rem; }
+    .hero__trust { list-style:none; padding:0; margin:0 0 2.8rem; display:flex; flex-direction:column; gap:1.6rem; } /* v7.1 (D4): larger gap between bullets */
     .hero__trust li { display:flex; align-items:flex-start; gap:1.2rem; font-size:1.5rem; line-height:1.45; font-weight:500; color: var(--pg-ink-2); }
     .hero__trust svg { width:1.8rem; height:1.8rem; min-width:1.8rem; margin-top:.2rem; color: var(--pg-teal); flex-shrink:0; }
 
-    /* v7 (H1e): TWO designed hero buttons, both themes.
-       Primary = identical solid teal fill in BOTH arms (the conversion element
-       is never a test variable); only the secondary adapts to its stage. */
+    /* v7.1 (D3): TWO gradient hero buttons, both themes. The gradient is the
+       conversion element — the SAME gradient in both A/B arms; only the shadow
+       adapts per stage (preserves a fair A/B). 8px radius, dark ink. */
     .hero__actions { display:flex; flex-wrap:wrap; gap:1.2rem; align-items:center; }
     .hero__btn {
       box-sizing:border-box; /* width:100% on mobile must include the padding */
       display:inline-flex; align-items:center; justify-content:center; gap:1rem;
-      min-height:4.8rem; padding:1.4rem 2.4rem; border-radius:10px;
+      min-height:4.8rem; padding:1.4rem 2.4rem; border-radius:8px;
       font-family:'Outfit', system-ui, sans-serif; font-size:1.6rem; line-height:1.2;
-      text-decoration:none; white-space:nowrap;
-      transition: background 150ms ease, border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease, color 150ms ease;
+      text-decoration:none; white-space:nowrap; border:1px solid transparent;
+      transition: filter 150ms ease, box-shadow 150ms ease, transform 150ms ease;
     }
     .hero__btn svg { flex-shrink:0; }
     .hero__btn:active { transform: translateY(1px); }
     .hero__btn:focus-visible { outline:2px solid rgb(0,169,145); outline-offset:2px; }
+    /* PRIMARY "Kontakta oss" — green->teal gradient, dark ink, trailing arrow */
     .hero__btn--primary {
-      font-weight:600;
-      background: rgb(0,122,105); color:#fff; border:1px solid rgb(0,122,105);
+      font-weight:600; color:#1e1e1e;
+      background: linear-gradient(120deg, #55ff9a 0%, #5eb1bf 100%);
     }
-    .hero__btn--secondary { font-weight:500; }
+    .hero__btn--primary svg { color:#1e1e1e; }
+    .hero__btn--primary:hover { filter:saturate(1.06) brightness(1.03); }
+    /* SECONDARY "Ring ..." — cyan gradient, dark ink, leading phone icon */
+    .hero__btn--secondary {
+      font-weight:600; color:#1e1e1e;
+      background: linear-gradient(120deg, #b6f2ff 0%, #70becb 100%);
+    }
+    .hero__btn--secondary svg { color:#1e1e1e; }
+    .hero__btn--secondary:hover { filter:saturate(1.06) brightness(1.03); }
 
     /* Mobile-only foot pieces (hidden on desktop) */
-    .hero__foot-ask, .hero__trust-mini { display:none; }
+    .hero__foot-ask { display:none; }
 
     /* ---------- RESPONSIVE: stack the split ---------- */
     @media (max-width: 1023px) {
@@ -166,6 +193,8 @@
       .hero { padding: 2.4rem 0 4rem; }
       .wrap { padding: 0 1.6rem; }
       .hero__h1 { font-size: clamp(2.9rem, 8vw, 3.2rem); line-height: 1.15; letter-spacing: -.012em; margin: 0 0 1.2rem; }
+      /* v7.1 (M1): the teal sentence gets its own line so the two colours never share one. */
+      .hero__h1-key { display: block; margin-top: 0.2rem; }
       .hero__sub { font-size: 1.6rem; line-height: 1.5; max-width: none; }
       /* v7 (H1d): the 3 trust bullets hide on mobile — every claim in them
          already lives inside the tool. The compact foot: ask line + stacked
@@ -178,11 +207,6 @@
       }
       .hero__actions { flex-direction: column; gap: 1rem; }
       .hero__btn { width: 100%; }
-      .hero__trust-mini {
-        display: block;
-        font-size: 1.3rem; line-height: 1.5; color: var(--pg-ink-2);
-        text-align: center; margin: 1.2rem 0 0;
-      }
     }
 
     /* ====================================================================
@@ -190,21 +214,12 @@
        card floats and the verdict reveal is the payoff.
        ==================================================================== */
     .elkollen-root[data-hero-theme="light"] .hero { background: transparent; }
+    /* v7.1 (D3): light-theme seating — the gradient stays; only the shadow adapts. */
     .elkollen-root[data-hero-theme="light"] .hero__btn--primary {
-      box-shadow: 0 6px 18px rgba(0,122,105,.20);
-    }
-    .elkollen-root[data-hero-theme="light"] .hero__btn--primary:hover {
-      background: rgb(0,110,94); border-color: rgb(0,110,94);
-      box-shadow: 0 8px 22px rgba(0,122,105,.26);
+      box-shadow: 0 6px 18px rgba(94,177,191,.30), 0 1px 2px rgba(11,13,42,.06);
     }
     .elkollen-root[data-hero-theme="light"] .hero__btn--secondary {
-      background: #fff; border: 1px solid #d6d9e4; color: rgb(9,11,50);
-      box-shadow: 0 1px 2px rgba(11,13,42,.05);
-    }
-    .elkollen-root[data-hero-theme="light"] .hero__btn--secondary svg { color: rgb(0,122,105); }
-    .elkollen-root[data-hero-theme="light"] .hero__btn--secondary:hover {
-      border-color: rgb(0,169,145);
-      box-shadow: 0 4px 12px rgba(11,13,42,.08);
+      box-shadow: 0 4px 14px rgba(112,190,203,.24), 0 1px 2px rgba(11,13,42,.05);
     }
     /* Card float (chrome-only: the block wrapper shadow; interior untouched) */
     .elkollen-root[data-hero-theme="light"] .ampy-bk--hero .ampy-bk__block {
@@ -264,25 +279,16 @@
     }
     /* Keep the H1 keyword legible on near-black (brighter teal) */
     .elkollen-root[data-hero-theme="dark"] .hero__h1-key { color: var(--pg-teal); }
-    /* Primary stays the SAME solid teal (never a ghost); aurora-tinted glow */
+    /* v7.1 (D3): dark-theme seating — the SAME gradient (never a ghost); the glow
+       ties into the aurora so the bright gradient reads premium on near-black,
+       not washed out. Dark ink is kept (set on the base rule). */
     .elkollen-root[data-hero-theme="dark"] .hero__btn--primary {
-      box-shadow: 0 6px 20px rgba(0,0,0,.4), 0 0 32px -8px rgba(var(--aurora-rgb),.35);
+      box-shadow: 0 8px 24px rgba(0,0,0,.48), 0 0 34px -8px rgba(94,255,154,.42);
+      border-color: rgba(255,255,255,.14);
     }
-    .elkollen-root[data-hero-theme="dark"] .hero__btn--primary:hover {
-      background: rgb(0,134,116); border-color: rgb(0,134,116);
-    }
-    /* Secondary = the established dark ghost recipe */
     .elkollen-root[data-hero-theme="dark"] .hero__btn--secondary {
-      border: 1px solid rgba(255,255,255,.22);
-      background: rgba(255,255,255,.03);
-      color: #fff;
-      -webkit-backdrop-filter: blur(2px);
-      backdrop-filter: blur(2px);
-    }
-    .elkollen-root[data-hero-theme="dark"] .hero__btn--secondary svg { color: rgb(0,169,145); }
-    .elkollen-root[data-hero-theme="dark"] .hero__btn--secondary:hover {
-      border-color: rgba(var(--aurora-rgb),.6);
-      background: rgba(var(--aurora-rgb),.08);
+      box-shadow: 0 6px 20px rgba(0,0,0,.42), 0 0 26px -10px rgba(112,190,203,.38);
+      border-color: rgba(255,255,255,.12);
     }
     /* Teal-tint disc behind each trust check (dark polish) */
     .elkollen-root[data-hero-theme="dark"] .hero__trust svg {
@@ -329,7 +335,7 @@
         <!-- HEAD: H1 + sub (Bricks-owned in production; strings = meta.hero) -->
         <div class="hero__head">
           <h1 class="hero__h1" id="hero-h1">Får du göra eljobbet själv? <span class="hero__h1-key">Kolla innan du kopplar.</span></h1>
-          <p class="hero__sub" id="hero-sub">Välj eljobbet du funderar på och få ett tydligt besked direkt, byggt på Elsäkerhetslagen.</p>
+          <p class="hero__sub" id="hero-sub">Välj installationen du funderar på och få ett tydligt besked direkt!</p>
         </div>
 
         <!-- TOOL: the plugin-owned tool (hero layout). THEME-AGNOSTIC. -->
@@ -361,21 +367,20 @@
           <ul class="hero__trust">
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Byggt på Elsäkerhetslagen och Elsäkerhetsverket</li>
             <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg> Registrerat elinstallationsföretag</li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Ett tydligt besked på några sekunder</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> <span id="hero-trust-3">Få ett tydligt besked på några sekunder</span></li>
           </ul>
           <p class="hero__foot-ask" id="hero-foot-ask">Hellre prata med en elektriker direkt?</p>
           <div class="hero__actions">
             <a class="hero__btn hero__btn--primary" id="hero-btn-primary" href="https://ampy.se/offert/"><span id="hero-btn-primary-label">Kontakta oss</span><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M5.13916 12.75L12.4808 5.25M12.4808 5.25H5.13916M12.4808 5.25V12.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
             <a class="hero__btn hero__btn--secondary" id="hero-btn-secondary" href="tel:+46102657979"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span id="hero-btn-secondary-label">Ring 010-265 79 79</span></a>
           </div>
-          <p class="hero__trust-mini" id="hero-trust-mini">Ampy är ett registrerat elinstallationsföretag.</p>
         </div>
 
       </div>
     </header>
   </div>
 
-  <script src="../assets/behorighetskollen.js?v=703"></script>
+  <script src="../assets/behorighetskollen.js?v=710"></script>
   <!-- Prototype-only theme toggle (never ships). Flips the A/B fork point. -->
   <script>
     (function () {
@@ -394,7 +399,7 @@
        truth so an owner copy swap never touches code. -->
   <script>
     (function () {
-      fetch('../data/behorighetskollen-data.json?v=703', { credentials: 'same-origin' })
+      fetch('../data/behorighetskollen-data.json?v=710', { credentials: 'same-origin' })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (data) {
           var hero = data && data.meta && data.meta.hero;
@@ -420,10 +425,10 @@
             if (node && text) node.textContent = text;
           };
           set('hero-sub', hero.sub);
+          set('hero-trust-3', hero.trust_3);
           set('hero-btn-primary-label', hero.button_primary);
           set('hero-btn-secondary-label', hero.button_secondary);
           set('hero-foot-ask', hero.mobile_ask);
-          set('hero-trust-mini', hero.mobile_trust);
           var setHref = function (id, url) {
             var node = document.getElementById(id);
             if (node && url) node.setAttribute('href', url);

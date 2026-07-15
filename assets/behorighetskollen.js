@@ -301,9 +301,13 @@
       try {
         headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ampy-header-h')) || 0;
       } catch (e) { /* no-op */ }
-      const anchor = headerH + 12; // px: target position for the card top
+      // v7.1 (M3/§4B): mobile uses a TIGHT band so every transition pulls the
+      // card top to ~8px under the header (no hunt-scroll); desktop keeps a wide
+      // band -> a no-op while the centered column is stable.
+      const isMobile = window.matchMedia('(max-width: 767px)').matches;
+      const anchor = headerH + (isMobile ? 8 : 12); // px: target position for the card top
       const top = block.getBoundingClientRect().top;
-      if (top < anchor - 4 || top > anchor + 64) {
+      if (top < anchor - 2 || top > anchor + (isMobile ? 6 : 48)) {
         // INSTANT scroll, deliberately not 'smooth': smooth scrolling is
         // rAF-driven and silently stalls in occluded/background tabs, and it
         // can be preempted by the view swap. An instant anchor is reliable on
@@ -315,10 +319,11 @@
     /* ===================================================================
        BREADCRUMB — universal pattern
        =================================================================== */
-    renderCrumb() {
-      // v7 (V1): the crumb is ONLY the back control. The job name lives in the
-      // kicker on the question and verdict screens, never duplicated here.
-      return el('div', { class: 'ampy-bk__crumb' }, [
+    renderCrumb(titleText) {
+      // v7.1 (D5b): the crumb is the back control; on the verdict screen it also
+      // carries the job title (the caps kicker + "Ditt val" subline are removed).
+      // Called with no argument elsewhere -> back-only.
+      const row = el('div', { class: 'ampy-bk__crumb' }, [
         el('button', {
           class: 'ampy-bk__crumb-back',
           type: 'button',
@@ -329,6 +334,11 @@
           'Tillbaka'
         ])
       ]);
+      if (titleText) {
+        row.appendChild(el('span', { class: 'ampy-bk__crumb-sep', 'aria-hidden': 'true' }, '·'));
+        row.appendChild(el('span', { class: 'ampy-bk__crumb-job' }, titleText));
+      }
+      return row;
     }
 
     /* ===================================================================
@@ -390,27 +400,26 @@
       // Drives the §5 verdict-reveal (full-height accent rule + interior wash).
       block.dataset.verdict = verdictKey;
 
-      block.appendChild(this.renderCrumb());
+      // v7.1 (D5b): the crumb now carries the job title (chip_label where authored
+      // gives a tighter mobile crumb, else the full label).
+      block.appendChild(this.renderCrumb(job.chip_label || job.label));
 
-      // The chosen option (all 26 jobs are conditional in v7, so a verdict is
-      // always the result of a committed choice; deep ?jobb=&svar= links too).
+      // The chosen option (all jobs are conditional, so a verdict is always the
+      // result of a committed choice; deep ?jobb=&svar= links too). Used to
+      // surface option-level green tips (§3F).
       const chosenOpt = (this.state.answerIndex != null && job.options && job.options[this.state.answerIndex])
         ? job.options[this.state.answerIndex] : null;
 
-      // Judgment — accent line + kicker + choice subline + headline
+      // Judgment — full-height accent rule + the boxed verdict board (D5c). The
+      // caps kicker and the "Ditt val" subline are gone (D5a); the job name is
+      // in the crumb.
       const judgment = el('div', { class: `ampy-bk__judgment ampy-bk__judgment--${verdictKey}` });
       judgment.appendChild(el('div', { class: 'ampy-bk__judgment-accent', 'aria-hidden': 'true' }));
       const jbody = el('div', { class: 'ampy-bk__judgment-body' });
-      // Kicker: the job name in caps (the crumb no longer carries it).
-      jbody.appendChild(el('p', { class: 'ampy-bk__verdict-kicker' }, job.label.toUpperCase()));
-      // v7: personalisation subline — the verdict visibly maps to their answer.
-      if (chosenOpt) {
-        jbody.appendChild(el('p', { class: 'ampy-bk__verdict-choice' }, `Ditt val: ${chosenOpt.label}`));
-      }
       const badgeIcon = verdictKey === 'green' ? 'check' : (verdictKey === 'red' ? 'ban' : 'alert');
       // h2, not h1: the page H1 is owned by Bricks/hero. data-focus-target so
       // focus lands here after the verdict renders (announced once, no aria-live
-      // shouting the heading on every paint).
+      // shouting the heading on every paint). The icon returns inside the board.
       jbody.appendChild(el('h2', {
         class: 'ampy-bk__badge',
         id: 'ampy-bk-v',
@@ -419,37 +428,24 @@
         el('span', { html: icon(badgeIcon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
         el('span', {}, v.label)
       ]));
+      // v7.1 (M7): red/yellow get a minimal source ref directly under the board;
+      // the merged law box is gone and the consequence lives only in the
+      // Konsekvenser tab. GREEN renders no source element (the Förklaring tab +
+      // the amber caveat carry the sourcing).
+      if (verdictKey !== 'green') {
+        const source = this._resolveSource(job, verdictKey);
+        jbody.appendChild(el('a', {
+          class: 'ampy-bk__verdict-src',
+          href: source.url,
+          target: '_blank',
+          rel: 'noopener noreferrer'
+        }, [
+          el('span', {}, source.text),
+          el('span', { html: icon('external'), 'aria-hidden': 'true', style: 'display:inline-flex' })
+        ]));
+      }
       judgment.appendChild(jbody);
       block.appendChild(judgment);
-
-      // v7 (V3/V4): ONE merged law box replaces BOTH the cite chip and the old
-      // red lead box — claim + citation visually fused. RED (and future YELLOW)
-      // only; GREEN renders no source element at all (the Förklaring tab + the
-      // amber caveat carry the sourcing).
-      if (verdictKey !== 'green') {
-        let lawBody = v.lawbox_body || '';
-        if (!lawBody) {
-          const ctext = (job.consequence || v.consequence || '').trim();
-          const lead = ctext.split('. ')[0];
-          if (lead) lawBody = /[.!?]$/.test(lead) ? lead : lead + '.';
-        }
-        if (lawBody) {
-          // Per-verdict source, resolved: option.source > job.source > verdict source.
-          const source = this._resolveSource(job, verdictKey);
-          block.appendChild(el('div', { class: `ampy-bk__lawnote ampy-bk__lawnote--${verdictKey}` }, [
-            el('p', { class: 'ampy-bk__lawnote-text' }, lawBody),
-            el('a', {
-              class: 'ampy-bk__lawnote-src',
-              href: source.url,
-              target: '_blank',
-              rel: 'noopener noreferrer'
-            }, [
-              el('span', {}, source.text),
-              el('span', { html: icon('external'), 'aria-hidden': 'true', style: 'display:inline-flex' })
-            ])
-          ]));
-        }
-      }
 
       // Two segments. Rendered as plain toggle buttons (aria-pressed), NOT an
       // ARIA tablist: we do not implement the roving-tabindex/arrow-key contract,
@@ -457,7 +453,10 @@
       // v7: the Tips tab is HIDDEN when the job has no tips array (otherwise
       // green verdicts on tip-less jobs render an empty tab). With only one
       // segment left there is nothing to switch, so the tab bar is skipped.
-      const hasTips = !!(job.tips && job.tips.length);
+      // v7.1 (§3F): prefer the chosen option's tips so every green verdict shows
+      // a correct Tips tab (falls back to job-level tips for back-compat).
+      const hasTips = !!((chosenOpt && chosenOpt.tips && chosenOpt.tips.length) ||
+                         (job.tips && job.tips.length));
       const secondTab = (verdictKey === 'red' || verdictKey === 'yellow')
         ? { key: 'consequence', label: 'Konsekvenser' }
         : (hasTips ? { key: 'tips', label: 'Tips' } : null);
@@ -584,7 +583,11 @@
       //   allowed=false → ✗ (the stop condition, the boundary to an electrician).
       // Backwards-compat: plain strings are interpreted as allowed=true.
       const job = this.currentJob;
-      const raw = (job && job.tips && job.tips.length) ? job.tips : (v.tips || []);
+      // v7.1 (§3F): option tips first, then job-level tips, then verdict tips.
+      const opt = (this.state.answerIndex != null && job && job.options && job.options[this.state.answerIndex])
+        ? job.options[this.state.answerIndex] : null;
+      const raw = (opt && opt.tips && opt.tips.length) ? opt.tips
+                : ((job && job.tips && job.tips.length) ? job.tips : (v.tips || []));
       const tips = raw.map(t => (typeof t === 'string') ? { text: t, allowed: true } : t);
 
       const list = el('ul', { class: 'ampy-bk__tips', role: 'list' });

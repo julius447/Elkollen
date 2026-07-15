@@ -1,12 +1,12 @@
 {
   "meta": {
-    "version": "7.0.1",
+    "version": "7.1.0",
     "product_name": "Elkollen",
     "page_heading": "Koppla elen",
     "page_lead": "Se direkt vilka eljobb du får göra själv.",
     "last_reviewed": "2026-06-XX",
     "reviewed_by": "TBD: certified electrician (auktoriserad elinstallatör) before launch",
-    "_pending_verification": "PENDING: the 26-job matrix + per-verdict legal sources + the penalty clause in Elsäkerhetslagen (48 § vs 49 §) + per-job tips must be signed off by a certified electrician (auktoriserad elinstallatör) before launch. The tips were reviewed by an independent safety reviewer in June 2026; the sign-off is the gate. The job 'fast-armatur' (replacing a fixed-mounted luminaire) is the most legally sensitive — verify its scope. v7 ADDITION: all 15 previously fixed jobs are converted to type:conditional with an authored two-option question (choice_type scenario/guess); every option-to-verdict mapping is derived from the job's own verified summary/do/dont/why_text/tips, and the ENTIRE new question matrix must be re-signed by the auktoriserad elinstallatör as part of this gate.",
+    "_pending_verification": "PENDING: the 26-job matrix + per-verdict legal sources + the penalty clause in Elsäkerhetslagen (48 § vs 49 §) + per-job tips must be signed off by a certified electrician (auktoriserad elinstallatör) before launch. The tips were reviewed by an independent safety reviewer in June 2026; the sign-off is the gate. The job 'fast-armatur' (replacing a fixed-mounted luminaire) is the most legally sensitive — verify its scope. v7 ADDITION: all 15 previously fixed jobs are converted to type:conditional with an authored two-option question (choice_type scenario/guess); every option-to-verdict mapping is derived from the job's own verified summary/do/dont/why_text/tips, and the ENTIRE new question matrix must be re-signed by the auktoriserad elinstallatör as part of this gate. v7.1 ADDITION: 18 option-level green-tip arrays (options[].tips) authored 2026-07-15 must be re-signed by the auktoriserad elinstallatör together with the matrix; see meta._green_tips_note. The M5 shortened red consequence drops the 48 vs 49 § citation (now says 'påföljd' generically); the only cited paragraph on the red screen is the verified 27 §.",
     "primary_source": "Elsäkerhetslagen (2016:732) & Elsäkerhetsverket",
     "disclaimer": "Vägledning, inte juridisk rådgivning. Är du osäker, anlita ett registrerat elinstallationsföretag.",
     "koppla_sakert_url": "https://www.kopplasakert.se/",
@@ -60,14 +60,16 @@
     "hero": {
       "h1": "Får du göra eljobbet själv? Kolla innan du kopplar.",
       "h1_key": "Kolla innan du kopplar.",
-      "sub": "Välj eljobbet du funderar på och få ett tydligt besked direkt, byggt på Elsäkerhetslagen.",
+      "sub": "Välj installationen du funderar på och få ett tydligt besked direkt!",
       "button_primary": "Kontakta oss",
       "button_primary_url": "https://ampy.se/offert/",
       "button_secondary": "Ring 010-265 79 79",
       "button_secondary_url": "tel:+46102657979",
       "mobile_ask": "Hellre prata med en elektriker direkt?",
-      "mobile_trust": "Ampy är ett registrerat elinstallationsföretag."
-    }
+      "mobile_trust": "_deprecated",
+      "trust_3": "Få ett tydligt besked på några sekunder"
+    },
+    "_green_tips_note": "[GAP] 18 option-level green tip arrays authored 2026-07-15; practical safety guidance only, no legal claim; must be re-signed by the auktoriserad elinstallatör with the matrix (meta._pending_verification)."
   },
   "verdicts": {
     "green": {
@@ -100,13 +102,13 @@
       "icon": "block",
       "token": "--state-error",
       "caveat": "Detta är elinstallationsarbete och får enligt lag bara utföras av ett registrerat elinstallationsföretag.",
-      "consequence": "Att utföra elinstallationsarbete utan behörighet är ett brott enligt Elsäkerhetslagen (48 §). Straffet är böter eller fängelse i upp till ett år, oavsett om jobbet blir tekniskt rätt. Din hemförsäkring kan dessutom sätta ned eller neka ersättning om en skada beror på arbete som inte gjorts fackmannamässigt.",
+      "consequence": "Utan behörighet är jobbet ett brott, med böter eller fängelse som påföljd. Även försäkringen kan neka ersättning vid skada.",
       "_consequence_verify": "VERIFIERA VID SIGNATUR: exakt straffparagraf (48 § vs 49 §) i Elsäkerhetslagen 2016:732 — riksdagen listar böter som 49 §; lämna texten som den är tills elinstallatör signerar. The v7 merged law box (lawbox_body) inherits the same 48 vs 49 § flag.",
       "source": {
         "text": "Elsäkerhetslagen (2016:732) 27 §",
         "url": "https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/elsakerhetslag-2016732_sfs-2016-732/"
       },
-      "lawbox_body": "Utan behörighet är jobbet ett brott, med böter eller fängelse i straffskalan. Även hemförsäkringen kan neka ersättning vid skada."
+      "lawbox_body": "_deprecated"
     }
   },
   "service_zones": [
@@ -238,7 +240,25 @@
           "verdict": "green",
           "summary": "Att byta ljuskälla räknas inte som elinstallationsarbete.",
           "do": "Byta ljuskälla i en befintlig armatur, inomhus eller utomhus.",
-          "dont": "Byta själva armaturen eller dra ny ledning kräver elektriker."
+          "dont": "Byta själva armaturen eller dra ny ledning kräver elektriker.",
+          "tips": [
+            {
+              "text": "Bryt strömmen vid strömbrytaren och låt ljuskällan svalna helt innan du rör den. Glödlampor och halogen blir brännheta.",
+              "allowed": true
+            },
+            {
+              "text": "Matcha sockel och effekt (E27, E14, GU10) mot armaturens märkning. För hög effekt kan överhetta armaturen.",
+              "allowed": true
+            },
+            {
+              "text": "Byter du till LED i en armatur med dimmer? Välj en ljuskälla märkt dimbar, annars kan den flimra.",
+              "allowed": true
+            },
+            {
+              "text": "Är sockeln bränd, missfärgad eller sitter lampan löst? Bryt strömmen och låt en elektriker titta på armaturen.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Sockeln är skadad eller ny ledning behövs",
@@ -296,7 +316,25 @@
           "verdict": "green",
           "summary": "Lampor med DCL-stickpropp räknas inte som fast installation.",
           "do": "Byta en lampa med DCL-stickpropp i ett torrt rum.",
-          "dont": "Fast monterad armatur, våtrum eller ny ledning kräver elektriker."
+          "dont": "Fast monterad armatur, våtrum eller ny ledning kräver elektriker.",
+          "tips": [
+            {
+              "text": "DCL-donet, den vita kopplingen i taket, är gjort för att du själv ska kunna klicka loss den gamla lampan och i den nya.",
+              "allowed": true
+            },
+            {
+              "text": "Bryt ändå strömmen vid strömbrytaren först och kontrollera att armaturen verkligen sitter i ett DCL-don.",
+              "allowed": true
+            },
+            {
+              "text": "Häng tunga armaturer i takkroken eller dosans fäste, aldrig i själva donet eller sladden.",
+              "allowed": true
+            },
+            {
+              "text": "Sticker ledningarna ut direkt ur taket utan DCL-don, eller är det ett våtrum? Då kräver inkopplingen en elektriker.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Ledningarna sticker ut direkt ur taket",
@@ -353,7 +391,25 @@
           "verdict": "green",
           "summary": "Du får byta armaturen, så länge ledningen och dosan redan sitter där.",
           "do": "Byta en befintlig armatur i ett torrt rum där ledningen finns.",
-          "dont": "Byta lamputtaget, dra ny ledning eller jobba i våtrum."
+          "dont": "Byta lamputtaget, dra ny ledning eller jobba i våtrum.",
+          "tips": [
+            {
+              "text": "Bryt strömmen vid säkringen, inte bara vid strömbrytaren, och kontrollera med spänningsprovare att ledningarna är döda.",
+              "allowed": true
+            },
+            {
+              "text": "Fotografera den gamla kopplingen innan du lossar något. Kan du inte återskapa exakt samma anslutning, ta in en elektriker.",
+              "allowed": true
+            },
+            {
+              "text": "Skyddsjorden (gul och grön) ska anslutas i en metallarmatur. Är kopplingen oklar, koppla inte på gissning.",
+              "allowed": true
+            },
+            {
+              "text": "Ny ledning, nytt lamputtag eller arbete i våtrum är elinstallationsarbete för ett registrerat företag.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Nytt uttag, ny ledning eller våtrum",
@@ -441,7 +497,25 @@
           "verdict": "green",
           "summary": "Du får byta brytaren, så länge typ och koppling är desamma.",
           "do": "Byta en befintlig brytare (högst 16 A) i sin egen dosa.",
-          "dont": "Sätta dimmer, flytta brytaren eller dra ny ledning."
+          "dont": "Sätta dimmer, flytta brytaren eller dra ny ledning.",
+          "tips": [
+            {
+              "text": "Bryt strömmen vid säkringen och prova med spänningsprovare. En strömbrytare kan ha spänning kvar även när lampan är släckt.",
+              "allowed": true
+            },
+            {
+              "text": "Märk eller fotografera ledarna innan du lossar dem. Hittar du nolla (N) på brytaren i stället för fas (L) är den felkopplad, ta då hjälp.",
+              "allowed": true
+            },
+            {
+              "text": "Byt mot samma typ. En trapp- eller korskoppling har fler ledare och kan inte ersättas med en enkel brytare.",
+              "allowed": true
+            },
+            {
+              "text": "Vill du sätta dimmer, flytta brytaren eller dra ny ledning? Det är elinstallationsarbete och kräver elektriker.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Jag vill flytta, sätta ny eller dra ny ledning",
@@ -498,7 +572,25 @@
           "source": {
             "text": "Elsäkerhetsverket – byta vägguttag",
             "url": "https://www.elsakerhetsverket.se/privatpersoner/detta-far-du-gora-sjalv-med-el/byta-vagguttag/"
-          }
+          },
+          "tips": [
+            {
+              "text": "Bryt strömmen vid säkringen och kontrollera med spänningsprovare i uttaget. Det räcker inte att stänga av med strömbrytaren.",
+              "allowed": true
+            },
+            {
+              "text": "Byt mot samma typ och märkström (oftast 16 A). Ett jordat uttag ska alltid ersättas med ett jordat, aldrig nedgraderas.",
+              "allowed": true
+            },
+            {
+              "text": "Dra åt plintskruvarna ordentligt så ingen ledare sitter löst. Glapp är en vanlig orsak till värme och brand.",
+              "allowed": true
+            },
+            {
+              "text": "Flytta uttaget, byta ojordat till jordat eller sätta ett nytt kräver ett registrerat företag.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Jag vill flytta, sätta nytt eller byta ojordat till jordat",
@@ -551,7 +643,25 @@
           "verdict": "green",
           "summary": "Du får återställa och byta säkringar, men inte ändra något inuti centralen.",
           "do": "Byta en trasig propp eller återställa en utlöst automatsäkring.",
-          "dont": "Lägga till en grupp eller byta en automatsäkring."
+          "dont": "Lägga till en grupp eller byta en automatsäkring.",
+          "tips": [
+            {
+              "text": "Det du får göra i centralen är att byta en trasig propp och att återställa en utlöst automatsäkring eller jordfelsbrytare.",
+              "allowed": true
+            },
+            {
+              "text": "Byt alltid mot samma typ och amperetal. En propp med högre värde tar bort skyddet för den ledningen.",
+              "allowed": true
+            },
+            {
+              "text": "Löser samma säkring ut om och om igen? Det är ett tecken på fel, dra ur apparater och ring en elektriker om det fortsätter.",
+              "allowed": true
+            },
+            {
+              "text": "Öppna aldrig kåpan för att skruva i plintar, lägga till en grupp eller byta en automatsäkring. Det är arbete för en elektriker.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Ny grupp, byta automatsäkring eller annat",
@@ -605,7 +715,25 @@
           "verdict": "green",
           "summary": "Att testa en befintlig jordfelsbrytare med testknappen får du göra själv.",
           "do": "Testa en befintlig jordfelsbrytare med testknappen varje halvår.",
-          "dont": "Installera eller byta jordfelsbrytare i centralen kräver elektriker."
+          "dont": "Installera eller byta jordfelsbrytare i centralen kräver elektriker.",
+          "tips": [
+            {
+              "text": "Tryck på testknappen (T) på jordfelsbrytaren ungefär var sjätte månad. Den ska lösa ut direkt och bryta strömmen.",
+              "allowed": true
+            },
+            {
+              "text": "Slår den inte ifrån när du testar? Då skyddar den inte som den ska, boka en elektriker för kontroll.",
+              "allowed": true
+            },
+            {
+              "text": "Slå på brytaren igen efter testet och ställ om klockor och annat som nollställts.",
+              "allowed": true
+            },
+            {
+              "text": "Att installera en ny jordfelsbrytare eller byta den gamla är arbete inne i elcentralen och kräver ett registrerat företag.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Installera en ny eller byta den gamla",
@@ -640,7 +768,25 @@
           "verdict": "green",
           "summary": "Med färdig stickpropp och rätt uttag är det bara att koppla in.",
           "do": "Ansluta en spis med stickpropp till ett befintligt matchande uttag.",
-          "dont": "Fast anslutning eller ett nytt Perilex-uttag."
+          "dont": "Fast anslutning eller ett nytt Perilex-uttag.",
+          "tips": [
+            {
+              "text": "Det här gäller bara om spisen har en färdig stickpropp och det finns ett matchande uttag. Du sätter i kontakten, inget mer.",
+              "allowed": true
+            },
+            {
+              "text": "Kontrollera att uttaget är avsett för spisens effekt. En spis drar mycket och ett underdimensionerat uttag blir varmt.",
+              "allowed": true
+            },
+            {
+              "text": "Dra fram spisen försiktigt så att sladden inte kläms bakom eller mot heta delar.",
+              "allowed": true
+            },
+            {
+              "text": "Behöver spisen fast anslutning eller ett nytt Perilex-uttag? Det ska en elektriker göra.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Fast anslutning eller Perilex-uttag",
@@ -693,7 +839,25 @@
           "verdict": "green",
           "summary": "Har maskinen stickpropp är det anslutning, inte elinstallation.",
           "do": "Ansluta en vitvara med stickpropp till ett befintligt jordat uttag.",
-          "dont": "Fast anslutning eller ett nytt uttag nära vatten."
+          "dont": "Fast anslutning eller ett nytt uttag nära vatten.",
+          "tips": [
+            {
+              "text": "Det här gäller vitvaror med stickpropp som ansluts till ett befintligt jordat uttag. Det är anslutning, inte elinstallation.",
+              "allowed": true
+            },
+            {
+              "text": "Använd inte grenuttag eller skarvsladd till vitvaror med hög effekt. De ska sitta i ett eget jordat vägguttag.",
+              "allowed": true
+            },
+            {
+              "text": "Kontrollera att uttaget är jordat. Vitvaror med metallhölje ska alltid ha jordad anslutning.",
+              "allowed": true
+            },
+            {
+              "text": "Fast anslutning eller ett nytt uttag, särskilt nära vatten, kräver ett registrerat företag.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Fast anslutning eller nytt uttag",
@@ -745,7 +909,25 @@
           "verdict": "green",
           "summary": "Lampor som bara pluggas in i ett befintligt uttag är fria.",
           "do": "Koppla in plugin-belysning i ett befintligt utomhusuttag.",
-          "dont": "Fast armatur, ny ledning eller kabel i mark."
+          "dont": "Fast armatur, ny ledning eller kabel i mark.",
+          "tips": [
+            {
+              "text": "Plugin-belysning som bara ansluts till ett befintligt utomhusuttag får du sätta upp fritt.",
+              "allowed": true
+            },
+            {
+              "text": "Använd armaturer och skarvdon märkta för utomhusbruk, minst IP44, så fukt inte tränger in.",
+              "allowed": true
+            },
+            {
+              "text": "Dra sladdar så att de inte ligger i vattensamlingar eller kläms i dörrar och fönster.",
+              "allowed": true
+            },
+            {
+              "text": "Fast armatur, ny ledning eller kabel i mark är elinstallationsarbete och kräver elektriker.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Fast armatur eller kabel i mark",
@@ -797,7 +979,25 @@
           "verdict": "green",
           "summary": "Ljuskällor och sladdlampor räknas inte som elinstallation.",
           "do": "Byta ljuskälla eller koppla in en lampa med stickpropp.",
-          "dont": "Nya punkter, spotlights eller ny ledning."
+          "dont": "Nya punkter, spotlights eller ny ledning.",
+          "tips": [
+            {
+              "text": "Ljuskällor och lampor med stickpropp får du byta och koppla in fritt.",
+              "allowed": true
+            },
+            {
+              "text": "Bryt strömmen och låt ljuskällan svalna innan du byter. Matcha sockel och effekt mot armaturen.",
+              "allowed": true
+            },
+            {
+              "text": "Anpassa färgtemperaturen efter rummet. Varmt ljus (runt 2700 K) i vardagsrum, neutralt över arbetsytor.",
+              "allowed": true
+            },
+            {
+              "text": "Nya punkter, spotlights eller ny ledning kräver ett registrerat företag.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Byta befintlig fast armatur",
@@ -805,7 +1005,25 @@
           "verdict": "green",
           "summary": "Du får byta armaturen så länge ledningen redan sitter där.",
           "do": "Byta en befintlig fast armatur där ledningen redan finns.",
-          "dont": "Nya punkter, spotlights eller ny ledning."
+          "dont": "Nya punkter, spotlights eller ny ledning.",
+          "tips": [
+            {
+              "text": "Bryt strömmen vid säkringen och kontrollera med spänningsprovare att ledningarna är döda innan du lossar armaturen.",
+              "allowed": true
+            },
+            {
+              "text": "Fotografera kopplingen innan du lossar den. Kan du inte återskapa exakt samma anslutning, ta in en elektriker.",
+              "allowed": true
+            },
+            {
+              "text": "Skyddsjorden (gul och grön) ska anslutas i en metallarmatur. Är du osäker på jorden, koppla inte på gissning.",
+              "allowed": true
+            },
+            {
+              "text": "Nya punkter, spotlights eller ny ledning är elinstallationsarbete.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Nya punkter, spotlights eller ny ledning",
@@ -857,7 +1075,25 @@
           "verdict": "green",
           "summary": "Allt som bara pluggas in får du installera fritt.",
           "do": "Koppla in smarta pluggar och fjärrkontakter i befintliga uttag.",
-          "dont": "Enheter som kräver nolledare eller ny ledning."
+          "dont": "Enheter som kräver nolledare eller ny ledning.",
+          "tips": [
+            {
+              "text": "Smarta uttag, pluggar, lampor och hubbar som ansluts via stickpropp får du installera helt fritt.",
+              "allowed": true
+            },
+            {
+              "text": "Belasta inte smarta pluggar över deras märkeffekt. De tål ofta lägre last än ett vanligt vägguttag.",
+              "allowed": true
+            },
+            {
+              "text": "Kontrollera sockel och kompatibilitet innan du köper smarta lampor och dimrar.",
+              "allowed": true
+            },
+            {
+              "text": "Enheter som kräver nolledare eller ny ledning i väggen kräver en elektriker.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Smart brytare eller dimmer som ersättning",
@@ -865,7 +1101,25 @@
           "verdict": "green",
           "summary": "Byter du mot en likadan brytare gäller vanliga regler.",
           "do": "Ersätta en befintlig brytare eller dimmer (högst 16 A) i egen dosa.",
-          "dont": "Enheter som kräver nolledare eller ny ledning."
+          "dont": "Enheter som kräver nolledare eller ny ledning.",
+          "tips": [
+            {
+              "text": "Bryt strömmen vid säkringen och prova med spänningsprovare innan du lossar den gamla brytaren.",
+              "allowed": true
+            },
+            {
+              "text": "Byt mot en enhet av samma typ (högst 16 A) i den befintliga dosan. Märk ledarna innan du lossar dem.",
+              "allowed": true
+            },
+            {
+              "text": "Kräver den smarta brytaren en nolledare? Kontrollera att den verkligen finns i dosan innan du börjar.",
+              "allowed": true
+            },
+            {
+              "text": "Saknas nolledare eller behövs ny ledning? Då är det elinstallationsarbete för en elektriker.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Kräver nolledare eller ny ledning",
@@ -1093,7 +1347,25 @@
           "verdict": "green",
           "summary": "Egna kontroller med syn och känsel får du göra fritt.",
           "do": "Testa jordfelsbrytaren och känna efter varma uttag och brännmärken.",
-          "dont": "Öppna centralen eller dosor för att inspektera inuti."
+          "dont": "Öppna centralen eller dosor för att inspektera inuti.",
+          "tips": [
+            {
+              "text": "Gör en egen rundvandring. Känn efter om uttag eller strömbrytare är varma och titta efter brännmärken.",
+              "allowed": true
+            },
+            {
+              "text": "Testa jordfelsbrytaren med testknappen (T). Den ska lösa ut direkt när du trycker.",
+              "allowed": true
+            },
+            {
+              "text": "Kontrollera att uttag och strömbrytare sitter fast och att inga höljen är spruckna.",
+              "allowed": true
+            },
+            {
+              "text": "En formell elbesiktning vid husköp, för försäkring eller efter en skada ska göras av en behörig besiktningsman.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Formell elbesiktning",
@@ -1146,7 +1418,25 @@
           "verdict": "green",
           "summary": "Du får leta, testa och återställa, men inte öppna installationen.",
           "do": "Testa jordfelsbrytaren, byta propp eller återställa en säkring.",
-          "dont": "Öppna dosor eller centralen för att mäta eller koppla om."
+          "dont": "Öppna dosor eller centralen för att mäta eller koppla om.",
+          "tips": [
+            {
+              "text": "Har strömmen försvunnit i en del av hemmet? Börja med att kontrollera jordfelsbrytaren och säkringarna i elcentralen.",
+              "allowed": true
+            },
+            {
+              "text": "Löser jordfelsbrytaren ut igen direkt? Dra ur misstänkta apparater en i taget för att hitta felet.",
+              "allowed": true
+            },
+            {
+              "text": "Byt en trasig propp mot en med exakt samma amperetal, aldrig en kraftigare.",
+              "allowed": true
+            },
+            {
+              "text": "Så fort en dosa eller centralen måste öppnas för att mäta eller koppla om är det arbete för en elektriker.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Öppna eller reparera fast installation",
@@ -1234,7 +1524,25 @@
           "verdict": "green",
           "summary": "Att ansluta en vitvara med stickpropp till ett befintligt uttag får du göra själv.",
           "do": "Ansluta vitvaror med stickpropp till befintliga jordade uttag.",
-          "dont": "Nya uttag, fast spisanslutning och ny ledning kräver en elektriker."
+          "dont": "Nya uttag, fast spisanslutning och ny ledning kräver en elektriker.",
+          "tips": [
+            {
+              "text": "Vitvaror med stickpropp får du ansluta till ett befintligt jordat uttag. Det är anslutning, inte elinstallation.",
+              "allowed": true
+            },
+            {
+              "text": "Ge varje maskin med hög effekt ett eget jordat uttag, inte grenuttag eller skarvsladd.",
+              "allowed": true
+            },
+            {
+              "text": "Kontrollera att uttaget är jordat och sitter fast innan du skjuter in maskinen.",
+              "allowed": true
+            },
+            {
+              "text": "Nya uttag, fast spisanslutning och ny ledningsdragning i köket kräver ett registrerat företag.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Nya uttag, fast spis eller ny ledning",
@@ -1270,7 +1578,25 @@
           "verdict": "green",
           "summary": "Att byta ljuskälla räknas inte som elinstallationsarbete, inte heller i badrummet.",
           "do": "Byta ljuskälla i en befintlig armatur i badrummet.",
-          "dont": "All fast el i våtrum kräver registrerat företag."
+          "dont": "All fast el i våtrum kräver registrerat företag.",
+          "tips": [
+            {
+              "text": "Att byta ljuskälla i en armatur som redan sitter får du göra, även i badrummet.",
+              "allowed": true
+            },
+            {
+              "text": "Bryt strömmen vid strömbrytaren och låt ljuskällan svalna. Matcha sockel och effekt mot armaturen.",
+              "allowed": true
+            },
+            {
+              "text": "Torka händerna och se till att armaturen är hel och tät innan du sätter tillbaka kupan.",
+              "allowed": true
+            },
+            {
+              "text": "All annan fast el i våtrummet, belysning, uttag, golvvärme och jordfelsbrytare, kräver ett registrerat företag.",
+              "allowed": false
+            }
+          ]
         },
         {
           "label": "Fast el i våtrummet",
