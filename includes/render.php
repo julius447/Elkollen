@@ -13,8 +13,14 @@ function ampy_bk_render_mount( $preselect, $data, $layout = '' ) {
     $preselect  = sanitize_key( $preselect );
     $valid_ids  = array_map( function( $j ) { return $j['id']; }, $data['jobs'] );
     $preselect  = ( $preselect && in_array( $preselect, $valid_ids, true ) ) ? $preselect : '';
-    $disclaimer = isset( $data['meta']['disclaimer'] ) ? $data['meta']['disclaimer'] : '';
     $lead       = isset( $data['meta']['page_lead'] ) ? $data['meta']['page_lead'] : 'Se direkt vilka eljobb du får göra själv.';
+    // v7: ONE source line for the crawlable fallback (meta.source_line). The
+    // old separate meta.disclaimer <p> duplicated its second sentence and is
+    // removed. NOTE: the fallback stays a flat link list — converted jobs keep
+    // default_verdict in the data, and these links resolve to the JS question
+    // step; the no-JS view never "asks" anything, it just links.
+    $source     = isset( $data['meta']['source_line'] ) ? $data['meta']['source_line']
+        : 'Källa: Elsäkerhetsverket & Elsäkerhetslagen (2016:732). Vägledning, inte juridisk rådgivning.';
     $hero       = ( $layout === 'hero' );
 
     ob_start();
@@ -36,10 +42,7 @@ function ampy_bk_render_mount( $preselect, $data, $layout = '' ) {
                         </li>
                     <?php endforeach; ?>
                 </ul>
-                <?php if ( $disclaimer ) : ?>
-                    <p class="ampy-bk__source-line">Källa: Elsäkerhetsverket &amp; Elsäkerhetslagen (2016:732) · Vägledning, inte juridisk rådgivning.</p>
-                    <p class="ampy-bk__disclaimer"><?php echo esc_html( $disclaimer ); ?></p>
-                <?php endif; ?>
+                <p class="ampy-bk__source-line"><?php echo esc_html( $source ); ?></p>
             </div>
         </div>
     </div>

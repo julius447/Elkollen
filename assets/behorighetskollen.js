@@ -1,5 +1,5 @@
 /* ============================================================================
-   Elkollen v5 — Craft pass
+   Elkollen v7 — the 4-slide funnel (rooms -> neutral list -> choice -> verdict)
    Pixel-faithful rendering against the approved design references (the middle
    step and the verdict screen). Function, data and flow are locked since earlier versions.
      1. DATA   — behorighetskollen-data.json (single source of truth)
@@ -19,6 +19,8 @@
     arrowLeft: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>',
     arrowRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
     chevron: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>',
+    /* v7: drill-in chevron for the neutral job list (navigation, not action) */
+    chevronRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg>',
     external: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/></svg>',
     share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>',
     search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
@@ -45,7 +47,8 @@
     cable: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v6a4 4 0 0 0 4 4h0a4 4 0 0 1 4 4v2"/><path d="M20 20v-6a4 4 0 0 0-4-4h0a4 4 0 0 1-4-4V4"/><rect x="2" y="2" width="4" height="4"/><rect x="18" y="18" width="4" height="4"/></svg>',
     splice: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h6"/><path d="M15 12h6"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 9l-1.5-1.5"/><path d="M15 15l1.5 1.5"/></svg>',
     kitchen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V8h16v13"/><path d="M4 13h16"/><circle cx="8" cy="10.5" r="0.6"/><circle cx="12" cy="10.5" r="0.6"/><path d="M9 17h3v3H9z"/><path d="M15 16v3"/></svg>',
-    sofa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v3"/><path d="M21 12V9a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v3"/><path d="M3 12h18v5H3z"/><path d="M5 17v2"/><path d="M19 17v2"/></svg>',
+    /* v7: redrawn sofa on the 24-grid (the old glyph read weak at tile size) */
+    sofa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11V8a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v3"/><path d="M2 13a2 2 0 0 1 4 0v1h12v-1a2 2 0 0 1 4 0v3a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2Z"/><path d="M5 19v2"/><path d="M19 19v2"/></svg>',
     felsok: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
     charger: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M13 7l-4 6h3l-1 4 4-6h-3z"/></svg>',
     solar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="13" width="18" height="8" rx="1"/><line x1="7" y1="13" x2="6" y2="21"/><line x1="12" y1="13" x2="12" y2="21"/><line x1="17" y1="13" x2="18" y2="21"/><line x1="3" y1="17" x2="21" y2="17"/><circle cx="12" cy="6" r="2.5"/><line x1="12" y1="1" x2="12" y2="2.2"/><line x1="6.3" y1="6" x2="5.1" y2="6"/><line x1="18.9" y1="6" x2="17.7" y2="6"/></svg>',
@@ -95,16 +98,9 @@
     return { kind: 'unknown' };
   }
 
-  function jobGroup(job) {
-    if (!job) return 'depends';
-    if (job.type === 'fixed') return job.default_verdict === 'green' ? 'green' :
-      (job.default_verdict === 'red' ? 'red' : 'depends');
-    const hasGreen = job.options.some(o => o.verdict === 'green');
-    const hasRed = job.options.some(o => o.verdict === 'red');
-    if (hasGreen && !hasRed) return 'green';
-    if (hasRed && !hasGreen) return 'red';
-    return 'depends';
-  }
+  /* v7: jobGroup() + the verdict-grouped list are GONE by design. Job lists are
+     neutral (F1): no green/yellow/red headers, no colour dots. The verdict is
+     only ever revealed on slide 4, after a committed choice. */
 
   /* ---------- Analytics: funnel event emitter ---------------------------- */
   // Vendor-agnostic. Pushes to window.dataLayer (GA4/GTM) AND dispatches a
@@ -188,7 +184,21 @@
         track('job_selected', { job_id: next.jobId });
       }
       if (next && Object.prototype.hasOwnProperty.call(next, 'answerIndex') && next.answerIndex != null) {
-        track('question_answered', { job_id: next.jobId || this.state.jobId, answer_index: next.answerIndex });
+        // v7: enrich with the chosen option's verdict. On guess forks option 0
+        // encodes the "I may do it myself" (green) hypothesis, option 1 the
+        // "needs an electrician" (red) one; guess_correct = hypothesis === verdict.
+        const ansJobId = next.jobId || this.state.jobId;
+        const ansJob = ansJobId ? this.jobsById[ansJobId] : null;
+        const ansOpt = (ansJob && ansJob.options) ? ansJob.options[next.answerIndex] : null;
+        const guess = (ansJob && ansJob.choice_type === 'guess')
+          ? (next.answerIndex === 0 ? 'green' : 'red') : null;
+        track('question_answered', {
+          job_id: ansJobId,
+          answer_index: next.answerIndex,
+          option_verdict: ansOpt ? ansOpt.verdict : null,
+          guess: guess,
+          guess_correct: (guess && ansOpt) ? (guess === ansOpt.verdict) : null
+        });
       }
       this.state = { ...this.state, ...next };
       this.activeTab = 'explain';
@@ -238,7 +248,7 @@
         this._lastShownKey = null; // leaving the verdict/question resets the impression
       } else if (result.kind === 'ask') {
         block = this.renderQuestionBlock(job);
-        this._trackShown('question_shown', { job_id: job.id }, 'q:' + job.id);
+        this._trackShown('question_shown', { job_id: job.id, question_type: job.choice_type || 'scenario' }, 'q:' + job.id);
       } else {
         block = this.renderVerdictBlock(job, result.verdictKey);
         this._trackShown('verdict_shown', { job_id: job.id, verdict: result.verdictKey }, 'v:' + job.id + ':' + result.verdictKey);
@@ -257,31 +267,57 @@
         this.mount.replaceChildren(block);
       }
 
-      // a11y: move focus to the new view's heading after each transition, so
-      // keyboard / screen-reader users land on the new content instead of being
-      // dropped at the top of the document. Skip the very first paint (booting)
-      // so we never steal focus on page load.
+      // v7 scroll/focus contract (M2), applied on EVERY view swap:
+      // 1) focus the new view's [data-focus-target] with preventScroll:true so
+      //    focus never fights the programmatic scroll (and no keyboard pops);
+      // 2) then _syncScroll() anchors the tool-card top near the viewport top.
+      // Skip the very first paint (booting) so we never steal focus or scroll
+      // on page load.
       if (this._booted) {
-        const target = block.querySelector('[data-focus-target]');
+        const target = block.querySelector('[data-focus-target]:not([hidden])');
         if (target) {
           target.setAttribute('tabindex', '-1');
-          // Scroll-sync: when the lead form mounts, focus the heading WITHOUT
-          // popping the keyboard (preventScroll), then smooth-scroll the whole
-          // white card into view so it lands cleanly (esp. on mobile).
-          const isLead = this.leadOpen && block.classList.contains('ampy-bk__lead');
-          try { target.focus({ preventScroll: isLead }); } catch (e) { target.focus(); }
-          if (isLead) {
-            try { block.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { /* no-op */ }
-          }
+          try { target.focus({ preventScroll: true }); } catch (e) { target.focus(); }
         }
+        // Deferred sync: let the browser settle layout + scroll clamping after
+        // replaceChildren (the page height changes between slides) BEFORE
+        // measuring; a same-tick measurement is stale and the sync no-ops.
+        // setTimeout (not rAF): rAF never fires in occluded/background tabs,
+        // which would silently skip the sync there.
+        clearTimeout(this._syncT);
+        this._syncT = setTimeout(() => this._syncScroll(), 60);
       }
       this._booted = true;
+    }
+
+    /* v7 (M2): one scroll rule for every transition. The TOOL-CARD TOP is the
+       anchor; a tolerance band prevents jarring micro-scrolls when the card is
+       already near the top (desktop no-op most of the time). --ampy-header-h is
+       the sticky-header hook for the Bricks page; 0 in the static prototype. */
+    _syncScroll() {
+      const block = this.mount.firstElementChild;
+      if (!block) return;
+      let headerH = 0;
+      try {
+        headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ampy-header-h')) || 0;
+      } catch (e) { /* no-op */ }
+      const anchor = headerH + 12; // px: target position for the card top
+      const top = block.getBoundingClientRect().top;
+      if (top < anchor - 4 || top > anchor + 64) {
+        // INSTANT scroll, deliberately not 'smooth': smooth scrolling is
+        // rAF-driven and silently stalls in occluded/background tabs, and it
+        // can be preempted by the view swap. An instant anchor is reliable on
+        // every device and reads as a crisp slide change.
+        window.scrollTo(0, Math.max(0, window.scrollY + top - anchor));
+      }
     }
 
     /* ===================================================================
        BREADCRUMB — universal pattern
        =================================================================== */
-    renderCrumb(job) {
+    renderCrumb() {
+      // v7 (V1): the crumb is ONLY the back control. The job name lives in the
+      // kicker on the question and verdict screens, never duplicated here.
       return el('div', { class: 'ampy-bk__crumb' }, [
         el('button', {
           class: 'ampy-bk__crumb-back',
@@ -291,9 +327,7 @@
         }, [
           el('span', { html: icon('arrowLeft'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
           'Tillbaka'
-        ]),
-        el('span', { class: 'ampy-bk__crumb-sep', 'aria-hidden': 'true' }, '·'),
-        el('p', { class: 'ampy-bk__crumb-job' }, job.label)
+        ])
       ]);
     }
 
@@ -303,7 +337,11 @@
     renderQuestionBlock(job) {
       const block = el('div', { class: 'ampy-bk__block', role: 'region', 'aria-labelledby': 'ampy-bk-q' });
 
-      block.appendChild(this.renderCrumb(job));
+      block.appendChild(this.renderCrumb());
+
+      // v7: neutral kicker carries the job name (deliberately never
+      // verdict-tinted on the choice step, so nothing leaks).
+      block.appendChild(el('p', { class: 'ampy-bk__q-kicker' }, job.label.toUpperCase()));
 
       // The question
       block.appendChild(el('p', { class: 'ampy-bk__q-title', id: 'ampy-bk-q', 'data-focus-target': '' }, job.question));
@@ -329,12 +367,15 @@
       });
       block.appendChild(options);
 
-      // Informationsnotis — alltid synlig
+      // Informationsnotis — alltid synlig; texten varierar per choice_type
+      // (scenario vs guess) och bor i datafilen.
+      const entryStrings = (this.data.meta && this.data.meta.entry) || {};
+      const infoText = (job.choice_type === 'guess')
+        ? (entryStrings.info_guess || 'Beskedet bygger på Elsäkerhetslagen (2016:732), inte på vad som känns rimligt.')
+        : (entryStrings.info_scenario || 'Lagen skiljer på att byta något befintligt och att installera nytt. Ditt svar avgör vilken regel som gäller.');
       block.appendChild(el('div', { class: 'ampy-bk__info', role: 'note' }, [
         el('span', { class: 'ampy-bk__info-icon', html: icon('info'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-        el('p', { class: 'ampy-bk__info-text' },
-          'Lagen skiljer på att byta något befintligt och att installera nytt. Ditt svar avgör vilken regel som gäller.'
-        )
+        el('p', { class: 'ampy-bk__info-text' }, infoText)
       ]));
 
       return block;
@@ -349,14 +390,23 @@
       // Drives the §5 verdict-reveal (full-height accent rule + interior wash).
       block.dataset.verdict = verdictKey;
 
-      block.appendChild(this.renderCrumb(job));
+      block.appendChild(this.renderCrumb());
 
-      // Judgment — accent line + badge + cite chip
+      // The chosen option (all 26 jobs are conditional in v7, so a verdict is
+      // always the result of a committed choice; deep ?jobb=&svar= links too).
+      const chosenOpt = (this.state.answerIndex != null && job.options && job.options[this.state.answerIndex])
+        ? job.options[this.state.answerIndex] : null;
+
+      // Judgment — accent line + kicker + choice subline + headline
       const judgment = el('div', { class: `ampy-bk__judgment ampy-bk__judgment--${verdictKey}` });
       judgment.appendChild(el('div', { class: 'ampy-bk__judgment-accent', 'aria-hidden': 'true' }));
       const jbody = el('div', { class: 'ampy-bk__judgment-body' });
-      // Kicker: the job name in caps, above the cover-line headline (§5).
+      // Kicker: the job name in caps (the crumb no longer carries it).
       jbody.appendChild(el('p', { class: 'ampy-bk__verdict-kicker' }, job.label.toUpperCase()));
+      // v7: personalisation subline — the verdict visibly maps to their answer.
+      if (chosenOpt) {
+        jbody.appendChild(el('p', { class: 'ampy-bk__verdict-choice' }, `Ditt val: ${chosenOpt.label}`));
+      }
       const badgeIcon = verdictKey === 'green' ? 'check' : (verdictKey === 'red' ? 'ban' : 'alert');
       // h2, not h1: the page H1 is owned by Bricks/hero. data-focus-target so
       // focus lands here after the verdict renders (announced once, no aria-live
@@ -369,66 +419,77 @@
         el('span', { html: icon(badgeIcon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
         el('span', {}, v.label)
       ]));
-      // v5.1 B1: Per-verdict source. Resolved: option.source > job.source > verdicts[verdictKey].source.
-      const source = this._resolveSource(job, verdictKey);
-      jbody.appendChild(el('a', {
-        class: 'ampy-bk__cite',
-        href: source.url,
-        target: '_blank',
-        rel: 'noopener noreferrer'
-      }, [
-        el('span', {}, source.text),
-        el('span', { html: icon('external'), 'aria-hidden': 'true', style: 'display:inline-flex' })
-      ]));
       judgment.appendChild(jbody);
       block.appendChild(judgment);
 
-      // RED: surface the single strongest motivator (first sentence of the
-      // consequence) by default, so it is not hidden behind the Konsekvenser tab.
-      if (verdictKey === 'red') {
-        const ctext = (job.consequence || v.consequence || '').trim();
-        const lead = ctext.split('. ')[0];
-        if (lead) {
-          block.appendChild(el('p', { class: 'ampy-bk__verdict-lead' },
-            /[.!?]$/.test(lead) ? lead : lead + '.'));
+      // v7 (V3/V4): ONE merged law box replaces BOTH the cite chip and the old
+      // red lead box — claim + citation visually fused. RED (and future YELLOW)
+      // only; GREEN renders no source element at all (the Förklaring tab + the
+      // amber caveat carry the sourcing).
+      if (verdictKey !== 'green') {
+        let lawBody = v.lawbox_body || '';
+        if (!lawBody) {
+          const ctext = (job.consequence || v.consequence || '').trim();
+          const lead = ctext.split('. ')[0];
+          if (lead) lawBody = /[.!?]$/.test(lead) ? lead : lead + '.';
+        }
+        if (lawBody) {
+          // Per-verdict source, resolved: option.source > job.source > verdict source.
+          const source = this._resolveSource(job, verdictKey);
+          block.appendChild(el('div', { class: `ampy-bk__lawnote ampy-bk__lawnote--${verdictKey}` }, [
+            el('p', { class: 'ampy-bk__lawnote-text' }, lawBody),
+            el('a', {
+              class: 'ampy-bk__lawnote-src',
+              href: source.url,
+              target: '_blank',
+              rel: 'noopener noreferrer'
+            }, [
+              el('span', {}, source.text),
+              el('span', { html: icon('external'), 'aria-hidden': 'true', style: 'display:inline-flex' })
+            ])
+          ]));
         }
       }
 
       // Two segments. Rendered as plain toggle buttons (aria-pressed), NOT an
       // ARIA tablist: we do not implement the roving-tabindex/arrow-key contract,
       // so claiming role=tab would mislead screen-reader users.
-      const secondTab = (verdictKey === 'red')
+      // v7: the Tips tab is HIDDEN when the job has no tips array (otherwise
+      // green verdicts on tip-less jobs render an empty tab). With only one
+      // segment left there is nothing to switch, so the tab bar is skipped.
+      const hasTips = !!(job.tips && job.tips.length);
+      const secondTab = (verdictKey === 'red' || verdictKey === 'yellow')
         ? { key: 'consequence', label: 'Konsekvenser' }
-        : { key: 'tips', label: 'Tips' };
-      const tabDefs = [
-        { key: 'explain', label: 'Förklaring' },
-        secondTab
-      ];
+        : (hasTips ? { key: 'tips', label: 'Tips' } : null);
+      const tabDefs = [{ key: 'explain', label: 'Förklaring' }];
+      if (secondTab) tabDefs.push(secondTab);
 
-      const tabs = el('div', { class: 'ampy-bk__tabs' });
-      tabDefs.forEach(def => {
-        const tabBtn = el('button', {
-          class: 'ampy-bk__tab',
-          type: 'button',
-          'aria-pressed': String(this.activeTab === def.key),
-          data: { tab: def.key },
-          onclick: () => {
-            this.activeTab = def.key;
-            tabs.querySelectorAll('.ampy-bk__tab').forEach(b => {
-              b.setAttribute('aria-pressed', String(b.dataset.tab === def.key));
-            });
-            this.renderTabBody();
-          }
-        }, def.label);
-        // Apply verdict accent to the tab indicator via inline CSS variable
-        tabBtn.style.setProperty('--verdict-accent',
-          verdictKey === 'green' ? 'rgb(15, 110, 86)' :
-          verdictKey === 'red' ? 'rgb(122, 22, 35)' :
-          'rgb(135, 101, 7)'
-        );
-        tabs.appendChild(tabBtn);
-      });
-      block.appendChild(tabs);
+      if (tabDefs.length > 1) {
+        const tabs = el('div', { class: 'ampy-bk__tabs' });
+        tabDefs.forEach(def => {
+          const tabBtn = el('button', {
+            class: 'ampy-bk__tab',
+            type: 'button',
+            'aria-pressed': String(this.activeTab === def.key),
+            data: { tab: def.key },
+            onclick: () => {
+              this.activeTab = def.key;
+              tabs.querySelectorAll('.ampy-bk__tab').forEach(b => {
+                b.setAttribute('aria-pressed', String(b.dataset.tab === def.key));
+              });
+              this.renderTabBody();
+            }
+          }, def.label);
+          // Apply verdict accent to the tab indicator via inline CSS variable
+          tabBtn.style.setProperty('--verdict-accent',
+            verdictKey === 'green' ? 'rgb(15, 110, 86)' :
+            verdictKey === 'red' ? 'rgb(122, 22, 35)' :
+            'rgb(135, 101, 7)'
+          );
+          tabs.appendChild(tabBtn);
+        });
+        block.appendChild(tabs);
+      }
 
       // Tab body — re-rendered on tab change
       this.tabBodyNode = el('div', {
@@ -470,7 +531,16 @@
       const optIdx = this.state.answerIndex;
       const opt = (optIdx != null && job.options && job.options[optIdx]) ? job.options[optIdx] : null;
       const summary = (opt && opt.summary) || job.summary || (verdictKey === 'green' ? v.caveat_short : job.why_text);
-      wrap.appendChild(el('p', { class: 'ampy-bk__summary' }, summary));
+      // v7: guess-fork options carry a reaction line ("Rätt gissat." / "Nej,
+      // här går lagens gräns.") rendered as a bold lead-in to the summary.
+      const summaryP = el('p', { class: 'ampy-bk__summary' });
+      if (opt && opt.reaction) {
+        summaryP.appendChild(el('strong', {}, opt.reaction));
+        summaryP.appendChild(document.createTextNode(' ' + summary));
+      } else {
+        summaryP.appendChild(document.createTextNode(summary));
+      }
+      wrap.appendChild(summaryP);
 
       // ✓ DO-rad
       const doText = (opt && opt.do) || job.do;
@@ -490,12 +560,19 @@
         ]));
       }
 
-      // Caveat notice — green only
-      if (verdictKey === 'green' && v.caveat_short) {
-        wrap.appendChild(el('div', { class: 'ampy-bk__caveat', role: 'note' }, [
-          el('span', { class: 'ampy-bk__caveat-icon', html: icon('alert'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-          el('p', { class: 'ampy-bk__caveat-text' }, v.caveat_short)
-        ]));
+      // Caveat notice — green only. v7: options flagged _kind:"planning" swap
+      // to the planning caveat (a "break the current first" safety caveat is
+      // nonsense over a pure planning verdict).
+      if (verdictKey === 'green') {
+        const caveatText = (opt && opt._kind === 'planning' && v.caveat_planning)
+          ? v.caveat_planning
+          : v.caveat_short;
+        if (caveatText) {
+          wrap.appendChild(el('div', { class: 'ampy-bk__caveat', role: 'note' }, [
+            el('span', { class: 'ampy-bk__caveat-icon', html: icon('alert'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
+            el('p', { class: 'ampy-bk__caveat-text' }, caveatText)
+          ]));
+        }
       }
 
       return wrap;
@@ -553,23 +630,15 @@
         el('span', { html: icon('arrowRight'), 'aria-hidden': 'true', style: 'display:inline-flex' })
       ]);
 
-      // The verdict ends with the CTAs (no share button, per client).
-      if (verdictKey === 'red') {
-        // RED: solid teal advice CTA (primary) + outline "Läs mer...".
-        wrap.appendChild(adviceBtn('ampy-bk__cta-primary ampy-bk__cta-primary--solid'));
-        wrap.appendChild(readMore('ampy-bk__cta-secondary'));
-
-      } else if (verdictKey === 'green') {
-        // GREEN: calm bordered "Läs mer om..." (the DIY guide) on top +
-        // a real outline advice button below (promoted from the old text link).
-        wrap.appendChild(readMore('ampy-bk__cta-primary'));
-        wrap.appendChild(adviceBtn('ampy-bk__cta-secondary'));
-
-      } else {
-        // YELLOW: mirror RED — solid-teal advice primary + outline "Läs mer...".
-        wrap.appendChild(adviceBtn('ampy-bk__cta-primary ampy-bk__cta-primary--solid'));
-        wrap.appendChild(readMore('ampy-bk__cta-secondary'));
+      // v7 (F3): ONE CTA hierarchy for every verdict — solid teal advice CTA
+      // on top + outline "Läs mer om ..." below. GREEN gets a framing line
+      // above the pair (a safety-net double-check, never contradicting the
+      // verdict); RED gets no extra line (the law box already does the push).
+      if (verdictKey === 'green' && this.data.meta.cta_green_note) {
+        wrap.appendChild(el('p', { class: 'ampy-bk__cta-note' }, this.data.meta.cta_green_note));
       }
+      wrap.appendChild(adviceBtn('ampy-bk__cta-primary ampy-bk__cta-primary--solid'));
+      wrap.appendChild(readMore('ampy-bk__cta-secondary'));
 
       return wrap;
     }
@@ -695,15 +764,25 @@
               el('span', { class: 'ampy-bk__lead-success-icon', html: icon('check'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
               el('h2', {}, successTitle),
               el('p', {}, f.success_body || 'En behörig elektriker ringer upp dig på telefon, oftast inom en arbetsdag. Passa på att kolla ett annat eljobb medan du väntar.'),
-              // Re-engagement loop: route back to the ENTRY, not the verdict.
-              el('button', { class: 'ampy-bk__lead-back', type: 'button', style: 'margin:0', onclick: () => this.navigate({ jobId: null, answerIndex: null }) }, [
+              // Re-engagement loop: route back to slide 1 (the room grid),
+              // not the verdict and not a stale room list.
+              el('button', { class: 'ampy-bk__lead-back', type: 'button', style: 'margin:0', onclick: () => {
+                this.activeRoom = null;
+                this.heroExpanded = false;
+                this.navigate({ jobId: null, answerIndex: null });
+              } }, [
                 el('span', { html: icon('arrowLeft'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
                 f.success_back || 'Kolla ett annat eljobb'
               ])
             ])
           );
+          // v7 scroll contract also applies to the success swap.
           const t = block.querySelector('[data-focus-target]');
-          if (t) { t.setAttribute('tabindex', '-1'); try { t.focus(); } catch (e2) {} }
+          if (t) {
+            t.setAttribute('tabindex', '-1');
+            try { t.focus({ preventScroll: true }); } catch (e2) { try { t.focus(); } catch (e3) {} }
+          }
+          this._syncScroll();
         }).catch(() => {
           submit.disabled = false;
           submit.textContent = f.submit || 'Boka kostnadsfri rådgivning';
@@ -918,48 +997,32 @@
       block.appendChild(this.swapNode);
 
       block.appendChild(el('p', { class: 'ampy-bk__source-line' },
-        'Källa: Elsäkerhetsverket & Elsäkerhetslagen (2016:732). ' + (this.data.meta.disclaimer || '')
+        this.data.meta.source_line ||
+        'Källa: Elsäkerhetsverket & Elsäkerhetslagen (2016:732). Vägledning, inte juridisk rådgivning.'
       ));
 
       return block;
     }
 
     /* ===================================================================
-       HERO ENTRY (layout="hero") — compact: search + 6 quick picks +
-       disclosure. The full 26-job grouped list and rooms live in an
-       in-panel drawer (progressive disclosure) so the hero never grows tall.
-       All drawer updates are in place (no full re-render) to keep search focus.
+       HERO ENTRY (layout="hero") — v7, slides 1 + 2 of the 4-slide funnel.
+       Slide 1: one heading + six IDENTICAL room tiles (no eyebrow, no search).
+       Slide 2: one NEUTRAL job list per room in an in-panel drawer — no
+       verdict grouping, no colour dots, nothing leaks before the choice step.
+       Drawer swaps are in place (no full re-render); the S1<->S2 transitions
+       run the same focus + scroll contract as every other slide change.
        =================================================================== */
     renderHeroEntry() {
       const data = this.data;
       const entry = (data.meta && data.meta.entry) || {};
       const block = el('div', { class: 'ampy-bk__block', role: 'region', 'aria-label': 'Elkollen' });
 
-      // --- 1. Card headline (gives the card a cover) ---
-      block.appendChild(el('p', { class: 'ampy-bk__entry-eyebrow' },
-        entry.eyebrow || 'Får du fixa det själv?'));
-
-      // --- 2. Express-lane search (always visible, every state) ---
-      const searchId = 'ampy-bk-search';
-      const searchInput = el('input', {
-        type: 'search', id: searchId, class: 'ampy-bk__search-input', inputmode: 'search',
-        placeholder: entry.search_placeholder || 'Sök eljobb – t.ex. vägguttag, laddbox, spis…',
-        autocomplete: 'off', value: this.searchQuery
-      });
-      block.appendChild(el('div', { class: 'ampy-bk__search' }, [
-        el('label', { class: 'ampy-bk__search-label', for: searchId }, entry.search_label || 'Sök eljobb'),
-        el('div', { class: 'ampy-bk__search-field' }, [
-          el('span', { class: 'ampy-bk__search-icon', html: icon('search'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-          searchInput
-        ])
-      ]));
-
-      // --- 3. Room prompt (ROOM state only) ---
-      const prompt = el('p', { class: 'ampy-bk__entry-hint', 'data-focus-target': '', tabindex: '-1' },
+      // --- 1. Card heading (the card's only heading; page H1 lives in the hero column) ---
+      const heading = el('h2', { class: 'ampy-bk__entry-title', 'data-focus-target': '', tabindex: '-1' },
         entry.prompt || 'Var i hemmet gäller det?');
-      block.appendChild(prompt);
+      block.appendChild(heading);
 
-      // --- 4. Room grid: 5 rooms + "Alla jobb" ---
+      // --- 2. Room grid: 5 rooms + "Alla eljobb", all six tiles identical ---
       const grid = el('ul', { class: 'ampy-bk__roomgrid', role: 'list' });
       (data.rooms || []).forEach(room => {
         const li = el('li');
@@ -968,9 +1031,9 @@
           'aria-label': `Visa eljobb i ${room.label}`, data: { room: room.id },
           onclick: () => {
             this.activeRoom = room.id;
-            this.searchQuery = ''; searchInput.value = ''; this.heroExpanded = false;
+            this.heroExpanded = false;
             track('room_selected', { room_id: room.id });
-            updateDrawer();
+            updateDrawer(true);
           }
         }, [
           el('span', { class: 'ampy-bk__roomtile-chip', html: icon(room.icon), 'aria-hidden': 'true' }),
@@ -981,89 +1044,94 @@
         ]));
         grid.appendChild(li);
       });
-      // "Alla jobb" tile — the honest escape hatch, quieter than a room
+      // "Alla eljobb" tile — same anatomy and style as the five rooms.
       const allLi = el('li');
       allLi.appendChild(el('button', {
-        class: 'ampy-bk__roomtile ampy-bk__roomtile--all', type: 'button',
+        class: 'ampy-bk__roomtile', type: 'button',
         'aria-label': 'Visa alla eljobb',
         onclick: () => {
           this.heroExpanded = true; this.activeRoom = null;
-          this.searchQuery = ''; searchInput.value = '';
           track('see_all');
-          updateDrawer();
+          updateDrawer(true);
         }
       }, [
         el('span', { class: 'ampy-bk__roomtile-chip', html: icon('grid'), 'aria-hidden': 'true' }),
         el('span', { class: 'ampy-bk__roomtile-body' }, [
-          el('span', { class: 'ampy-bk__roomtile-label' }, entry.all_label || 'Alla jobb'),
+          el('span', { class: 'ampy-bk__roomtile-label' }, entry.all_label || 'Alla eljobb'),
           el('span', { class: 'ampy-bk__roomtile-sub' },
-            (entry.all_subline || 'Alla {count} eljobb, A–Ö').replace('{count}', data.jobs.length))
+            (entry.all_subline || 'Hela listan, A till Ö').replace('{count}', data.jobs.length))
         ])
       ]));
       grid.appendChild(allLi);
       block.appendChild(grid);
 
-      // --- 5. Results drawer (hidden until search/room/see-all) ---
+      // --- 3. Slide-2 drawer (hidden until a tile is tapped) ---
       const drawer = el('div', { class: 'ampy-bk__drawer', role: 'region', 'aria-live': 'polite', hidden: true });
       this.swapNode = drawer;
       block.appendChild(drawer);
 
-      // --- 6. Source line (pinned to card floor via margin-top:auto) ---
+      // --- 4. Source line, slides 1-2 only (pinned to the card floor) ---
       block.appendChild(el('p', { class: 'ampy-bk__source-line' },
-        'Källa: Elsäkerhetsverket & Elsäkerhetslagen (2016:732). ' + (data.meta.disclaimer || '')
+        data.meta.source_line ||
+        'Källa: Elsäkerhetsverket & Elsäkerhetslagen (2016:732). Vägledning, inte juridisk rådgivning.'
       ));
 
       const resetToRooms = () => {
-        this.searchQuery = ''; searchInput.value = '';
         this.activeRoom = null; this.heroExpanded = false;
-        updateDrawer();
+        updateDrawer(true);
       };
 
-      const updateDrawer = () => {
-        const q = (this.searchQuery || '').trim().toLowerCase();
-        let jobs = null, titleText = '';
-        if (q) {
-          jobs = data.jobs.filter(j => j.label.toLowerCase().includes(q) || j.id.includes(q));
-          titleText = entry.drawer_search_title || 'Sökresultat';
-        } else if (this.activeRoom) {
+      // userTriggered: run the focus + scroll contract and the list_view event
+      // only on real taps, never on the re-render restore (popstate / back).
+      const updateDrawer = (userTriggered) => {
+        let jobs = null, titleText = '', source = null;
+        if (this.activeRoom) {
           const r = (data.rooms || []).find(x => x.id === this.activeRoom);
           jobs = r ? r.jobs.map(id => this.jobsById[id]).filter(Boolean) : [];
           titleText = r ? r.label : '';
+          source = this.activeRoom;
         } else if (this.heroExpanded) {
-          jobs = data.jobs;
+          // "Alla eljobb": Swedish alphabetical (å/ä/ö collate correctly).
+          jobs = data.jobs.slice().sort((a, b) => a.label.localeCompare(b.label, 'sv'));
           titleText = entry.drawer_all_title || 'Alla eljobb';
+          source = 'all';
         }
 
         if (jobs === null) {
+          // Slide 1
           drawer.hidden = true; drawer.replaceChildren();
-          grid.hidden = false; prompt.hidden = false;
+          grid.hidden = false; heading.hidden = false;
+          if (userTriggered) {
+            try { heading.focus({ preventScroll: true }); } catch (e) { try { heading.focus(); } catch (e2) {} }
+            this._syncScroll();
+          }
           return;
         }
-        // Results replace the grid + prompt.
-        grid.hidden = true; prompt.hidden = true;
+        // Slide 2 replaces the grid + heading.
+        grid.hidden = true; heading.hidden = true;
         drawer.hidden = false;
 
-        const drawerTitle = el('p', { class: 'ampy-bk__drawer-title', 'data-focus-target': '', tabindex: '-1' }, titleText);
-        const back = el('button', { class: 'ampy-bk__drawer-back', type: 'button', onclick: resetToRooms }, [
+        const back = el('button', {
+          class: 'ampy-bk__drawer-back', type: 'button',
+          'aria-label': 'Tillbaka till rummen', onclick: resetToRooms
+        }, [
           el('span', { html: icon('arrowLeft'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-          entry.drawer_back || 'Visa rummen'
+          entry.drawer_back || 'Tillbaka'
         ]);
-        if (!jobs.length) {
-          drawer.replaceChildren(drawerTitle, back, el('p', { class: 'ampy-bk__empty' },
-            entry.empty || 'Inget jobb matchar. Prova ett annat ord eller välj ett rum.'));
-        } else {
-          drawer.replaceChildren(drawerTitle, back, this.renderGroupedJobs(jobs, null));
+        const drawerTitle = el('p', { class: 'ampy-bk__drawer-title', 'data-focus-target': '', tabindex: '-1' }, titleText);
+        const subtitle = el('p', { class: 'ampy-bk__list-subtitle' },
+          entry.list_subtitle || 'Välj jobbet, så kollar vi vad som gäller i just ditt fall.');
+        drawer.replaceChildren(back, drawerTitle, subtitle, this.renderJobList(jobs));
+        drawer.scrollTop = 0;
+
+        if (userTriggered) {
+          track('list_view', { source: source });
+          try { drawerTitle.focus({ preventScroll: true }); } catch (e) { try { drawerTitle.focus(); } catch (e2) {} }
+          this._syncScroll();
         }
-        try { drawerTitle.focus(); } catch (e) { /* no-op */ }
       };
 
-      searchInput.addEventListener('input', (e) => {
-        this.searchQuery = e.target.value;
-        if (this.searchQuery) { this.activeRoom = null; this.heroExpanded = false; }
-        updateDrawer();
-      });
-
-      updateDrawer();
+      updateDrawer(false);
       return block;
     }
 
@@ -1090,34 +1158,18 @@
 
       const topHint = (this.searchQuery && this.searchQuery.trim())
         ? null : (this.activeRoom ? null : 'Vanliga eljobb');
-      this.swapNode.replaceChildren(this.renderGroupedJobs(jobs, topHint));
+      const frag = document.createDocumentFragment();
+      if (topHint) frag.appendChild(el('p', { class: 'ampy-bk__joblist-hint' }, topHint));
+      frag.appendChild(this.renderJobList(jobs));
+      this.swapNode.replaceChildren(frag);
     }
 
-    renderGroupedJobs(jobs, topHint) {
-      const groups = { green: [], depends: [], red: [] };
-      jobs.forEach(j => groups[jobGroup(j)].push(j));
-
-      const wrap = document.createDocumentFragment();
-      if (topHint) wrap.appendChild(el('p', { class: 'ampy-bk__joblist-hint' }, topHint));
-
-      const groupDefs = [
-        { key: 'green', label: 'Får du göra själv' },
-        { key: 'depends', label: 'Det beror på' },
-        { key: 'red', label: 'Kräver elektriker' }
-      ];
-
-      groupDefs.forEach(def => {
-        const items = groups[def.key];
-        if (!items.length) return;
-        const groupList = el('ul', { class: 'ampy-bk__joblist-group', role: 'list' });
-        groupList.appendChild(el('li', { class: 'ampy-bk__joblist-group-label', data: { group: def.key } }, [
-          def.label,
-          el('span', { class: 'ampy-bk__joblist-group-label-count' }, `· ${items.length}`)
-        ]));
-        items.forEach(j => groupList.appendChild(this.renderJobRow(j)));
-        wrap.appendChild(groupList);
-      });
-      return wrap;
+    /* v7 (F1): ONE flat, neutral job list. No group headers, no colour dots,
+       no verdict word anywhere — a row must be unreadable as an answer. */
+    renderJobList(jobs) {
+      const list = el('ul', { class: 'ampy-bk__joblist', role: 'list' });
+      jobs.forEach(j => list.appendChild(this.renderJobRow(j)));
+      return list;
     }
 
     renderJobRow(job) {
@@ -1128,19 +1180,15 @@
         'aria-label': `Välj jobb: ${job.label}`,
         onclick: () => this.navigate({ jobId: job.id, answerIndex: null })
       }, [
-        el('span', { html: icon(job.icon === 'search' ? 'felsok' : job.icon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-        el('span', {}, job.label),
-        el('span', { class: 'ampy-bk__job-row-arrow', html: icon('arrowRight'), 'aria-hidden': 'true', style: 'display:inline-flex' })
+        // Teal marks interactivity only; every row gets it, so it carries zero
+        // verdict signal.
+        el('span', { class: 'ampy-bk__job-row-icon', html: icon(job.icon === 'search' ? 'felsok' : job.icon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
+        el('span', { class: 'ampy-bk__job-row-label' }, job.label),
+        // Chevron, not the CTA arrow: this is drill-in navigation, not an action.
+        el('span', { class: 'ampy-bk__job-row-arrow', html: icon('chevronRight'), 'aria-hidden': 'true', style: 'display:inline-flex' })
       ]);
       li.appendChild(btn);
       return li;
-    }
-
-    /** Human word for a verdict group (used in chip aria-labels). */
-    _groupWord(group) {
-      return group === 'green' ? 'får du göra själv'
-        : group === 'red' ? 'kräver elektriker'
-        : 'det beror på';
     }
 
     /** Strip leading verb + trailing parens from label. */
@@ -1196,15 +1244,15 @@
       ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
 
       ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.font = '500 22px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.font = '500 22px "Outfit", system-ui, sans-serif';
       ctx.fillText('AMPY · Elkollen', 80, 90);
 
       ctx.fillStyle = 'rgba(255,255,255,0.78)';
-      ctx.font = '600 26px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.font = '600 26px "Outfit", system-ui, sans-serif';
       ctx.fillText(job.label, 80, 175);
 
       const v = this.data.verdicts[verdictKey];
-      ctx.font = '500 44px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.font = '500 44px "Outfit", system-ui, sans-serif';
       const labelW = ctx.measureText(v.label).width;
       const padX = 32, badgeH = 84, iconBox = 50;
       const badgeW = Math.min(W - 160, iconBox + 16 + labelW + padX * 2);
@@ -1213,11 +1261,11 @@
       ctx.fillStyle = accent.bg;
       this._roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 42); ctx.fill();
       ctx.fillStyle = accent.fg;
-      ctx.font = '700 38px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.font = '700 38px "Outfit", system-ui, sans-serif';
       ctx.textBaseline = 'middle';
       const glyph = verdictKey === 'green' ? '✓' : (verdictKey === 'red' ? '✕' : '!');
       ctx.fillText(glyph, badgeX + padX, badgeY + badgeH/2 + 2);
-      ctx.font = '500 36px "Plus Jakarta Sans", system-ui, sans-serif';
+      ctx.font = '500 36px "Outfit", system-ui, sans-serif';
       ctx.fillText(v.label, badgeX + padX + iconBox, badgeY + badgeH/2 + 2);
       ctx.textBaseline = 'alphabetic';
 

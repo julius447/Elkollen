@@ -1,17 +1,22 @@
 /* ============================================================================
-   Elkollen v5 — Craft pass
-   Pixel-faithful translation of the approved design references.
-   The middle step (question) and the verdict screen are redesigned into a
-   composed layout: title + clarifying subline on answer, always-visible info
-   notice, badge -> source chip linked by the accent, summary followed by
-   ✓/✗ contrast rows, caveat notice on green, calm CTA on green / solid on red.
+   Elkollen v7 — the 4-slide funnel.
+   Slide 1: heading + six identical room tiles. Slide 2: one neutral job list
+   (no verdict grouping). Slide 3: the choice step (every job is conditional).
+   Slide 4: refined verdict (kicker + headline + merged law box + tabs + one
+   CTA hierarchy for every verdict).
+
+   Typography is OUTFIT-ONLY (weight-led: 400 body, 500 interactive, 600
+   headings, 700 reserved for the verdict headline). Plus Jakarta Sans is
+   removed. NOTE for the dev: per the FluentSnippets delivery contract the
+   Google Fonts @import below should be replaced with a self-hosted Outfit
+   variable woff2 (latin subset incl. å ä ö) at WordPress implementation time.
 
    Rem base: html font-size 62.5% (= 10 px) — all rem values read on that base.
    Tokens: never raw values in components; only semantic CSS variables.
    ============================================================================ */
 html { font-size: 62.5%; }
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=Outfit:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
 
 .ampy-bk {
   /* ---------- Color tokens ---------------------------------------------- */
@@ -77,14 +82,22 @@ html { font-size: 62.5%; }
   --shadow-md: 0 6px 18px rgba(11, 13, 42, 0.06);
   --shadow-lg: 0 14px 32px rgba(11, 13, 42, 0.1);
 
-  /* ---------- Type sizes (rem on a 10 px base — matches the mockup px) -------- */
-  --fs-12: 1.2rem;
-  --fs-13: 1.3rem;
-  --fs-14: 1.4rem;
-  --fs-15: 1.5rem;
-  --fs-16: 1.6rem;
-  --fs-18: 1.8rem;
-  --fs-20: 2.0rem;
+  /* ---------- Type sizes (rem on a 10 px base) --------------------------
+     v7: ONE truthful token set for BOTH layouts (the old .ampy-bk--hero
+     block that redefined --fs-12 to 1.3rem etc. is deleted; token names
+     that lie are a defect class). Mobile differences are explicit
+     per-element overrides inside media queries, never token remaps. */
+  --fs-11: 1.1rem;  /* source line mobile only */
+  --fs-12: 1.2rem;  /* kicker, share-status */
+  --fs-13: 1.3rem;  /* source line desktop, fine print, clarifier mobile */
+  --fs-14: 1.4rem;  /* meta layer: crumb, labels, clarifiers, caveat, law box, info */
+  --fs-15: 1.5rem;  /* secondary body: tips, rows mobile, tabs, lead intro */
+  --fs-16: 1.6rem;  /* primary body + ALL buttons + ALL inputs (iOS 16px floor) */
+  --fs-17: 1.7rem;  /* summary desktop, tile labels desktop */
+  --fs-20: 2.0rem;  /* card/question/lead headings mobile, success h2 */
+  --fs-22: 2.2rem;  /* card/question/lead headings desktop */
+  --fs-24: 2.4rem;  /* verdict headline mobile */
+  --fs-30: 3.0rem;  /* verdict headline desktop */
 
   /* ---------- Block frame ---------------------------------------------- */
   --block-max-width: 60rem; /* v5.1 A6: 600 px @ 10 px base, calm line length */
@@ -151,13 +164,13 @@ html { font-size: 62.5%; }
 }
 
 /* ============================================================================
-   BREADCRUMB — universal pattern: ← Tillbaka · Job name
+   BREADCRUMB — universal pattern (v7): ONLY "← Tillbaka" on every slide
    ============================================================================ */
 .ampy-bk__crumb {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  margin: 0 0 var(--space-10);
+  margin: 0 0 var(--space-7); /* v7: the crumb is a single small control now */
   min-height: 4.4rem;
 }
 
@@ -171,7 +184,8 @@ html { font-size: 62.5%; }
   margin: 0;
   min-height: 4.4rem; /* the real tap target lives on the button, not the row */
   font: inherit;
-  font-size: var(--fs-13);
+  font-size: var(--fs-14);
+  font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
   border-radius: var(--radius-sm);
@@ -181,33 +195,31 @@ html { font-size: 62.5%; }
 .ampy-bk__crumb-back:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
 .ampy-bk__crumb-back svg { width: 1.6rem; height: 1.6rem; }
 
-.ampy-bk__crumb-sep {
-  color: var(--text-tertiary);
-  font-size: var(--fs-13);
-}
-
-.ampy-bk__crumb-job {
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-13);
-  font-weight: 500;
-  color: var(--text-primary);
-  margin: 0;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+/* v7 (V1): the crumb separator + job-name span are gone; the kicker on the
+   question/verdict screens carries the job name. */
 
 /* ============================================================================
    QUESTION MODE — mellansteget
    ============================================================================ */
+/* v7: neutral kicker above the question — the job name, NEVER verdict-tinted
+   here (the choice step must not leak the answer). */
+.ampy-bk__q-kicker {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin: 0 0 var(--space-2);
+}
+
 .ampy-bk__q-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-size: var(--fs-18);
-  font-weight: 500;
-  line-height: 1.4;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-22);
+  font-weight: 600;
+  line-height: 1.3;
   color: var(--text-primary);
-  letter-spacing: -0.005em;
+  letter-spacing: -0.01em;
   margin: 0 0 var(--space-9);
 }
 
@@ -227,14 +239,14 @@ html { font-size: 62.5%; }
   justify-content: space-between;
   gap: var(--space-5);
   text-align: left;
-  padding: var(--space-6) var(--space-7);
+  padding: var(--space-7);
   font: inherit;
   background: var(--bg-primary);
   color: var(--text-primary);
   border: 1px solid var(--border-tertiary);
   border-radius: var(--radius-md);
   cursor: pointer;
-  min-height: 6.4rem;
+  min-height: 7.2rem;
   transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
 }
 .ampy-bk__option:hover {
@@ -252,16 +264,16 @@ html { font-size: 62.5%; }
 .ampy-bk__option-title {
   display: block;
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-15);
-  font-weight: 500;
-  line-height: 1.4;
+  font-size: var(--fs-16);
+  font-weight: 600; /* v7: the options ARE the decision */
+  line-height: 1.35;
   color: var(--text-primary);
 }
 .ampy-bk__option-clarifier {
   display: block;
   margin-top: 0.3rem;
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-13);
+  font-size: var(--fs-14);
   font-weight: 400;
   line-height: 1.45;
   color: var(--text-secondary);
@@ -292,9 +304,9 @@ html { font-size: 62.5%; }
 }
 .ampy-bk__info-text {
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-13);
+  font-size: var(--fs-14);
   font-weight: 400;
-  line-height: 1.55;
+  line-height: 1.5;
   color: var(--text-secondary);
   margin: 0;
 }
@@ -338,7 +350,7 @@ html { font-size: 62.5%; }
   background: var(--verdict-badge-bg);
   color: var(--verdict-badge-fg);
   border-radius: var(--radius-full);
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   /* The verdict is the payoff: it must be the dominant heading on the screen
      (>= the entry/lead titles). */
   font-size: var(--fs-20);
@@ -374,39 +386,50 @@ html { font-size: 62.5%; }
   --verdict-badge-fg: rgb(80, 19, 19);
 }
 
-/* Cite chip — direkt under badgen, kompakt */
-.ampy-bk__cite {
+/* ============================================================================
+   MERGED LAW BOX (v7, V3) — ONE element replaces BOTH the cite chip and the
+   old red lead box: claim + citation visually fused. RED (and future YELLOW)
+   verdicts only; GREEN renders no source element at all (V4).
+   ============================================================================ */
+.ampy-bk__lawnote {
+  margin: 0 0 var(--space-9);
+  padding: var(--space-5) var(--space-6);
+  border-radius: var(--radius-md);
+  background: rgba(214, 64, 64, 0.05);
+  border: 1px solid rgba(214, 64, 64, 0.16);
+}
+.ampy-bk__lawnote--yellow {
+  background: rgba(245, 175, 25, 0.07);
+  border-color: rgba(245, 175, 25, 0.28);
+}
+.ampy-bk__lawnote-text {
+  margin: 0;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-14);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+.ampy-bk__lawnote-src {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  margin-top: var(--space-5);
-  padding: var(--space-2) var(--space-4);
-  background: var(--bg-secondary);
-  border-radius: var(--radius-md);
-  color: var(--text-secondary);
-  text-decoration: none;
+  gap: 0.5rem;
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  width: 100%;
+  border-top: 1px solid rgba(214, 64, 64, 0.14);
   font-family: 'Outfit', system-ui, sans-serif;
   font-size: var(--fs-12);
   font-weight: 400;
-  line-height: 1.45;
-  border: 1px solid transparent;
-  transition: border-color 150ms ease, color 150ms ease;
-  max-width: 100%;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  transition: color 150ms ease;
 }
-.ampy-bk__cite:hover {
-  border-color: var(--border-default);
-  color: var(--text-primary);
-}
-.ampy-bk__cite:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-}
-.ampy-bk__cite svg {
-  width: 1.3rem;
-  height: 1.3rem;
-  flex-shrink: 0;
-  opacity: 0.8;
-}
+.ampy-bk__lawnote--yellow .ampy-bk__lawnote-src { border-top-color: rgba(245, 175, 25, 0.24); }
+.ampy-bk__lawnote-src:hover { color: var(--text-primary); }
+.ampy-bk__lawnote-src:hover span:first-child { text-decoration: underline; text-underline-offset: 2px; }
+.ampy-bk__lawnote-src:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+.ampy-bk__lawnote-src svg { width: 1.3rem; height: 1.3rem; opacity: 0.75; flex-shrink: 0; }
 
 /* ============================================================================
    TABS — thin underline, two states
@@ -415,7 +438,7 @@ html { font-size: 62.5%; }
   display: flex;
   gap: var(--space-11);
   border-bottom: 1px solid var(--border-tertiary);
-  margin: 0 0 var(--space-9);
+  margin: 0 0 var(--space-8);
 }
 @media (max-width: 767px) {
   .ampy-bk__tabs { gap: var(--space-9); }
@@ -428,8 +451,9 @@ html { font-size: 62.5%; }
   margin: 0 0 -1px;
   font: inherit;
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-14);
-  font-weight: 400;
+  font-size: var(--fs-15);
+  /* v7: weight 500 in BOTH states — kills the selected-state width shift */
+  font-weight: 500;
   color: var(--text-secondary);
   cursor: pointer;
   border-bottom: 2px solid transparent;
@@ -439,7 +463,6 @@ html { font-size: 62.5%; }
 .ampy-bk__tab:hover { color: var(--text-primary); }
 .ampy-bk__tab[aria-selected="true"] {
   color: var(--text-primary);
-  font-weight: 500;
   border-bottom-color: var(--verdict-accent, var(--action-primary));
 }
 .ampy-bk__tab:focus-visible {
@@ -454,10 +477,11 @@ html { font-size: 62.5%; }
 
 .ampy-bk__summary {
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-16);
+  font-size: var(--fs-17);
   font-weight: 500;
   line-height: 1.5;
   color: var(--text-primary);
+  text-wrap: pretty;
   margin: 0 0 var(--space-7);
 }
 
@@ -465,18 +489,18 @@ html { font-size: 62.5%; }
   display: flex;
   align-items: flex-start;
   gap: var(--space-4);
-  margin: 0 0 var(--space-5);
+  margin: 0 0 var(--space-4);
 }
 /* Bump the last row so there is real breathing room before the CTA (extra
    important on red, where there is no caveat notice acting as a visual buffer). */
-.ampy-bk__row:last-of-type { margin-bottom: var(--space-12); }
+.ampy-bk__row:last-of-type { margin-bottom: var(--space-11); }
 
 .ampy-bk__row-icon {
   flex-shrink: 0;
   width: 1.8rem;
   /* Box = one text line tall, glyph centered, so the icon optically aligns to the
      first line of the row text (robust vs a fixed margin-top nudge). */
-  height: calc(var(--fs-15) * 1.5);
+  height: calc(var(--fs-16) * 1.5);
   align-items: center;
   justify-content: center;
 }
@@ -486,7 +510,7 @@ html { font-size: 62.5%; }
 
 .ampy-bk__row-text {
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-15);
+  font-size: var(--fs-16);
   font-weight: 400;
   line-height: 1.5;
   color: var(--text-secondary);
@@ -501,12 +525,12 @@ html { font-size: 62.5%; }
   border-left: 3px solid rgb(186, 117, 23);
   border-radius: 0;
   padding: 0.2rem 0 0.2rem var(--space-5);
-  margin: 0 0 var(--space-11);
+  margin: 0 0 var(--space-9);
 }
 .ampy-bk__caveat-icon {
   flex-shrink: 0;
   width: 1.6rem;
-  height: calc(var(--fs-13) * 1.55); /* one line tall, glyph centered -> aligns to first line */
+  height: calc(var(--fs-14) * 1.55); /* one line tall, glyph centered -> aligns to first line */
   align-items: center;
   justify-content: center;
   color: rgb(186, 117, 23);
@@ -514,7 +538,7 @@ html { font-size: 62.5%; }
 .ampy-bk__caveat-icon svg { width: 1.6rem; height: 1.6rem; }
 .ampy-bk__caveat-text {
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-13);
+  font-size: var(--fs-14);
   font-weight: 400;
   line-height: 1.55;
   color: var(--text-secondary);
@@ -565,12 +589,22 @@ html { font-size: 62.5%; }
   font-weight: 400;
   line-height: 1.55;
   color: var(--text-secondary);
-  margin: 0 0 var(--space-12);
+  margin: 0 0 var(--space-11);
 }
 
 /* ============================================================================
-   CTA — green (calm) / red (solid teal primary)
+   CTA (v7, F3) — ONE hierarchy on every verdict: solid teal advice CTA on top,
+   outline "Läs mer om ..." below. Green adds a framing line above the pair.
    ============================================================================ */
+.ampy-bk__cta-note {
+  margin: 0 0 var(--space-4);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-13);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
 .ampy-bk__cta-primary {
   display: flex;
   align-items: center;
@@ -578,10 +612,10 @@ html { font-size: 62.5%; }
   gap: var(--space-3);
   width: 100%;
   padding: var(--space-5);
-  margin: 0 0 var(--space-5);
+  margin: 0 0 var(--space-4);
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-14);
-  font-weight: 500;
+  font-size: var(--fs-16);
+  font-weight: 600;
   line-height: 1.3;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-default);
@@ -590,7 +624,7 @@ html { font-size: 62.5%; }
   cursor: pointer;
   text-decoration: none;
   transition: border-color 150ms ease, background 150ms ease;
-  min-height: 4.4rem;
+  min-height: 4.8rem;
 }
 .ampy-bk__cta-primary:hover {
   border-color: var(--action-primary);
@@ -622,10 +656,10 @@ html { font-size: 62.5%; }
   gap: var(--space-3);
   width: 100%;
   padding: var(--space-5);
-  margin: 0 0 var(--space-5);
-  line-height: 1.3; /* match the primary so the stacked RED buttons are equal height */
+  margin: 0;
+  line-height: 1.3; /* match the primary so the stacked buttons are equal height */
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-14);
+  font-size: var(--fs-15);
   font-weight: 500;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-default);
@@ -634,7 +668,7 @@ html { font-size: 62.5%; }
   cursor: pointer;
   text-decoration: none;
   transition: border-color 150ms ease, background 150ms ease;
-  min-height: 4.4rem;
+  min-height: 4.8rem;
 }
 .ampy-bk__cta-secondary:hover {
   border-color: var(--action-primary);
@@ -645,45 +679,8 @@ html { font-size: 62.5%; }
   box-shadow: var(--focus-ring);
 }
 
-/* Secondary row: "Anlita expert?" + share icon (green CTA) */
-.ampy-bk__cta-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0;
-  padding: 0; /* single child (advice link) since share was removed; the link's own 4.4rem owns the height */
-}
-/* v5.1 A5: clear click affordance without becoming a solid sales button.
-   The text is in action-primary with an underline so it reads as a link;
-   borderless, no background — keeps the green screen calm. */
-.ampy-bk__cta-link {
-  background: none;
-  border: 0;
-  padding: var(--space-2) 0;
-  margin: 0;
-  font: inherit;
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-14);
-  font-weight: 500;
-  color: var(--action-primary-text);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-decoration-thickness: 1px;
-  cursor: pointer;
-  transition: color 150ms ease, text-decoration-thickness 150ms ease;
-  min-height: 4.4rem;
-  display: inline-flex;
-  align-items: center;
-}
-.ampy-bk__cta-link:hover {
-  color: var(--text-primary);
-  text-decoration-thickness: 2px;
-}
-.ampy-bk__cta-link:focus-visible {
-  outline: 2px solid var(--border-focus);
-  outline-offset: 3px;
-  border-radius: var(--radius-sm);
-}
+/* v7 (F3): the green-only .ampy-bk__cta-row / .ampy-bk__cta-link treatment is
+   deleted — every verdict now ends with the same primary + secondary pair. */
 
 .ampy-bk__share-anchor {
   position: relative;
@@ -787,23 +784,7 @@ html { font-size: 62.5%; }
 /* ============================================================================
    ENTRY MODE — the picker (approved, keeps the v4 structure)
    ============================================================================ */
-.ampy-bk__head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin: 0 0 var(--space-7);
-  flex-wrap: wrap;
-}
-
-.ampy-bk__head-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-size: var(--fs-20);
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--text-primary);
-  margin: 0;
-  letter-spacing: -0.01em;
-}
+/* v7: .ampy-bk__head / __head-title removed — no render path creates them. */
 
 /* Search */
 .ampy-bk__search {
@@ -927,73 +908,50 @@ html { font-size: 62.5%; }
   margin: 0 0 var(--space-3);
 }
 
-.ampy-bk__joblist-group {
+/* v7 (F1): the NEUTRAL job list — one flat list, hairline-divided rows.
+   No group headers, no colour dots, no verdict word anywhere: a row must be
+   unreadable as an answer. Teal on every row icon = interactivity only. */
+.ampy-bk__joblist {
   list-style: none;
   padding: 0;
-  margin: 0 0 var(--space-7);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+  margin: 0;
 }
-.ampy-bk__joblist-group:last-child { margin-bottom: 0; }
-
-.ampy-bk__joblist-group-label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-13);
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0 0 var(--space-2);
-}
-.ampy-bk__joblist-group-label::before {
-  content: '';
-  display: inline-block;
-  width: 0.8rem;
-  height: 0.8rem;
-  border-radius: 50%;
-  background: var(--dot, var(--text-secondary));
-  flex-shrink: 0;
-}
-.ampy-bk__joblist-group-label[data-group="green"]::before { background: var(--state-success); }
-.ampy-bk__joblist-group-label[data-group="depends"]::before { background: var(--state-warning); }
-.ampy-bk__joblist-group-label[data-group="red"]::before { background: var(--state-error); }
-
-.ampy-bk__joblist-group-label-count {
-  font-size: var(--fs-12);
-  font-weight: 400;
-  color: var(--text-secondary);
-}
+.ampy-bk__joblist > li { border-bottom: 1px solid var(--border-tertiary); }
+.ampy-bk__joblist > li:last-child { border-bottom: 0; }
 
 .ampy-bk__job-row {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-5);
-  min-height: 4.4rem;
-  background: var(--bg-primary);
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-3);
+  min-height: 5.2rem;
+  background: none;
   color: var(--text-primary);
-  border: 1px solid transparent;
+  border: 0;
   border-radius: var(--radius-sm);
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-14);
-  font-weight: 400;
+  font-size: var(--fs-16);
+  font-weight: 500;
+  line-height: 1.4;
   cursor: pointer;
   text-align: left;
-  transition: background 150ms ease, border-color 150ms ease;
+  transition: background 150ms ease, color 150ms ease;
 }
-.ampy-bk__job-row:hover { background: var(--bg-secondary); border-color: var(--border-tertiary); }
+.ampy-bk__job-row:hover { background: var(--bg-secondary); }
+.ampy-bk__job-row:hover .ampy-bk__job-row-label { color: var(--action-primary-text); }
 .ampy-bk__job-row:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-.ampy-bk__job-row svg { width: 1.6rem; height: 1.6rem; color: var(--action-primary); flex-shrink: 0; }
-.ampy-bk__job-row-arrow { margin-left: auto; width: 1.4rem; height: 1.4rem; color: var(--text-tertiary); flex-shrink: 0; }
+.ampy-bk__job-row-icon { width: 2rem; height: 2rem; color: var(--action-primary); flex-shrink: 0; }
+.ampy-bk__job-row-icon svg { width: 2rem; height: 2rem; }
+.ampy-bk__job-row-label { min-width: 0; }
+.ampy-bk__job-row-arrow { margin-left: auto; width: 1.6rem; height: 1.6rem; color: var(--text-tertiary); flex-shrink: 0; }
+.ampy-bk__job-row-arrow svg { width: 1.6rem; height: 1.6rem; }
 
 .ampy-bk__source-line {
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-12);
+  font-size: var(--fs-13);
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.45;
   color: var(--text-tertiary);
   margin: var(--space-7) 0 0;
   padding-top: var(--space-5);
@@ -1086,14 +1044,9 @@ html { font-size: 62.5%; }
 
 /* Larger, hero-context type ramp (the embedded "instrument" scale reads thin
    when the tool is the page hero). One step up across the board. */
+/* v7: the hero-scope --fs-* remap is DELETED (one truthful token set for both
+   layouts); hero-specific sizes are explicit per-element rules. */
 .ampy-bk--hero {
-  --fs-12: 1.3rem;
-  --fs-13: 1.4rem;
-  --fs-14: 1.5rem;
-  --fs-15: 1.6rem;
-  --fs-16: 1.7rem;
-  --fs-18: 2.0rem;
-  --fs-20: 2.2rem;
   display: block;
   transition: min-height 200ms ease;
 }
@@ -1111,150 +1064,13 @@ html { font-size: 62.5%; }
 @media (max-width: 767px) {
   .ampy-bk--hero .ampy-bk__block {
     min-height: 0;              /* phones flow naturally; no reserved void */
-    padding: var(--space-9);
+    /* v7: 16px side padding buys one extra word per line at 375px */
+    padding: var(--space-9) var(--space-7);
   }
 }
 
-/* Quick-pick chips (6 popular jobs) */
-.ampy-bk__quickwrap { display: block; }
-.ampy-bk__quickpicks {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  list-style: none;
-  margin: var(--space-3) 0 0;
-  padding: 0;
-}
-.ampy-bk__quickpicks li { margin: 0; }
-.ampy-bk__quickpick {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3);
-  min-height: 4.4rem;
-  padding: var(--space-3) var(--space-5);
-  background: var(--bg-secondary);
-  border: 1px solid transparent;
-  border-radius: var(--radius-full);
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-15);
-  font-weight: 500;
-  color: var(--text-primary);
-  cursor: pointer;
-  white-space: nowrap; /* desktop: chip text stays on one line; chips wrap as a group */
-  max-width: 100%;
-  transition: background 150ms ease, border-color 150ms ease;
-}
-.ampy-bk__quickpick svg { width: 1.6rem; height: 1.6rem; color: var(--action-primary); flex-shrink: 0; }
-.ampy-bk__quickpick > span:last-child { overflow: hidden; text-overflow: ellipsis; }
-/* On narrow screens let chip text wrap rather than force horizontal overflow. */
-@media (max-width: 767px) {
-  .ampy-bk__quickpick { white-space: normal; }
-  .ampy-bk__quickpick > span:last-child { overflow: visible; text-overflow: clip; }
-}
-.ampy-bk__quickpick:hover { border-color: var(--action-primary); background: var(--bg-primary); }
-.ampy-bk__quickpick:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-
-/* "Välj rum" standing dropdown — always between search and "Vanliga eljobb" */
-.ampy-bk__roomselect { margin-top: var(--space-6); position: relative; }
-.ampy-bk__roomtoggle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: 4.8rem;
-  padding: var(--space-4) var(--space-5);
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-tertiary);
-  border-radius: var(--radius-md);
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-15);
-  font-weight: 600;
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: border-color 150ms ease, background 150ms ease;
-}
-.ampy-bk__roomtoggle:hover { border-color: var(--action-primary); }
-.ampy-bk__roomtoggle:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-.ampy-bk__roomtoggle-icon { width: 1.8rem; height: 1.8rem; color: var(--action-primary); flex-shrink: 0; }
-.ampy-bk__roomtoggle-icon svg { width: 100%; height: 100%; }
-.ampy-bk__roomtoggle-label { flex: 1; text-align: left; }
-.ampy-bk__roomtoggle-chev { width: 1.6rem; height: 1.6rem; color: var(--text-tertiary); transition: transform 200ms ease; flex-shrink: 0; }
-.ampy-bk__roomtoggle-chev svg { width: 100%; height: 100%; }
-.ampy-bk__roomtoggle[aria-expanded="true"] .ampy-bk__roomtoggle-chev { transform: rotate(180deg); }
-
-/* The dropdown panel: room options */
-.ampy-bk__roompanel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  list-style: none;
-  margin: var(--space-3) 0 0;
-  padding: var(--space-3);
-  background: var(--bg-primary);
-  border: 1px solid var(--border-tertiary);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-}
-.ampy-bk__roompanel[hidden] { display: none; }
-.ampy-bk__roompanel li { margin: 0; }
-.ampy-bk__roomitem {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: 4.4rem;
-  padding: var(--space-3) var(--space-4);
-  background: none;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-15);
-  font-weight: 500;
-  color: var(--text-primary);
-  text-align: left;
-  cursor: pointer;
-  transition: background 150ms ease;
-}
-.ampy-bk__roomitem:hover { background: var(--bg-secondary); }
-.ampy-bk__roomitem:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-.ampy-bk__roomitem-icon { width: 1.8rem; height: 1.8rem; color: var(--action-primary); flex-shrink: 0; }
-.ampy-bk__roomitem-icon svg { width: 100%; height: 100%; }
-.ampy-bk__roomitem[aria-pressed="true"] { background: var(--bg-secondary); border-color: var(--action-primary); font-weight: 600; }
-
-/* "Vanliga eljobb" wrap */
-.ampy-bk__commonwrap { display: block; }
-.ampy-bk--hero .ampy-bk__commonwrap { margin-top: var(--space-6); }
-/* Consistent 14px (--space-6) rhythm between the stacked entry blocks: drive the
-   gap from the top of each following block, not from the search bottom. */
-.ampy-bk--hero .ampy-bk__search { margin-bottom: 0; }
-.ampy-bk__commonwrap[hidden] { display: none; }
-
-/* "Se alla N jobb" — its own tappable row at the end of the common list */
-.ampy-bk__seeall {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: 4.8rem;
-  margin-top: var(--space-4);
-  padding: var(--space-4) var(--space-5);
-  background: var(--bg-primary);
-  border: 1px solid var(--border-tertiary);
-  border-radius: var(--radius-md);
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-15);
-  font-weight: 600;
-  /* "Browse everything" is a secondary affordance: neutral text + teal arrow,
-     so it does not out-shout the real goal (pick your job / get a verdict). */
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: border-color 150ms ease, background 150ms ease;
-}
-.ampy-bk__seeall:hover { border-color: var(--action-primary); background: var(--bg-secondary); }
-.ampy-bk__seeall:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-.ampy-bk__seeall-arrow { width: 1.6rem; height: 1.6rem; flex-shrink: 0; color: var(--action-primary); }
-.ampy-bk__seeall-arrow svg { width: 100%; height: 100%; }
+/* v7: quick-pick chips, the "Välj rum" dropdown, commonwrap and "Se alla" CSS
+   are removed — no render path has created them since the room-grid entry. */
 
 /* The drawer: grouped list. Desktop scrolls INSIDE the card (long rooms), mobile flows. */
 .ampy-bk__drawer {
@@ -1271,14 +1087,24 @@ html { font-size: 62.5%; }
   .ampy-bk__drawer { max-height: none; overflow: visible; padding-right: 0; }
 }
 
-/* Drawer title — the room / search / all label above the grouped results */
+/* Slide-2 header: room title + helper subtitle above the neutral list */
 .ampy-bk__drawer-title {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-size: var(--fs-18);
-  font-weight: 700;
-  line-height: 1.2;
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-22);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
   color: var(--text-primary);
-  margin: 0 0 var(--space-4);
+  margin: 0 0 0.2rem;
+}
+.ampy-bk__drawer-title:focus { outline: none; }
+.ampy-bk__list-subtitle {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-14);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-5);
 }
 
 /* "Visa vanliga eljobb" back link inside the results drawer */
@@ -1301,37 +1127,32 @@ html { font-size: 62.5%; }
 .ampy-bk__drawer-back:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ampy-bk__drawer-back:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-sm); }
 
-/* Verdict/question in hero: a touch more air, fill the column */
-.ampy-bk--hero .ampy-bk__judgment { margin-bottom: var(--space-9); }
+/* Verdict headline block rhythm in hero (16px to the law box / tabs) */
+.ampy-bk--hero .ampy-bk__judgment { margin-bottom: var(--space-7); }
 
 /* ============================================================================
    ROOM-GRID ENTRY (hero, Version-3) — shared, theme-agnostic
    ============================================================================ */
-/* Card headline: gives the white card a cover / owner glance */
-.ampy-bk__entry-eyebrow {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-size: var(--fs-20);
-  font-weight: 700;
-  line-height: 1.2;
+/* Slide-1 card heading (v7): the card's ONLY heading — the old eyebrow and
+   the search field are gone (T1/T2). */
+.ampy-bk__entry-title {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-22);
+  font-weight: 600;
+  line-height: 1.25;
   letter-spacing: -0.01em;
+  text-wrap: balance;
   color: var(--text-primary);
   margin: 0 0 var(--space-9);
 }
-/* Room prompt (ROOM state only; hidden when the drawer opens) */
-.ampy-bk__entry-hint {
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-14);
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin: var(--space-7) 0 var(--space-5);
-}
-.ampy-bk__entry-hint[hidden] { display: none; }
-.ampy-bk__entry-hint:focus { outline: none; }
+.ampy-bk__entry-title[hidden] { display: none; }
+.ampy-bk__entry-title:focus { outline: none; }
 
 /* The 6-tile grid: 5 rooms + "Alla jobb" (2x3 fills the 520px floor) */
 .ampy-bk__roomgrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 1fr; /* v7 (T3): every row identical — the equal-size guarantee */
   gap: var(--space-5);
   list-style: none;
   padding: 0;
@@ -1343,18 +1164,21 @@ html { font-size: 62.5%; }
 .ampy-bk__roomtile {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
   width: 100%;
-  min-height: 10.4rem;
+  height: 100%;   /* fill the 1fr row */
+  min-height: 11.2rem;
   padding: var(--space-7);
   background: var(--bg-primary);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
-  text-align: left;
+  text-align: center;
   cursor: pointer;
   transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
 }
+.ampy-bk__roomtile:active { transform: scale(0.98); }
 .ampy-bk__roomtile:hover {
   border-color: var(--action-primary);
   transform: translateY(-1px);
@@ -1367,49 +1191,49 @@ html { font-size: 62.5%; }
   justify-content: center;
   width: 4rem;
   height: 4rem;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full); /* v7: circle, calmer than the square */
   background: rgba(0, 169, 145, 0.08);
   color: var(--action-primary);
   flex-shrink: 0;
 }
-.ampy-bk__roomtile-chip svg { width: 2rem; height: 2rem; }
+/* stroke-width normalized to 1.8 across all tile glyphs (2.0 renders heavy) */
+.ampy-bk__roomtile-chip svg { width: 2rem; height: 2rem; stroke-width: 1.8; }
 .ampy-bk__roomtile-body {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0.2rem;
   min-width: 0;
   width: 100%;
 }
 .ampy-bk__roomtile-label {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-size: var(--fs-16);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-17);
   font-weight: 600;
   line-height: 1.25;
+  letter-spacing: -0.005em;
   color: var(--text-primary);
 }
+/* Single-line ellipsis at ALL widths: with grid-auto-rows 1fr this is what
+   guarantees six pixel-identical tiles on desktop too. */
 .ampy-bk__roomtile-sub {
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-13);
+  font-size: var(--fs-14);
   line-height: 1.35;
   color: var(--text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
-/* "Alla jobb" — a quieter, honest escape hatch: dashed border + neutral chip */
-.ampy-bk__roomtile--all { border-style: dashed; }
-.ampy-bk__roomtile--all .ampy-bk__roomtile-chip {
-  background: var(--bg-secondary);
-  color: var(--text-tertiary);
-}
+/* v7 (T3): the .ampy-bk__roomtile--all dashed/grey overrides are DELETED —
+   the "Alla eljobb" tile is styled exactly like the five rooms. */
 @media (max-width: 767px) {
   /* Keep 2 columns on mobile (minmax(0,1fr) prevents overflow); tiles a touch shorter */
-  .ampy-bk__roomtile { min-height: 8.8rem; padding: var(--space-6); }
+  .ampy-bk__roomgrid { gap: var(--space-4); }
+  .ampy-bk__roomtile { min-height: 9.2rem; padding: var(--space-6); }
   .ampy-bk__roomtile-chip { width: 3.6rem; height: 3.6rem; }
   .ampy-bk__roomtile-chip svg { width: 1.8rem; height: 1.8rem; }
-  .ampy-bk__roomtile-sub {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%;
-  }
 }
 
 /* Pin the source line to the card floor so the 520px never reads half-empty */
@@ -1462,38 +1286,49 @@ html { font-size: 62.5%; }
 }
 .ampy-bk--hero .ampy-bk__block[data-verdict] > * { position: relative; z-index: 1; }
 @media (max-width: 767px) {
-  .ampy-bk--hero .ampy-bk__block[data-verdict]::after { height: 15rem; }
+  .ampy-bk--hero .ampy-bk__block[data-verdict]::after { height: 12rem; }
 }
-/* Cover line: render the badge as a magazine headline, not a pill */
+/* v7 (V2): the giant cover line is retired. Refined headline: 30/24px, 700
+   (the ONLY 700 on the surface), generous 1.15 leading. The drama lives in the
+   full-height accent rule + top wash, which stay unchanged. */
 .ampy-bk--hero .ampy-bk__badge {
   display: block;
   background: none;
   padding: 0;
   border-radius: 0;
   margin: 0;
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Outfit', system-ui, sans-serif;
   font-weight: 700;
-  font-size: clamp(4rem, 5.2vw, 5.2rem);
-  line-height: 1.04;
-  letter-spacing: -0.02em;
+  font-size: var(--fs-30);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
   color: var(--text-primary);
   text-wrap: balance;
-  max-width: 18ch;
+  max-width: 22ch;
 }
 .ampy-bk--hero .ampy-bk__badge svg { display: none; }
 @media (max-width: 767px) {
-  .ampy-bk--hero .ampy-bk__badge { font-size: clamp(3rem, 8.5vw, 3.6rem); max-width: none; }
+  .ampy-bk--hero .ampy-bk__badge { font-size: var(--fs-24); line-height: 1.2; max-width: none; }
 }
 /* Kicker: the job name in caps, tinted to the verdict accent.
    Unscoped so the embedded layout styles it too (never an unstyled line). */
 .ampy-bk__verdict-kicker {
   font-family: 'Outfit', system-ui, sans-serif;
   font-weight: 600;
-  font-size: 1.2rem;
-  letter-spacing: 0.14em;
+  font-size: var(--fs-12);
+  letter-spacing: 0.10em; /* v7: Outfit caps are wide; 0.14 gapped */
   text-transform: uppercase;
   color: var(--verdict-accent);
-  margin: 0 0 var(--space-4);
+  margin: 0 0 var(--space-1);
+}
+/* v7: personalisation subline under the kicker — "Ditt val: {option}" */
+.ampy-bk__verdict-choice {
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-13);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  margin: 0 0 var(--space-3);
 }
 /* The lead form sets no data-verdict, so the wash/rule never fire there. */
 
@@ -1508,19 +1343,8 @@ html { font-size: 62.5%; }
      as the teal "hire us" action.
    ============================================================================ */
 
-/* ---------- RED: one-line consequence surfaced by default ------------------ */
-.ampy-bk__verdict-lead {
-  margin: 0 0 var(--space-6);
-  padding: var(--space-4) var(--space-5);
-  background: rgba(214, 64, 64, 0.06);
-  border-left: 3px solid var(--state-error);
-  border-radius: var(--radius-sm);
-  /* Deliberately smaller than the badge headline so the verdict stays dominant. */
-  font-size: var(--fs-13);
-  font-weight: 400;
-  line-height: 1.5;
-  color: var(--text-secondary);
-}
+/* v7 (V3): the old .ampy-bk__verdict-lead red box is deleted — merged into
+   .ampy-bk__lawnote together with the cite chip. */
 
 
 /* ---------- IN-TOOL LEAD FORM ---------------------------------------------- */
@@ -1528,9 +1352,9 @@ html { font-size: 62.5%; }
    identical at every step (entry -> verdict -> lead -> success). */
 .ampy-bk__lead-back {
   display: inline-flex; align-items: center; gap: var(--space-3);
-  margin-bottom: var(--space-5); padding: var(--space-2) 0; min-height: 4.4rem;
+  margin-bottom: var(--space-4); padding: var(--space-2) 0; min-height: 4.4rem;
   background: none; border: 0; cursor: pointer;
-  font-family: 'Outfit', system-ui, sans-serif; font-size: var(--fs-13); font-weight: 500;
+  font-family: 'Outfit', system-ui, sans-serif; font-size: var(--fs-14); font-weight: 500;
   color: var(--text-secondary);
   transition: color 150ms ease;
 }
@@ -1539,20 +1363,20 @@ html { font-size: 62.5%; }
 .ampy-bk__lead-back:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-sm); }
 .ampy-bk__lead-title {
   margin: 0 0 var(--space-3);
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-size: var(--fs-20); font-weight: 700; line-height: 1.2; color: var(--text-primary);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-22); font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; color: var(--text-primary);
 }
 .ampy-bk__lead-intro {
-  margin: 0 0 var(--space-9); font-size: var(--fs-14); line-height: 1.5; color: var(--text-secondary);
+  margin: 0 0 var(--space-8); font-size: var(--fs-15); line-height: 1.5; color: var(--text-secondary);
 }
 .ampy-bk__lead-grid {
   display: grid; grid-template-columns: 1fr 1fr;
-  column-gap: var(--space-5); row-gap: var(--space-8);
+  column-gap: var(--space-5); row-gap: var(--space-7);
 }
 @media (max-width: 520px) { .ampy-bk__lead-grid { grid-template-columns: 1fr; row-gap: var(--space-7); } }
 .ampy-bk__lead-field { display: flex; flex-direction: column; gap: var(--space-3); }
 .ampy-bk__lead-label {
-  font-family: 'Outfit', system-ui, sans-serif; font-size: var(--fs-13); font-weight: 600; color: var(--text-primary);
+  font-family: 'Outfit', system-ui, sans-serif; font-size: var(--fs-14); font-weight: 600; color: var(--text-primary);
 }
 .ampy-bk__lead-input {
   width: 100%; min-height: 4.8rem; padding: var(--space-4) var(--space-5);
@@ -1566,12 +1390,12 @@ html { font-size: 62.5%; }
 .ampy-bk__lead-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 .ampy-bk__lead-consent {
   display: flex; align-items: flex-start; gap: var(--space-3);
-  margin: var(--space-8) 0 0; font-size: var(--fs-13); line-height: 1.5; color: var(--text-secondary);
+  margin: var(--space-7) 0 0; font-size: var(--fs-13); line-height: 1.5; color: var(--text-secondary);
 }
 .ampy-bk__lead-check { margin-top: 0.3rem; width: 1.8rem; height: 1.8rem; flex-shrink: 0; accent-color: var(--action-primary); }
 .ampy-bk__lead-consent label { cursor: pointer; }
 .ampy-bk__lead-consent a { color: var(--action-primary-text); text-decoration: underline; text-underline-offset: 2px; }
-.ampy-bk__lead-error { margin: var(--space-3) 0 0; font-size: var(--fs-13); font-weight: 500; color: var(--state-error); }
+.ampy-bk__lead-error { margin: var(--space-3) 0 0; font-size: var(--fs-14); font-weight: 500; color: var(--state-error); }
 .ampy-bk__lead-error[hidden] { display: none; }
 .ampy-bk__lead-submit { margin: var(--space-7) 0 0; min-height: 4.8rem; }
 .ampy-bk__lead-submit:disabled { background: rgba(0,122,105,0.7); border-color: rgba(0,122,105,0.7); color: var(--text-inverse); cursor: default; }
@@ -1583,7 +1407,33 @@ html { font-size: 62.5%; }
 }
 .ampy-bk__lead-success-icon svg { width: 2.8rem; height: 2.8rem; }
 .ampy-bk__lead-success h2 {
-  margin: 0 0 var(--space-3); font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-size: var(--fs-18); font-weight: 700; color: var(--text-primary);
+  margin: 0 0 var(--space-3); font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--fs-20); font-weight: 600; letter-spacing: -0.005em; color: var(--text-primary);
 }
-.ampy-bk__lead-success p { margin: 0 0 var(--space-5); font-size: var(--fs-14); line-height: 1.5; color: var(--text-secondary); }
+.ampy-bk__lead-success p { margin: 0 0 var(--space-5); font-size: var(--fs-15); line-height: 1.5; color: var(--text-secondary); }
+
+/* ============================================================================
+   v7 MOBILE OVERRIDES (<=767px) — explicit per-element steps, never token
+   remaps. 90% of paid traffic is mobile: tighter type, >=16px inputs, >=44px
+   tap targets, 52px primary buttons.
+   ============================================================================ */
+@media (max-width: 767px) {
+  .ampy-bk__block { scroll-margin-top: 1.2rem; }
+  .ampy-bk__entry-title { font-size: var(--fs-20); }
+  .ampy-bk__drawer-title { font-size: var(--fs-20); }
+  .ampy-bk__roomtile-label { font-size: var(--fs-16); }
+  .ampy-bk__roomtile-sub { font-size: var(--fs-13); }
+  .ampy-bk__job-row { font-size: var(--fs-15); min-height: 4.8rem; }
+  .ampy-bk__q-title { font-size: var(--fs-20); margin-bottom: var(--space-7); }
+  .ampy-bk__options { margin-bottom: var(--space-7); }
+  .ampy-bk__option { padding: var(--space-6) var(--space-7); min-height: 6.4rem; }
+  .ampy-bk__option-title { font-size: var(--fs-15); }
+  .ampy-bk__option-clarifier { font-size: var(--fs-13); }
+  .ampy-bk__summary { font-size: var(--fs-16); }
+  .ampy-bk__row-text { font-size: var(--fs-15); }
+  .ampy-bk__row-icon { height: calc(var(--fs-15) * 1.5); }
+  .ampy-bk__cta-primary, .ampy-bk__cta-secondary { min-height: 5.2rem; }
+  .ampy-bk__lead-title { font-size: var(--fs-20); }
+  .ampy-bk__lead-submit { min-height: 5.2rem; }
+  .ampy-bk__source-line { font-size: var(--fs-11); line-height: 1.45; }
+}

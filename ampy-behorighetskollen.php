@@ -3,7 +3,7 @@
  * Plugin Name:       Elkollen (Ampy)
  * Plugin URI:        https://ampy.se/
  * Description:       Elkollen — lead magnet where a homeowner picks an electrical job and gets a GREEN/YELLOW/RED verdict with a legal source. Renders in Bricks via the shortcode [elkollen] (or [behorighetskollen]). UI copy is Swedish by design.
- * Version:           5.7.9
+ * Version:           7.0.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Ampy
@@ -23,7 +23,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-define( 'AMPY_BK_VERSION',  '5.7.9' );
+define( 'AMPY_BK_VERSION',  '7.0.1' );
 define( 'AMPY_BK_FILE',     __FILE__ );
 define( 'AMPY_BK_DIR',      plugin_dir_path( __FILE__ ) );
 define( 'AMPY_BK_URL',      plugin_dir_url( __FILE__ ) );
@@ -130,8 +130,11 @@ function ampy_bk_dynamic_og() {
         $desc  = isset( $j['summary'] ) ? wp_strip_all_tags( $j['summary'] ) : wp_strip_all_tags( $j['why_text'] );
 
         // Resolve OG image: per-job override → per-verdict fallback → none.
+        // v7: all jobs are type:conditional, but the 15 converted jobs KEEP
+        // default_verdict, so their per-verdict OG image stays correct; the 11
+        // originally-conditional jobs (no default) fall back to yellow.
         $og_url = '';
-        $verdict_key = $j['type'] === 'fixed' ? $j['default_verdict'] : 'yellow';
+        $verdict_key = ( isset( $j['default_verdict'] ) && $j['default_verdict'] ) ? $j['default_verdict'] : 'yellow';
         $candidates = array(
             AMPY_BK_DIR . 'assets/og/' . $j['id'] . '.png'        => AMPY_BK_URL . 'assets/og/' . $j['id'] . '.png',
             AMPY_BK_DIR . 'assets/og/' . $verdict_key . '.png'    => AMPY_BK_URL . 'assets/og/' . $verdict_key . '.png',
