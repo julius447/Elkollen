@@ -1,10 +1,10 @@
 /* ============================================================================
-   Elkollen v5 — Craft-passet
-   Pixel-trogen rendering mot godkända designreferenser (mellansteget och
-   beskedsskärmen). Funktion, data, flöde är låsta sedan tidigare versioner.
+   Elkollen v5 — Craft pass
+   Pixel-faithful rendering against the approved design references (the middle
+   step and the verdict screen). Function, data and flow are locked since earlier versions.
      1. DATA   — behorighetskollen-data.json (single source of truth)
      2. ENGINE — pure resolve(job, answerIndex) → verdict
-     3. VIEW   — entry / question / verdict, alla i ett block med fast ram
+     3. VIEW   — entry / question / verdict, all in one block with a fixed frame
    ============================================================================ */
 (function () {
   'use strict';
@@ -50,6 +50,7 @@
     charger: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M13 7l-4 6h3l-1 4 4-6h-3z"/></svg>',
     solar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="13" width="18" height="8" rx="1"/><line x1="7" y1="13" x2="6" y2="21"/><line x1="12" y1="13" x2="12" y2="21"/><line x1="17" y1="13" x2="18" y2="21"/><line x1="3" y1="17" x2="21" y2="17"/><circle cx="12" cy="6" r="2.5"/><line x1="12" y1="1" x2="12" y2="2.2"/><line x1="6.3" y1="6" x2="5.1" y2="6"/><line x1="18.9" y1="6" x2="17.7" y2="6"/></svg>',
     inspect: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M9 13l2 2 4-4"/></svg>',
+    grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>',
 
     /* Share / social icons */
     facebook: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>',
@@ -60,7 +61,7 @@
     link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'
   };
   ICONS.search_icon = ICONS.search;
-  // Alias: data uses 'search' for felsökning job
+  // Alias: data uses 'search' for the felsökning (troubleshooting) job
   const icon = (name) => ICONS[name] || ICONS.info;
 
   /* ---------- Element helper -------------------------------------------- */
@@ -264,7 +265,14 @@
         const target = block.querySelector('[data-focus-target]');
         if (target) {
           target.setAttribute('tabindex', '-1');
-          try { target.focus({ preventScroll: false }); } catch (e) { target.focus(); }
+          // Scroll-sync: when the lead form mounts, focus the heading WITHOUT
+          // popping the keyboard (preventScroll), then smooth-scroll the whole
+          // white card into view so it lands cleanly (esp. on mobile).
+          const isLead = this.leadOpen && block.classList.contains('ampy-bk__lead');
+          try { target.focus({ preventScroll: isLead }); } catch (e) { target.focus(); }
+          if (isLead) {
+            try { block.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { /* no-op */ }
+          }
         }
       }
       this._booted = true;
@@ -297,7 +305,7 @@
 
       block.appendChild(this.renderCrumb(job));
 
-      // Frågan
+      // The question
       block.appendChild(el('p', { class: 'ampy-bk__q-title', id: 'ampy-bk-q', 'data-focus-target': '' }, job.question));
 
       // Svarsalternativ (title + clarifier subline)
@@ -333,11 +341,13 @@
     }
 
     /* ===================================================================
-       VERDICT MODE — beskedsskärmen (v5 mockup)
+       VERDICT MODE — the verdict screen (v5 mockup)
        =================================================================== */
     renderVerdictBlock(job, verdictKey) {
       const v = this.data.verdicts[verdictKey];
       const block = el('div', { class: 'ampy-bk__block', role: 'region', 'aria-labelledby': 'ampy-bk-v' });
+      // Drives the §5 verdict-reveal (full-height accent rule + interior wash).
+      block.dataset.verdict = verdictKey;
 
       block.appendChild(this.renderCrumb(job));
 
@@ -345,6 +355,8 @@
       const judgment = el('div', { class: `ampy-bk__judgment ampy-bk__judgment--${verdictKey}` });
       judgment.appendChild(el('div', { class: 'ampy-bk__judgment-accent', 'aria-hidden': 'true' }));
       const jbody = el('div', { class: 'ampy-bk__judgment-body' });
+      // Kicker: the job name in caps, above the cover-line headline (§5).
+      jbody.appendChild(el('p', { class: 'ampy-bk__verdict-kicker' }, job.label.toUpperCase()));
       const badgeIcon = verdictKey === 'green' ? 'check' : (verdictKey === 'red' ? 'ban' : 'alert');
       // h2, not h1: the page H1 is owned by Bricks/hero. data-focus-target so
       // focus lands here after the verdict renders (announced once, no aria-live
@@ -357,7 +369,7 @@
         el('span', { html: icon(badgeIcon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
         el('span', {}, v.label)
       ]));
-      // v5.1 B1: Per-verdict-källa. Resolveras: option.source > job.source > verdicts[verdictKey].source.
+      // v5.1 B1: Per-verdict source. Resolved: option.source > job.source > verdicts[verdictKey].source.
       const source = this._resolveSource(job, verdictKey);
       jbody.appendChild(el('a', {
         class: 'ampy-bk__cite',
@@ -450,7 +462,7 @@
       }
     }
 
-    /** Förklaring-tabben: summary + ✓/✗ kontrastrader + caveat (grön) */
+    /** Förklaring tab: summary + ✓/✗ contrast rows + caveat (green) */
     renderExplain(job, verdictKey, v) {
       const wrap = document.createDocumentFragment();
 
@@ -478,7 +490,7 @@
         ]));
       }
 
-      // Caveat notice — bara på grön
+      // Caveat notice — green only
       if (verdictKey === 'green' && v.caveat_short) {
         wrap.appendChild(el('div', { class: 'ampy-bk__caveat', role: 'note' }, [
           el('span', { class: 'ampy-bk__caveat-icon', html: icon('alert'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
@@ -491,9 +503,9 @@
 
     renderTips(v) {
       // v5.3: jobb-specifika tips med per-tips ✓/✗.
-      //   { text, allowed }: allowed=true → ✓ (något du FÅR göra),
-      //   allowed=false → ✗ (stopp-villkoret, gränsen mot elektriker).
-      // Bakåtkompat: strängar tolkas som allowed=true.
+      //   { text, allowed }: allowed=true → ✓ (something you MAY do),
+      //   allowed=false → ✗ (the stop condition, the boundary to an electrician).
+      // Backwards-compat: plain strings are interpreted as allowed=true.
       const job = this.currentJob;
       const raw = (job && job.tips && job.tips.length) ? job.tips : (v.tips || []);
       const tips = raw.map(t => (typeof t === 'string') ? { text: t, allowed: true } : t);
@@ -515,7 +527,7 @@
     }
 
     /* ===================================================================
-       CTA — grön (lugn) / röd (solid teal primär)
+       CTA — green (calm) / red (solid teal primary)
        =================================================================== */
     renderCta(job, verdictKey) {
       const wrap = document.createDocumentFragment();
@@ -523,7 +535,7 @@
       // (e.g. "Felsökning av el" -> "el"); else strip the leading verb.
       const shortJob = job.cta_short || this._shortLabel(job.label);
       // One standardized advice CTA label everywhere (data file = source of truth).
-      const adviceLabel = this.data.meta.cta_advice_label || 'Få kostnadsfri rådgivning';
+      const adviceLabel = this.data.meta.cta_advice_label || 'Boka kostnadsfri rådgivning';
 
       // The advice CTA opens the in-tool lead form (no outbound jump to /offert/).
       const adviceBtn = (cls) => el('button', {
@@ -543,23 +555,20 @@
 
       // The verdict ends with the CTAs (no share button, per client).
       if (verdictKey === 'red') {
-        // RÖD: solid teal advice-CTA (primary) + outline "Läs mer...".
+        // RED: solid teal advice CTA (primary) + outline "Läs mer...".
         wrap.appendChild(adviceBtn('ampy-bk__cta-primary ampy-bk__cta-primary--solid'));
         wrap.appendChild(readMore('ampy-bk__cta-secondary'));
 
       } else if (verdictKey === 'green') {
-        // GRÖN: lugn primär "Läs mer om..." (DIY-guiden) + diskret advice-länk.
+        // GREEN: calm bordered "Läs mer om..." (the DIY guide) on top +
+        // a real outline advice button below (promoted from the old text link).
         wrap.appendChild(readMore('ampy-bk__cta-primary'));
-        const ctaRow = el('div', { class: 'ampy-bk__cta-row' });
-        ctaRow.appendChild(adviceBtn('ampy-bk__cta-link'));
-        wrap.appendChild(ctaRow);
+        wrap.appendChild(adviceBtn('ampy-bk__cta-secondary'));
 
       } else {
-        // GUL: "Läs mer om..." + advice-länk.
-        wrap.appendChild(readMore('ampy-bk__cta-primary'));
-        const ctaRow = el('div', { class: 'ampy-bk__cta-row' });
-        ctaRow.appendChild(adviceBtn('ampy-bk__cta-link'));
-        wrap.appendChild(ctaRow);
+        // YELLOW: mirror RED — solid-teal advice primary + outline "Läs mer...".
+        wrap.appendChild(adviceBtn('ampy-bk__cta-primary ampy-bk__cta-primary--solid'));
+        wrap.appendChild(readMore('ampy-bk__cta-secondary'));
       }
 
       return wrap;
@@ -583,16 +592,19 @@
       ]));
 
       block.appendChild(el('h2', { class: 'ampy-bk__lead-title', id: 'ampy-bk-lead-h', 'data-focus-target': '' },
-        f.title || 'Få kostnadsfri rådgivning'));
+        f.title || 'Boka kostnadsfri rådgivning'));
       block.appendChild(el('p', { class: 'ampy-bk__lead-intro' },
-        f.intro || 'Ampys behöriga elektriker hör av sig med ett förslag, oftast inom en arbetsdag.'));
+        f.intro || 'Ampys behöriga elektriker hör av sig på telefon för din rådgivning!'));
 
       const form = el('form', { class: 'ampy-bk__lead-form', novalidate: 'true' });
       const field = (name, label, type, required, inputmode, autocomplete) => {
         const id = 'ampy-bk-lf-' + name;
         const wrapF = el('div', { class: 'ampy-bk__lead-field' });
-        wrapF.appendChild(el('label', { class: 'ampy-bk__lead-label', for: id },
-          label + (required ? '' : ' (valfritt)')));
+        // All four fields are required now; each label carries a small black asterisk.
+        wrapF.appendChild(el('label', { class: 'ampy-bk__lead-label', for: id }, [
+          label,
+          required ? el('span', { class: 'ampy-bk__req', 'aria-hidden': 'true' }, '*') : null
+        ]));
         // Field-specific autocomplete tokens drive the one-tap contact autofill
         // chip on iOS/Android and satisfy WCAG 1.3.5 (Identify Input Purpose).
         const input = el('input', Object.assign({
@@ -601,47 +613,44 @@
         wrapF.appendChild(input);
         return { wrapF, input };
       };
+      // Order: Namn -> Telefon -> Postnummer -> E-post (telefon is the money field).
       const namn  = field('namn', 'Namn', 'text', true, null, 'name');
-      const epost = field('epost', 'E-post', 'email', true, 'email', 'email');
       const tel   = field('telefon', 'Telefon', 'tel', true, 'tel', 'tel');
       const post  = field('postnummer', 'Postnummer', 'text', true, 'numeric', 'postal-code');
+      const epost = field('epost', 'E-post', 'email', true, 'email', 'email');
 
       const grid = el('div', { class: 'ampy-bk__lead-grid' });
-      grid.appendChild(namn.wrapF); grid.appendChild(epost.wrapF);
-      grid.appendChild(tel.wrapF);  grid.appendChild(post.wrapF);
+      grid.appendChild(namn.wrapF); grid.appendChild(tel.wrapF);
+      grid.appendChild(post.wrapF); grid.appendChild(epost.wrapF);
       form.appendChild(grid);
 
       // honeypot (hidden from humans)
       const honey = el('input', { type: 'text', name: 'webbplats', class: 'ampy-bk__lead-hp', tabindex: '-1', autocomplete: 'off', 'aria-hidden': 'true' });
       form.appendChild(honey);
 
-      // GDPR consent
-      const consentId = 'ampy-bk-lf-consent';
-      const consent = el('input', { type: 'checkbox', id: consentId, class: 'ampy-bk__lead-check', required: 'true' });
-      const consentRow = el('div', { class: 'ampy-bk__lead-consent' }, [
-        consent,
-        el('label', { for: consentId }, [
-          (f.consent || 'Jag godkänner att Ampy sparar mina uppgifter för att kontakta mig med ett förslag, enligt '),
-          el('a', { href: this.data.meta.privacy_url || 'https://ampy.se/integritetspolicy/', target: '_blank', rel: 'noopener noreferrer' },
-            f.consent_link || 'integritetspolicyn'),
-          '.'
-        ])
-      ]);
-      form.appendChild(consentRow);
-
       const errorId = 'ampy-bk-lf-error';
       const errorBox = el('p', { class: 'ampy-bk__lead-error', id: errorId, role: 'alert', hidden: true });
       form.appendChild(errorBox);
 
       const submit = el('button', { class: 'ampy-bk__cta-primary ampy-bk__cta-primary--solid ampy-bk__lead-submit', type: 'submit' },
-        f.submit || 'Skicka förfrågan');
+        f.submit || 'Boka kostnadsfri rådgivning');
       form.appendChild(submit);
 
+      // Consent is implicit by submitting; state it in fine print under the button,
+      // with the word "integritetspolicy" as an inline link to the privacy page.
+      const fineText = f.fineprint || 'Genom att trycka på "Boka kostnadsfri rådgivning" samtycker jag till att Ampy behandlar mina personuppgifter enligt vår integritetspolicy.';
+      const fpParts = fineText.split('integritetspolicy');
+      form.appendChild(el('p', { class: 'ampy-bk__lead-fineprint' }, [
+        fpParts[0],
+        el('a', { href: this.data.meta.privacy_url || 'https://ampy.se/integritetspolicy/', target: '_blank', rel: 'noopener noreferrer' },
+          'integritetspolicy'),
+        fpParts.slice(1).join('integritetspolicy')
+      ]));
+
       // Clear the invalid state on a field as soon as the user edits it.
-      [namn, epost, tel, post].forEach(({ input }) => {
+      [namn, tel, post, epost].forEach(({ input }) => {
         input.addEventListener('input', () => { input.removeAttribute('aria-invalid'); input.removeAttribute('aria-describedby'); });
       });
-      consent.addEventListener('change', () => consent.removeAttribute('aria-invalid'));
 
       form.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -649,17 +658,16 @@
         if (honey.value) return; // bot
         const checks = [
           [namn.input, !!namn.input.value.trim()],
-          [epost.input, !!epost.input.value.trim()],
           [tel.input, !!tel.input.value.trim()],
           [post.input, !!post.input.value.trim()],
-          [consent, consent.checked]
+          [epost.input, !!epost.input.value.trim()]
         ];
         checks.forEach(([el2]) => el2.removeAttribute('aria-invalid'));
         const failed = checks.filter(([, ok]) => !ok).map(([el2]) => el2);
         if (failed.length) {
           failed.forEach(el2 => el2.setAttribute('aria-invalid', 'true'));
           failed[0].setAttribute('aria-describedby', errorId);
-          errorBox.textContent = f.error_required || 'Fyll i alla fält och godkänn villkoren.';
+          errorBox.textContent = f.error_required || 'Fyll i alla fält så ringer vi upp dig.';
           errorBox.hidden = false;
           try { failed[0].focus(); } catch (e2) {}
           return;
@@ -675,14 +683,22 @@
           webbplats: honey.value
         }).then(() => {
           track('lead_submitted', { job_id: job.id, verdict: verdictKey });
+          // Personalise the title with the submitter's first name (first whitespace
+          // token). el() uses textContent, so the name is inherently HTML-escaped.
+          const rawName = namn.input.value.trim();
+          const firstName = rawName ? rawName.split(/\s+/)[0] : '';
+          const successTitle = firstName
+            ? (f.success_title || 'Tack {namn}! Vi hör av oss.').replace('{namn}', firstName)
+            : (f.success_title_noname || 'Tack! Vi hör av oss.');
           block.replaceChildren(
             el('div', { class: 'ampy-bk__lead-success', 'data-focus-target': '' }, [
               el('span', { class: 'ampy-bk__lead-success-icon', html: icon('check'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-              el('h2', {}, f.success_title || 'Tack! Vi hör av oss inom kort.'),
-              el('p', {}, f.success_body || 'En behörig elektriker återkommer med ett förslag, oftast inom en arbetsdag.'),
-              el('button', { class: 'ampy-bk__lead-back', type: 'button', style: 'margin:0', onclick: () => this.closeLead() }, [
+              el('h2', {}, successTitle),
+              el('p', {}, f.success_body || 'En behörig elektriker ringer upp dig på telefon, oftast inom en arbetsdag. Passa på att kolla ett annat eljobb medan du väntar.'),
+              // Re-engagement loop: route back to the ENTRY, not the verdict.
+              el('button', { class: 'ampy-bk__lead-back', type: 'button', style: 'margin:0', onclick: () => this.navigate({ jobId: null, answerIndex: null }) }, [
                 el('span', { html: icon('arrowLeft'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-                f.success_back || 'Tillbaka till beskedet'
+                f.success_back || 'Kolla ett annat eljobb'
               ])
             ])
           );
@@ -690,7 +706,7 @@
           if (t) { t.setAttribute('tabindex', '-1'); try { t.focus(); } catch (e2) {} }
         }).catch(() => {
           submit.disabled = false;
-          submit.textContent = f.submit || 'Skicka förfrågan';
+          submit.textContent = f.submit || 'Boka kostnadsfri rådgivning';
           errorBox.textContent = f.error_send || 'Något gick fel. Ring oss på 010-265 79 79 så hjälper vi dig.';
           errorBox.hidden = false;
         });
@@ -803,8 +819,8 @@
         onclick: async () => {
           track('share_opened', { job_id: job.id, verdict: verdictKey });
           // Touch-enheter (mobil/platta): native share sheet — ger Instagram,
-          // Meddelanden, m.m. Desktop får ALLTID vår popover (Web Share finns på
-          // desktop Chrome/Edge/Safari men ger inkonsekvent UX där). Detektera
+          // Messages, etc. Desktop ALWAYS gets our popover (Web Share exists on
+          // desktop Chrome/Edge/Safari but gives inconsistent UX there). Detect
           // via pekare: 'coarse' = touch.
           const isTouch = typeof window.matchMedia === 'function' &&
                           window.matchMedia('(pointer: coarse)').matches;
@@ -817,7 +833,7 @@
               await navigator.share(payload);
               track('share_completed', { job_id: job.id, verdict: verdictKey, channel: 'native' });
               return;
-            } catch (e) { /* användaren avbröt eller share misslyckades → fall till menyn */ }
+            } catch (e) { /* the user cancelled or the share failed → fall back to the menu */ }
           }
           // Desktop (eller ingen native share): toggla popover med sociala val.
           if (menu.hidden) openMenu(); else closeMenu();
@@ -831,17 +847,17 @@
     }
 
     /* ===================================================================
-       ENTRY MODE — godkänd v4-struktur, lätt trimmad till v5-tokens
+       ENTRY MODE — approved v4 structure, lightly trimmed to v5 tokens
        =================================================================== */
     renderEntryBlock() {
       if (this.heroMode) return this.renderHeroEntry();
 
       const block = el('div', { class: 'ampy-bk__block', role: 'region', 'aria-label': 'Elkollen' });
 
-      // v5.2: huvudrubrik och "Testa din kunskap" är borttagna ur blocket.
-      // H2 "Koppla elen — din guide till vad du får och inte får göra" lever
-      // som page-heading OVANFÖR shortcode-embeddet (i Bricks/preview).
-      // Blocket startar nu direkt med sökfältets label — den är affordansen.
+      // v5.2: the main heading and "Testa din kunskap" are removed from the block.
+      // The H2 "Koppla elen — din guide till vad du får och inte får göra" lives
+      // as the page heading ABOVE the shortcode embed (in Bricks/preview).
+      // The block now starts directly with the search field's label — that is the affordance.
 
       const searchId = 'ampy-bk-search';
       const searchInput = el('input', {
@@ -916,146 +932,134 @@
        =================================================================== */
     renderHeroEntry() {
       const data = this.data;
+      const entry = (data.meta && data.meta.entry) || {};
       const block = el('div', { class: 'ampy-bk__block', role: 'region', 'aria-label': 'Elkollen' });
 
-      // --- 1. Search ---
+      // --- 1. Card headline (gives the card a cover) ---
+      block.appendChild(el('p', { class: 'ampy-bk__entry-eyebrow' },
+        entry.eyebrow || 'Får du fixa det själv?'));
+
+      // --- 2. Express-lane search (always visible, every state) ---
       const searchId = 'ampy-bk-search';
       const searchInput = el('input', {
-        type: 'search', id: searchId, class: 'ampy-bk__search-input',
-        placeholder: 'T.ex. vägguttag, badrum, spis…', autocomplete: 'off', value: this.searchQuery
+        type: 'search', id: searchId, class: 'ampy-bk__search-input', inputmode: 'search',
+        placeholder: entry.search_placeholder || 'Sök eljobb – t.ex. vägguttag, laddbox, spis…',
+        autocomplete: 'off', value: this.searchQuery
       });
       block.appendChild(el('div', { class: 'ampy-bk__search' }, [
-        el('label', { class: 'ampy-bk__search-label', for: searchId }, 'Sök eljobb'),
+        el('label', { class: 'ampy-bk__search-label', for: searchId }, entry.search_label || 'Sök eljobb'),
         el('div', { class: 'ampy-bk__search-field' }, [
           el('span', { class: 'ampy-bk__search-icon', html: icon('search'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
           searchInput
         ])
       ]));
 
-      // --- 2. "Välj rum" standing dropdown (always between search and list) ---
-      const roomToggleLabel = el('span', { class: 'ampy-bk__roomtoggle-label' }, 'Välj rum');
-      const roomToggle = el('button', {
-        class: 'ampy-bk__roomtoggle', type: 'button', 'aria-expanded': 'false', 'aria-controls': 'ampy-bk-roompanel'
-      }, [
-        el('span', { class: 'ampy-bk__roomtoggle-icon', html: icon('panel'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-        roomToggleLabel,
-        el('span', { class: 'ampy-bk__roomtoggle-chev', html: icon('chevron'), 'aria-hidden': 'true', style: 'display:inline-flex' })
-      ]);
-      const roomPanel = el('ul', { class: 'ampy-bk__roompanel', id: 'ampy-bk-roompanel', role: 'list', hidden: true });
+      // --- 3. Room prompt (ROOM state only) ---
+      const prompt = el('p', { class: 'ampy-bk__entry-hint', 'data-focus-target': '', tabindex: '-1' },
+        entry.prompt || 'Var i hemmet gäller det?');
+      block.appendChild(prompt);
+
+      // --- 4. Room grid: 5 rooms + "Alla jobb" ---
+      const grid = el('ul', { class: 'ampy-bk__roomgrid', role: 'list' });
       (data.rooms || []).forEach(room => {
         const li = el('li');
         li.appendChild(el('button', {
-          class: 'ampy-bk__roomitem', type: 'button', 'aria-pressed': 'false',
+          class: 'ampy-bk__roomtile', type: 'button',
           'aria-label': `Visa eljobb i ${room.label}`, data: { room: room.id },
           onclick: () => {
-            this.activeRoom = (this.activeRoom === room.id) ? null : room.id;
+            this.activeRoom = room.id;
             this.searchQuery = ''; searchInput.value = ''; this.heroExpanded = false;
-            roomPanel.hidden = true; roomToggle.setAttribute('aria-expanded', 'false');
-            roomToggleLabel.textContent = this.activeRoom ? `Rum: ${room.label}` : 'Välj rum';
-            roomPanel.querySelectorAll('.ampy-bk__roomitem').forEach(b =>
-              b.setAttribute('aria-pressed', String(b.dataset.room === this.activeRoom)));
+            track('room_selected', { room_id: room.id });
             updateDrawer();
           }
         }, [
-          el('span', { class: 'ampy-bk__roomitem-icon', html: icon(room.icon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-          el('span', {}, room.label)
+          el('span', { class: 'ampy-bk__roomtile-chip', html: icon(room.icon), 'aria-hidden': 'true' }),
+          el('span', { class: 'ampy-bk__roomtile-body' }, [
+            el('span', { class: 'ampy-bk__roomtile-label' }, room.label),
+            room.subline ? el('span', { class: 'ampy-bk__roomtile-sub' }, room.subline) : null
+          ])
         ]));
-        roomPanel.appendChild(li);
+        grid.appendChild(li);
       });
-      roomToggle.addEventListener('click', () => {
-        const open = roomPanel.hidden;
-        roomPanel.hidden = !open;
-        roomToggle.setAttribute('aria-expanded', String(open));
-      });
-      block.appendChild(el('div', { class: 'ampy-bk__roomselect' }, [roomToggle, roomPanel]));
-
-      // --- 3. "Vanliga eljobb": 6 quick picks + "Se alla N jobb" row ---
-      const picks = (data.meta.quick_picks || []).slice(0, 6).map(id => this.jobsById[id]).filter(Boolean);
-      const commonWrap = el('div', { class: 'ampy-bk__commonwrap' });
-      commonWrap.appendChild(el('p', { class: 'ampy-bk__joblist-hint' }, 'Vanliga eljobb'));
-      const chips = el('ul', { class: 'ampy-bk__quickpicks', role: 'list' });
-      picks.forEach(j => {
-        const li = el('li');
-        li.appendChild(el('button', {
-          class: 'ampy-bk__quickpick', type: 'button',
-          'aria-label': `Välj jobb: ${j.label} (${this._groupWord(jobGroup(j))})`,
-          onclick: () => this.navigate({ jobId: j.id, answerIndex: null })
-        }, [
-          el('span', { html: icon(j.icon === 'search' ? 'felsok' : j.icon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-          el('span', {}, j.chip_label || j.label)
-        ]));
-        chips.appendChild(li);
-      });
-      commonWrap.appendChild(chips);
-      // "Se alla N jobb" as its own tappable row inside the common section
-      commonWrap.appendChild(el('button', {
-        class: 'ampy-bk__seeall', type: 'button',
+      // "Alla jobb" tile — the honest escape hatch, quieter than a room
+      const allLi = el('li');
+      allLi.appendChild(el('button', {
+        class: 'ampy-bk__roomtile ampy-bk__roomtile--all', type: 'button',
+        'aria-label': 'Visa alla eljobb',
         onclick: () => {
-          this.heroExpanded = true; this.activeRoom = null; this.searchQuery = ''; searchInput.value = '';
-          roomPanel.hidden = true; roomToggle.setAttribute('aria-expanded', 'false');
-          roomToggleLabel.textContent = 'Välj rum';
-          roomPanel.querySelectorAll('.ampy-bk__roomitem').forEach(b => b.setAttribute('aria-pressed', 'false'));
+          this.heroExpanded = true; this.activeRoom = null;
+          this.searchQuery = ''; searchInput.value = '';
+          track('see_all');
           updateDrawer();
         }
       }, [
-        el('span', { class: 'ampy-bk__seeall-label' }, `Se alla ${data.jobs.length} jobb`),
-        el('span', { class: 'ampy-bk__seeall-arrow', html: icon('arrowRight'), 'aria-hidden': 'true', style: 'display:inline-flex' })
+        el('span', { class: 'ampy-bk__roomtile-chip', html: icon('grid'), 'aria-hidden': 'true' }),
+        el('span', { class: 'ampy-bk__roomtile-body' }, [
+          el('span', { class: 'ampy-bk__roomtile-label' }, entry.all_label || 'Alla jobb'),
+          el('span', { class: 'ampy-bk__roomtile-sub' },
+            (entry.all_subline || 'Alla {count} eljobb, A–Ö').replace('{count}', data.jobs.length))
+        ])
       ]));
-      block.appendChild(commonWrap);
+      grid.appendChild(allLi);
+      block.appendChild(grid);
 
-      // --- 4. Drawer (results) — hidden until search/room/see-all ---
-      this.swapNode = el('div', { class: 'ampy-bk__drawer', role: 'region', 'aria-live': 'polite', hidden: true });
-      block.appendChild(this.swapNode);
+      // --- 5. Results drawer (hidden until search/room/see-all) ---
+      const drawer = el('div', { class: 'ampy-bk__drawer', role: 'region', 'aria-live': 'polite', hidden: true });
+      this.swapNode = drawer;
+      block.appendChild(drawer);
 
-      // --- 5. Source line ---
+      // --- 6. Source line (pinned to card floor via margin-top:auto) ---
       block.appendChild(el('p', { class: 'ampy-bk__source-line' },
         'Källa: Elsäkerhetsverket & Elsäkerhetslagen (2016:732). ' + (data.meta.disclaimer || '')
       ));
 
-      const resetToCommon = () => {
-        this.searchQuery = ''; searchInput.value = ''; this.activeRoom = null; this.heroExpanded = false;
-        roomPanel.hidden = true; roomToggle.setAttribute('aria-expanded', 'false');
-        roomToggleLabel.textContent = 'Välj rum';
-        roomPanel.querySelectorAll('.ampy-bk__roomitem').forEach(b => b.setAttribute('aria-pressed', 'false'));
+      const resetToRooms = () => {
+        this.searchQuery = ''; searchInput.value = '';
+        this.activeRoom = null; this.heroExpanded = false;
         updateDrawer();
       };
 
       const updateDrawer = () => {
         const q = (this.searchQuery || '').trim().toLowerCase();
-        let jobs = null;
-        if (q) jobs = data.jobs.filter(j => j.label.toLowerCase().includes(q) || j.id.includes(q));
-        else if (this.activeRoom) {
+        let jobs = null, titleText = '';
+        if (q) {
+          jobs = data.jobs.filter(j => j.label.toLowerCase().includes(q) || j.id.includes(q));
+          titleText = entry.drawer_search_title || 'Sökresultat';
+        } else if (this.activeRoom) {
           const r = (data.rooms || []).find(x => x.id === this.activeRoom);
           jobs = r ? r.jobs.map(id => this.jobsById[id]).filter(Boolean) : [];
-        } else if (this.heroExpanded) jobs = data.jobs;
+          titleText = r ? r.label : '';
+        } else if (this.heroExpanded) {
+          jobs = data.jobs;
+          titleText = entry.drawer_all_title || 'Alla eljobb';
+        }
 
         if (jobs === null) {
-          this.swapNode.hidden = true; this.swapNode.replaceChildren();
-          commonWrap.hidden = false;
+          drawer.hidden = true; drawer.replaceChildren();
+          grid.hidden = false; prompt.hidden = false;
           return;
         }
-        commonWrap.hidden = true; // results replace the common-jobs surface
-        this.swapNode.hidden = false;
-        const back = el('button', { class: 'ampy-bk__drawer-back', type: 'button', onclick: resetToCommon }, [
+        // Results replace the grid + prompt.
+        grid.hidden = true; prompt.hidden = true;
+        drawer.hidden = false;
+
+        const drawerTitle = el('p', { class: 'ampy-bk__drawer-title', 'data-focus-target': '', tabindex: '-1' }, titleText);
+        const back = el('button', { class: 'ampy-bk__drawer-back', type: 'button', onclick: resetToRooms }, [
           el('span', { html: icon('arrowLeft'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-          'Visa vanliga eljobb'
+          entry.drawer_back || 'Visa rummen'
         ]);
         if (!jobs.length) {
-          this.swapNode.replaceChildren(back, el('p', { class: 'ampy-bk__empty' },
-            'Inget jobb matchar. Prova ett annat ord eller välj ett rum.'));
-          return;
+          drawer.replaceChildren(drawerTitle, back, el('p', { class: 'ampy-bk__empty' },
+            entry.empty || 'Inget jobb matchar. Prova ett annat ord eller välj ett rum.'));
+        } else {
+          drawer.replaceChildren(drawerTitle, back, this.renderGroupedJobs(jobs, null));
         }
-        this.swapNode.replaceChildren(back, this.renderGroupedJobs(jobs, null));
+        try { drawerTitle.focus(); } catch (e) { /* no-op */ }
       };
 
       searchInput.addEventListener('input', (e) => {
         this.searchQuery = e.target.value;
-        if (this.searchQuery) {
-          this.activeRoom = null; this.heroExpanded = false;
-          roomPanel.hidden = true; roomToggle.setAttribute('aria-expanded', 'false');
-          roomToggleLabel.textContent = 'Välj rum';
-          roomPanel.querySelectorAll('.ampy-bk__roomitem').forEach(b => b.setAttribute('aria-pressed', 'false'));
-        }
+        if (this.searchQuery) { this.activeRoom = null; this.heroExpanded = false; }
         updateDrawer();
       });
 
@@ -1155,10 +1159,10 @@
     }
 
     /**
-     * v5.1 B1: resolve per-verdict source for the cite chip.
+     * v5.1 B1: resolve the per-verdict source for the cite chip.
      * Priority: option.source → job.source → verdicts[verdictKey].source → fallback.
-     * For conditional jobs, the option's verdict-color is honoured — green-branch
-     * gets Elsäkerhetsverket-källan, red-branch gets 27 §-källan.
+     * For conditional jobs the option's verdict color is honoured — the green branch
+     * gets the Elsäkerhetsverket source, the red branch gets the 27 § source.
      */
     _resolveSource(job, verdictKey) {
       const optIdx = this.state.answerIndex;

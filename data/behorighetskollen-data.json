@@ -5,8 +5,8 @@
     "page_heading": "Koppla elen",
     "page_lead": "Se direkt vilka eljobb du får göra själv.",
     "last_reviewed": "2026-06-XX",
-    "reviewed_by": "TBD: auktoriserad elinstallatör innan lansering",
-    "_pending_verification": "PENDING: 26-jobbs-matrisen + per-verdict-källor + straffparagrafen i Elsäkerhetslagen (48 § vs 49 §) + per-jobb-tips ska signeras av auktoriserad elinstallatör före lansering. Tipsen är granskade av oberoende säkerhetsgranskare juni 2026; signaturen är gaten. Job 'fast-armatur' (byta fast monterad armatur) är juridiskt känsligast — verifiera scope.",
+    "reviewed_by": "TBD: certified electrician (auktoriserad elinstallatör) before launch",
+    "_pending_verification": "PENDING: the 26-job matrix + per-verdict legal sources + the penalty clause in Elsäkerhetslagen (48 § vs 49 §) + per-job tips must be signed off by a certified electrician (auktoriserad elinstallatör) before launch. The tips were reviewed by an independent safety reviewer in June 2026; the sign-off is the gate. The job 'fast-armatur' (replacing a fixed-mounted luminaire) is the most legally sensitive — verify its scope.",
     "primary_source": "Elsäkerhetslagen (2016:732) & Elsäkerhetsverket",
     "disclaimer": "Vägledning, inte juridisk rådgivning. Är du osäker, anlita ett registrerat elinstallationsföretag.",
     "koppla_sakert_url": "https://www.kopplasakert.se/",
@@ -14,20 +14,32 @@
     "ampy_offert_url": "https://ampy.se/offert/",
     "contact_url": "https://ampy.se/offert/",
     "privacy_url": "https://ampy.se/integritetspolicy/",
-    "cta_advice_label": "Få kostnadsfri rådgivning",
+    "cta_advice_label": "Boka kostnadsfri rådgivning",
+    "entry": {
+      "eyebrow": "Får du fixa det själv?",
+      "prompt": "Var i hemmet gäller det?",
+      "search_label": "Sök eljobb",
+      "search_placeholder": "Sök eljobb – t.ex. vägguttag, laddbox, spis…",
+      "all_label": "Alla jobb",
+      "all_subline": "Alla {count} eljobb, A–Ö",
+      "drawer_back": "Visa rummen",
+      "drawer_all_title": "Alla eljobb",
+      "drawer_search_title": "Sökresultat",
+      "empty": "Inget jobb matchar. Prova ett annat ord eller välj ett rum."
+    },
     "lead_form": {
-      "title": "Få kostnadsfri rådgivning",
-      "intro": "Ampys behöriga elektriker hör av sig med ett förslag, oftast inom en arbetsdag.",
-      "submit": "Skicka förfrågan",
+      "title": "Boka kostnadsfri rådgivning",
+      "intro": "Ampys behöriga elektriker hör av sig på telefon för din rådgivning!",
+      "submit": "Boka kostnadsfri rådgivning",
       "submitting": "Skickar…",
       "back": "Tillbaka till beskedet",
-      "consent": "Jag godkänner att Ampy sparar mina uppgifter för att kontakta mig med ett förslag, enligt ",
-      "consent_link": "integritetspolicyn",
-      "error_required": "Fyll i alla fält och godkänn villkoren.",
+      "fineprint": "Genom att trycka på \"Boka kostnadsfri rådgivning\" samtycker jag till att Ampy behandlar mina personuppgifter enligt vår integritetspolicy.",
+      "error_required": "Fyll i alla fält så ringer vi upp dig.",
       "error_send": "Något gick fel. Ring oss på 010-265 79 79 så hjälper vi dig.",
-      "success_title": "Tack! Vi hör av oss inom kort.",
-      "success_body": "En behörig elektriker återkommer med ett förslag, oftast inom en arbetsdag.",
-      "success_back": "Tillbaka till beskedet"
+      "success_title": "Tack {namn}! Vi hör av oss.",
+      "success_title_noname": "Tack! Vi hör av oss.",
+      "success_body": "En behörig elektriker ringer upp dig på telefon, oftast inom en arbetsdag. Passa på att kolla ett annat eljobb medan du väntar.",
+      "success_back": "Kolla ett annat eljobb"
     },
     "quick_picks": ["byta-vagguttag","byta-armatur-dcl","golvvarme","laddbox","spotlights","spis-ugn","byta-strombrytare","elcentral"]
   },
@@ -74,11 +86,11 @@
   "service_zones": ["stockholm","solna","sundbyberg","nacka","huddinge","botkyrka","haninge","tyreso","taby","sollentuna","jarfalla","upplands-vasby","danderyd","lidingo","vaxholm","varmdo","ekero","sigtuna","marsta","upplands-bro","vallentuna","osteraker","akersberga","norrtalje","sodertalje","salem","nynashamn"],
 
   "rooms": [
-    { "id": "badrum",     "label": "Badrum",     "icon": "bath",    "jobs": ["badrum","badrumsrenovering","golvvarme","fast-armatur","vitvaror","byta-gloldlampa"] },
-    { "id": "kok",        "label": "Kök",        "icon": "kitchen", "jobs": ["spis-ugn","vitvaror","koksrenovering","byta-vagguttag","byta-strombrytare","byta-armatur-dcl","spotlights","smarta-hem"] },
-    { "id": "vardagsrum", "label": "Vardagsrum", "icon": "sofa",    "jobs": ["byta-armatur-dcl","fast-armatur","spotlights","byta-vagguttag","byta-strombrytare","inomhusbelysning","smarta-hem","luftvarmepump","byta-gloldlampa"] },
-    { "id": "utomhus",    "label": "Utomhus",    "icon": "outdoor", "jobs": ["laddbox","solcellsbatterier","utomhusbelysning","dra-ny-kabel","luftvarmepump","byta-vagguttag"] },
-    { "id": "elcentral",  "label": "Elcentral",  "icon": "panel",   "jobs": ["elcentral","jordfelsbrytare","lastbalansering","elbesiktning","felsokning","elrenovering","dra-ny-kabel","skarva-fast"] }
+    { "id": "badrum",     "label": "Badrum",     "icon": "bath",    "subline": "Belysning, golvvärme, våtrum",                "jobs": ["badrum","badrumsrenovering","golvvarme","fast-armatur","vitvaror","byta-gloldlampa"] },
+    { "id": "kok",        "label": "Kök",        "icon": "kitchen", "subline": "Spis, vitvaror, uttag, lampor",               "jobs": ["spis-ugn","vitvaror","koksrenovering","byta-vagguttag","byta-strombrytare","byta-armatur-dcl","spotlights","smarta-hem","byta-gloldlampa","golvvarme"] },
+    { "id": "vardagsrum", "label": "Vardagsrum", "icon": "sofa",    "subline": "Lampor, uttag, brytare – även sovrum och hall", "jobs": ["byta-armatur-dcl","fast-armatur","spotlights","byta-vagguttag","byta-strombrytare","inomhusbelysning","smarta-hem","luftvarmepump","byta-gloldlampa"] },
+    { "id": "utomhus",    "label": "Utomhus",    "icon": "outdoor", "subline": "Laddbox, solceller, belysning",               "jobs": ["laddbox","solcellsbatterier","utomhusbelysning","dra-ny-kabel","luftvarmepump","byta-vagguttag"] },
+    { "id": "elcentral",  "label": "Elcentral",  "icon": "panel",   "subline": "Säkringar, felsökning, laddbox",              "jobs": ["elcentral","jordfelsbrytare","lastbalansering","elbesiktning","felsokning","elrenovering","dra-ny-kabel","skarva-fast","laddbox","solcellsbatterier"] }
   ],
 
   "jobs": [
@@ -158,7 +170,7 @@
         { "text": "Skyddsjorden (gul och grön) ska sitta i en metallarmatur. Saknas jord helt är det ett jobb för en elektriker.", "allowed": true },
         { "text": "Gäller det våtrum, ny ledning eller byte av själva lamputtaget? Då är det behörighetskrävande arbete.", "allowed": false }
       ],
-      "_tips_verify": "Job 'fast-armatur' flaggat av oberoende säkerhetsgranskare som juridiskt känsligast — verifiera scope (är 'fast monterad' med plint-koppling fortfarande lekmannajobb?) vid signatur.",
+      "_tips_verify": "Job 'fast-armatur' flagged by the independent safety reviewer as the most legally sensitive — verify scope at sign-off (is a 'fixed-mounted' luminaire with terminal-block connection still a layperson job?).",
       "related_jobs": ["byta-armatur-dcl","spotlights","badrum"]
     },
     {
