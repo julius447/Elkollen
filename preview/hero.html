@@ -6,7 +6,7 @@
   <title>Får du göra eljobbet själv? | Elkollen, Ampy</title>
   <meta name="description" content="Välj eljobbet du funderar på och få ett tydligt besked direkt, byggt på Elsäkerhetslagen." />
 
-  <link rel="stylesheet" href="../assets/behorighetskollen.css?v=731" />
+  <link rel="stylesheet" href="../assets/behorighetskollen.css?v=732" />
 
   <style>
     /* ====================================================================
@@ -132,7 +132,10 @@
     @media (min-width: 768px) and (max-width: 1023px) {
       .hero__h1 { font-size: clamp(2.8rem, 3.4vw, 3.4rem); }
     }
-    .hero__h1-key { color: var(--pg-teal-strong); }
+    /* v7.3.2 (QC): the teal sentence ALWAYS gets its own line (block), so the two
+       H1 colours never share a line at ANY width. Was mobile-only, which let the
+       768-1023 tablet range mix "eljobbet själv? Kolla" on one line. */
+    .hero__h1-key { color: var(--pg-teal-strong); display: block; margin-top: 0.2rem; }
     .hero__sub {
       font-size: 1.8rem;
       line-height: 1.6; /* v7.1 (D4) */
@@ -200,8 +203,7 @@
          -.012em, 3.0rem = 346.8px (wraps) but 2.8rem = 323.7px (fits); the 7.4vw
          slope keeps the fit down to 320px (2.4rem floor = 277.5px vs 288px). */
       .hero__h1 { font-size: clamp(2.4rem, 7.4vw, 2.8rem); line-height: 1.15; letter-spacing: -.012em; margin: 0 0 1.2rem; }
-      /* v7.1 (M1): the teal sentence gets its own line so the two colours never share one. */
-      .hero__h1-key { display: block; margin-top: 0.2rem; }
+      /* v7.1 (M1): teal-sentence-own-line is now global (see base rule); nothing extra here. */
       .hero__sub { font-size: 1.6rem; line-height: 1.5; max-width: none; }
       /* v7 (H1d): the 3 trust bullets hide on mobile — every claim in them
          already lives inside the tool. The compact foot: ask line + stacked
@@ -378,7 +380,7 @@
     </header>
   </div>
 
-  <script src="../assets/behorighetskollen.js?v=731"></script>
+  <script src="../assets/behorighetskollen.js?v=732"></script>
   <!-- Prototype-only theme toggle (never ships). Flips the A/B fork point. -->
   <script>
     (function () {
@@ -397,7 +399,7 @@
        truth so an owner copy swap never touches code. -->
   <script>
     (function () {
-      fetch('../data/behorighetskollen-data.json?v=731', { credentials: 'same-origin' })
+      fetch('../data/behorighetskollen-data.json?v=732', { credentials: 'same-origin' })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (data) {
           var hero = data && data.meta && data.meta.hero;
