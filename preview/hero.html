@@ -6,7 +6,7 @@
   <title>Får du göra eljobbet själv? | Elkollen, Ampy</title>
   <meta name="description" content="Välj eljobbet du funderar på och få ett tydligt besked direkt, byggt på Elsäkerhetslagen." />
 
-  <link rel="stylesheet" href="../assets/behorighetskollen.css?v=734" />
+  <link rel="stylesheet" href="../assets/behorighetskollen.css?v=735" />
 
   <style>
     /* ====================================================================
@@ -153,15 +153,17 @@
        justify-content:space-between + 2rem gap. SAME buttons in both A/B arms;
        only the dark stage swaps the glow for a plain elevation shadow. */
     .hero__actions { display:flex; flex-wrap:wrap; gap:2rem; align-items:center; }
-    /* v7.3.3: EXACT ampy.se button recipe from the Picasso reference repo
-       (julius447/Picasso elements/buttons.css, 1:1 with live Bricks 076d6b/395b4f):
-       radius 16px, Outfit 400, ink #0d0d0d, label+icon centered with an apspace-l
-       gap, light glow, translateY(-1px)+saturate hover. Token clamps inlined. */
+    /* v7.3.5: Picasso recipe (radius 16px, Outfit 400, ink #0d0d0d, gradients, light
+       glow, translateY(-1px)+saturate hover) with OWNER finesse: taller body (the old
+       ~9px vertical read too thin) and space-between so the label sits left and the
+       icon sits at the right edge. On desktop the two buttons are flex:1 -> equal
+       width, filling the row. Icon is on the RIGHT for both (arrow / phone). */
     .hero__btn {
       box-sizing:border-box;
-      display:inline-flex; align-items:center; justify-content:center;
-      gap: clamp(2rem, calc(2.04vw + 1.35rem), 3.96rem);
-      padding: clamp(0.82rem, calc(0.18vw + 0.76rem), 0.99rem) clamp(2rem, calc(2rem + 0.0044 * (100vw - 380px)), 2.4rem);
+      display:inline-flex; align-items:center; justify-content:space-between;
+      flex:1 1 0;                 /* desktop: two equal-width buttons fill the row */
+      gap:1.6rem;                 /* minimum; space-between opens the rest */
+      padding:2rem 2.4rem;        /* taller, premium body (~56px tall) */
       border:0; border-radius:16px;
       box-shadow: 0 0 16px rgba(241,241,241,0.25);
       font-family:'Outfit', system-ui, sans-serif;
@@ -219,9 +221,12 @@
         font-size: 1.5rem; font-weight: 600; line-height: 1.4;
         color: var(--pg-ink); text-align: center; margin: 0 0 1.2rem;
       }
-      /* v7.2 (§4): full-width stacked; label+icon grouped centered (not split) */
-      .hero__actions { flex-direction: column; align-items: stretch; gap: 1rem; }
-      .hero__btn { width: 100%; max-width: 100%; padding: clamp(1.28rem, calc(0.73vw + 1.05rem), 1.98rem) clamp(2rem, calc(2.04vw + 1.35rem), 3.96rem); }
+      /* v7.3.5: full-width stacked, tall, label-left/icon-right (space-between from
+         the base). column-REVERSE puts the phone number FIRST and "Kontakta oss"
+         second under "Hellre prata med en elektriker direkt?" (owner order), while
+         desktop keeps Kontakta-left / phone-right with no DOM reorder. */
+      .hero__actions { flex-direction: column-reverse; align-items: stretch; gap: 1.2rem; }
+      .hero__btn { width: 100%; max-width: 100%; flex: 0 0 auto; padding: 2.2rem 2.4rem; }
     }
 
     /* ====================================================================
@@ -377,7 +382,7 @@
           <p class="hero__foot-ask" id="hero-foot-ask">Hellre prata med en elektriker direkt?</p>
           <div class="hero__actions">
             <a class="hero__btn hero__btn--primary" id="hero-btn-primary" href="https://ampy.se/offert/"><span id="hero-btn-primary-label">Kontakta oss</span><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M4.66406 11.3333L11.3307 4.66663M11.3307 4.66663H4.66406M11.3307 4.66663V11.3333" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-            <a class="hero__btn hero__btn--secondary" id="hero-btn-secondary" href="tel:+46102657979"><svg viewBox="0 0 19 20" fill="none" aria-hidden="true"><path d="M11.9146 4.16668C12.6878 4.32548 13.3984 4.72356 13.9555 5.30996C14.5126 5.89635 14.8908 6.6444 15.0416 7.45834M11.9146 0.833344C13.5211 1.02121 15.0191 1.77849 16.1628 2.98085C17.3065 4.18321 18.0278 5.75918 18.2083 7.45001M17.4166 14.1V16.6C17.4175 16.8321 17.3724 17.0618 17.284 17.2745C17.1957 17.4871 17.0662 17.678 16.9037 17.8349C16.7412 17.9918 16.5494 18.1112 16.3406 18.1856C16.1317 18.26 15.9104 18.2876 15.6908 18.2667C13.2547 17.988 10.9147 17.1118 8.85872 15.7083C6.94591 14.4289 5.32419 12.7218 4.10872 10.7083C2.77078 8.53435 1.93816 6.05917 1.6783 3.48334C1.65852 3.2529 1.68454 3.02064 1.7547 2.80136C1.82486 2.58208 1.93763 2.38058 2.08582 2.20969C2.23402 2.0388 2.4144 1.90227 2.61547 1.80878C2.81654 1.71529 3.0339 1.66689 3.25372 1.66668H5.62872C6.01292 1.6627 6.38539 1.80591 6.6767 2.06962C6.968 2.33333 7.15828 2.69955 7.21205 3.10001C7.31229 3.90007 7.4982 4.68562 7.76622 5.44168C7.87273 5.73995 7.89578 6.06411 7.83264 6.37574C7.7695 6.68738 7.62282 6.97344 7.40997 7.20001L6.40455 8.25834C7.53153 10.3446 9.17258 12.072 11.1546 13.2583L12.16 12.2C12.3752 11.976 12.647 11.8216 12.943 11.7551C13.2391 11.6886 13.547 11.7129 13.8304 11.825C14.5486 12.1071 15.2949 12.3028 16.055 12.4083C16.4395 12.4655 16.7907 12.6693 17.0418 12.9813C17.2929 13.2932 17.4263 13.6913 17.4166 14.1Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg><span id="hero-btn-secondary-label">010-265 79 79</span></a>
+            <a class="hero__btn hero__btn--secondary" id="hero-btn-secondary" href="tel:+46102657979"><span id="hero-btn-secondary-label">010-265 79 79</span><svg viewBox="0 0 19 20" fill="none" aria-hidden="true"><path d="M11.9146 4.16668C12.6878 4.32548 13.3984 4.72356 13.9555 5.30996C14.5126 5.89635 14.8908 6.6444 15.0416 7.45834M11.9146 0.833344C13.5211 1.02121 15.0191 1.77849 16.1628 2.98085C17.3065 4.18321 18.0278 5.75918 18.2083 7.45001M17.4166 14.1V16.6C17.4175 16.8321 17.3724 17.0618 17.284 17.2745C17.1957 17.4871 17.0662 17.678 16.9037 17.8349C16.7412 17.9918 16.5494 18.1112 16.3406 18.1856C16.1317 18.26 15.9104 18.2876 15.6908 18.2667C13.2547 17.988 10.9147 17.1118 8.85872 15.7083C6.94591 14.4289 5.32419 12.7218 4.10872 10.7083C2.77078 8.53435 1.93816 6.05917 1.6783 3.48334C1.65852 3.2529 1.68454 3.02064 1.7547 2.80136C1.82486 2.58208 1.93763 2.38058 2.08582 2.20969C2.23402 2.0388 2.4144 1.90227 2.61547 1.80878C2.81654 1.71529 3.0339 1.66689 3.25372 1.66668H5.62872C6.01292 1.6627 6.38539 1.80591 6.6767 2.06962C6.968 2.33333 7.15828 2.69955 7.21205 3.10001C7.31229 3.90007 7.4982 4.68562 7.76622 5.44168C7.87273 5.73995 7.89578 6.06411 7.83264 6.37574C7.7695 6.68738 7.62282 6.97344 7.40997 7.20001L6.40455 8.25834C7.53153 10.3446 9.17258 12.072 11.1546 13.2583L12.16 12.2C12.3752 11.976 12.647 11.8216 12.943 11.7551C13.2391 11.6886 13.547 11.7129 13.8304 11.825C14.5486 12.1071 15.2949 12.3028 16.055 12.4083C16.4395 12.4655 16.7907 12.6693 17.0418 12.9813C17.2929 13.2932 17.4263 13.6913 17.4166 14.1Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
           </div>
         </div>
 
@@ -385,7 +390,7 @@
     </header>
   </div>
 
-  <script src="../assets/behorighetskollen.js?v=734"></script>
+  <script src="../assets/behorighetskollen.js?v=735"></script>
   <!-- Prototype-only theme toggle (never ships). Flips the A/B fork point. -->
   <script>
     (function () {
@@ -404,7 +409,7 @@
        truth so an owner copy swap never touches code. -->
   <script>
     (function () {
-      fetch('../data/behorighetskollen-data.json?v=734', { credentials: 'same-origin' })
+      fetch('../data/behorighetskollen-data.json?v=735', { credentials: 'same-origin' })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (data) {
           var hero = data && data.meta && data.meta.hero;

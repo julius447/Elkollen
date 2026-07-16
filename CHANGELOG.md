@@ -2,6 +2,20 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 7.3.5 — Hero CTA finesse (taller, space-between, mobile phone-first)
+Owner finesse pass on the two hero CTAs (they read too thin/short before):
+- **Taller body** on both breakpoints (desktop ~58px, mobile ~60px; was ~44px) via
+  larger vertical padding.
+- **space-between** layout: label pinned left, icon pinned right (was centered with a
+  gap). Desktop `flex:1` makes the two buttons equal width and fill the row.
+- **Phone icon moved to the right** (after the number), matching the primary arrow, so
+  both buttons are label-left / icon-right.
+- **Mobile order:** phone number FIRST, "Kontakta oss" second under "Hellre prata med en
+  elektriker direkt?" via `flex-direction: column-reverse` (desktop keeps
+  Kontakta-left / phone-right, no DOM reorder, so keyboard order stays sane on desktop).
+- Gradients, radius 16px, ink #0d0d0d, glow and hover unchanged. Preview-only file;
+  production CTAs are native Bricks elements that mirror this recipe.
+
 ## 7.3.4 — Desktop lead-form spacing + three job-icon redraws
 - **Lead form (desktop only, <=767px untouched):** the hero card reserves 56rem, so
   on desktop the submit sat only 16px under the fields while ~114px of dead space
