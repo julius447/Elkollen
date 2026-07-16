@@ -1,9 +1,10 @@
 /* ============================================================================
    Elkollen v7 — the 4-slide funnel.
    Slide 1: heading + six identical room tiles. Slide 2: one neutral job list
-   (no verdict grouping). Slide 3: the choice step (every job is conditional).
-   Slide 4: refined verdict (kicker + headline + merged law box + tabs + one
-   CTA hierarchy for every verdict).
+   (no verdict grouping). Slide 3: the choice step (conditional jobs only;
+   v7.2: the 10 direct-verdict jobs go straight from the list to the verdict).
+   Slide 4: refined verdict (board + tabs + one CTA hierarchy for every
+   verdict, the CTA stack pinned to the card floor).
 
    Typography is OUTFIT-ONLY (weight-led: 400 body, 500 interactive, 600
    headings, 700 reserved for the verdict headline). Plus Jakarta Sans is
@@ -40,10 +41,6 @@ html { font-size: 62.5%; }
   --action-primary-text: rgb(0, 110, 94);
   --action-primary-strong: rgb(0, 122, 105);
   --focus-ring: 0 0 0 3px rgba(0, 169, 145, 0.25);
-
-  /* v7.1 (§4A/§4B): sticky site-header height hook. Bricks overrides this to its
-     real header px so the tool card anchors BELOW it; 0 in the static prototype. */
-  --ampy-header-h: 0px;
 
   /* Leafier green, deliberately warmer than the teal --action-primary so the
      "green = you may do it yourself" verdict never reads as the teal "hire us"
@@ -98,6 +95,7 @@ html { font-size: 62.5%; }
   --fs-15: 1.5rem;  /* secondary body: tips, rows mobile, tabs, lead intro */
   --fs-16: 1.6rem;  /* primary body + ALL buttons + ALL inputs (iOS 16px floor) */
   --fs-17: 1.7rem;  /* summary desktop, tile labels desktop */
+  --fs-18: 1.8rem;  /* verdict board mobile (v7.2) */
   --fs-20: 2.0rem;  /* card/question/lead headings mobile, success h2 */
   --fs-22: 2.2rem;  /* card/question/lead headings desktop */
   --fs-24: 2.4rem;  /* verdict headline mobile */
@@ -212,7 +210,7 @@ html { font-size: 62.5%; }
   font-family: 'Outfit', system-ui, sans-serif;
   font-size: var(--fs-14);
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -226,7 +224,7 @@ html { font-size: 62.5%; }
    here (the choice step must not leak the answer). */
 .ampy-bk__q-kicker {
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: 1.1rem;
+  font-size: var(--fs-12);
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -415,8 +413,9 @@ html { font-size: 62.5%; }
 .ampy-bk__verdict-src {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-top: var(--space-3);
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-2) 0; /* >=24px effective tap target for the external link */
   font-family: 'Outfit', system-ui, sans-serif;
   font-size: var(--fs-12);
   font-weight: 400;
@@ -471,9 +470,17 @@ html { font-size: 62.5%; }
 /* ============================================================================
    FÖRKLARING TAB — summary + ✓/✗ contrast rows + caveat notice (green)
    ============================================================================ */
-/* v7.1 (M6): indent the tab panel inward, clearing the full-height accent rule. */
-.ampy-bk__tab-body { display: block; padding-left: var(--space-4); }
+/* v7.1 (M6): indent the tab panel inward, clearing the full-height accent rule.
+   v7.2 (§7): margin-bottom 2rem = the guaranteed minimum gap before the pinned
+   CTA zone (collapses with the tab content's own last margin, never stacks). */
+.ampy-bk__tab-body { display: block; padding-left: var(--space-4); margin-bottom: var(--space-9); }
 @media (max-width: 767px) { .ampy-bk__tab-body { padding-left: var(--space-5); } }
+
+/* v7.2 (§7): the verdict CTA stack (note + primary + secondary) pins to the
+   card floor on BOTH desktop and mobile — remaining slack sits inside the
+   layout above it, never as dead space under the CTAs. In the embedded layout
+   (no min-height) the auto margin simply resolves to 0. */
+.ampy-bk__cta-zone { margin-top: auto; }
 
 .ampy-bk__summary {
   font-family: 'Outfit', system-ui, sans-serif;
@@ -517,10 +524,12 @@ html { font-size: 62.5%; }
   margin: 0;
 }
 
-/* Caveat notice — green only. Amber accent, square corners. */
+/* Caveat notice — green only. Amber accent, square corners.
+   v7.2 (§8): align-items center so the ⚠ icon centers against the text block
+   when it wraps to two lines on mobile (desktop single-line reads the same). */
 .ampy-bk__caveat {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-4);
   border-left: 3px solid rgb(186, 117, 23);
   border-radius: 0;
@@ -596,8 +605,10 @@ html { font-size: 62.5%; }
    CTA (v7, F3) — ONE hierarchy on every verdict: solid teal advice CTA on top,
    outline "Läs mer om ..." below. Green adds a framing line above the pair.
    ============================================================================ */
+/* v7.2 (§7): breathing room around the green framing line ("Vill du
+   dubbelkolla ..."), which sat cramped against the tab body and the CTA. */
 .ampy-bk__cta-note {
-  margin: 0 0 var(--space-4);
+  margin: var(--space-9) 0 var(--space-5);
   font-family: 'Outfit', system-ui, sans-serif;
   font-size: var(--fs-13);
   font-weight: 400;
@@ -812,7 +823,7 @@ html { font-size: 62.5%; }
   -webkit-appearance: none;
   appearance: none;
   font-family: 'Outfit', system-ui, sans-serif;
-  font-size: 1.6rem; /* 16px floor so iOS Safari doesn't auto-zoom on focus */
+  font-size: var(--fs-16); /* 16px floor so iOS Safari doesn't auto-zoom on focus */
   font-weight: 400;
   /* Matches the lead-form inputs (one input component, one size). */
   padding: var(--space-4) var(--space-5) var(--space-4) calc(var(--space-5) + 1.6rem + var(--space-3));
@@ -1065,11 +1076,11 @@ html { font-size: 62.5%; }
 }
 @media (max-width: 767px) {
   .ampy-bk--hero .ampy-bk__block {
-    /* v7.1 (M3): fill the small-viewport minus the Bricks sticky header + a
-       3.2rem breathing gap, with a 52rem floor so short slides never collapse.
-       This is what keeps the H1/paragraph/foot out of view while on the tool.
-       svh (small-viewport) is stable when the mobile URL bar shows/hides. */
-    min-height: max(52rem, calc(100svh - var(--ampy-header-h, 0px) - 3.2rem));
+    /* v7.2 (§7): the svh fill is gone (it manufactured dead space under the
+       source line / CTAs on tall phones). A plain 50rem floor + the pinned
+       bottom elements (source line on S1/S2, CTA zone on the verdict) put the
+       slack INSIDE the slide instead of trailing below it. */
+    min-height: 50rem;
     /* v7: 16px side padding buys one extra word per line at 375px */
     padding: var(--space-9) var(--space-7);
   }
@@ -1133,8 +1144,14 @@ html { font-size: 62.5%; }
 .ampy-bk__drawer-back:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ampy-bk__drawer-back:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-sm); }
 
-/* Verdict headline block rhythm in hero (16px to the law box / tabs) */
+/* Verdict headline block rhythm in hero (16px to the tabs) */
 .ampy-bk--hero .ampy-bk__judgment { margin-bottom: var(--space-7); }
+@media (min-width: 768px) {
+  /* v7.2 (§7): with the CTA stack pinned to the card floor, give the desktop
+     verdict a touch more top rhythm — crumb->board and board->tabs each +4px. */
+  .ampy-bk--hero .ampy-bk__block[data-verdict] .ampy-bk__crumb { margin-bottom: var(--space-8); }
+  .ampy-bk--hero .ampy-bk__block[data-verdict] .ampy-bk__judgment { margin-bottom: var(--space-9); }
+}
 
 /* ============================================================================
    ROOM-GRID ENTRY (hero, Version-3) — shared, theme-agnostic
@@ -1244,13 +1261,11 @@ html { font-size: 62.5%; }
   .ampy-bk__roomtile-chip svg { width: 1.8rem; height: 1.8rem; }
 }
 
-/* Pin the source line to the card floor so the desktop card never reads half-empty */
+/* Pin the source line to the card floor so the card never reads half-empty.
+   v7.2 (§7): auto-pinned on BOTH desktop and mobile again — with the mobile svh
+   fill gone (plain 50rem floor) the pin no longer shoves it far down, and the
+   roomgrid's 2rem margin-bottom guarantees it never collides with the tiles. */
 .ampy-bk--hero .ampy-bk__source-line { margin-top: auto; }
-@media (max-width: 767px) {
-  /* v7.1 (M2): unpin from the floor on mobile (the tall fill would shove it far
-     down); a fixed 20px gap keeps tiles->source symmetric with heading->tiles. */
-  .ampy-bk--hero .ampy-bk__source-line { margin-top: var(--space-9); }
-}
 
 /* Required-field asterisk (small, black) */
 .ampy-bk__req { color: #000; margin-left: 0.2rem; }
@@ -1284,9 +1299,12 @@ html { font-size: 62.5%; }
 }
 /* Retire the 3px judgment sliver — the full-height rule replaces it */
 .ampy-bk--hero .ampy-bk__block[data-verdict] .ampy-bk__judgment-accent { display: none; }
-.ampy-bk__block[data-verdict="green"]  { --verdict-accent: rgb(15, 110, 86);  --verdict-wash: rgba(15, 110, 86, 0.07);  --verdict-board-bg: rgba(15, 110, 86, 0.08); }
-.ampy-bk__block[data-verdict="red"]    { --verdict-accent: rgb(122, 22, 35);  --verdict-wash: rgba(214, 64, 64, 0.07);  --verdict-board-bg: rgba(214, 64, 64, 0.06); }
-.ampy-bk__block[data-verdict="yellow"] { --verdict-accent: rgb(135, 101, 7);  --verdict-wash: rgba(245, 175, 25, 0.09);  --verdict-board-bg: rgba(245, 175, 25, 0.08); }
+/* v7.2 (§3): --verdict-board-border is a SOFTENED, semi-transparent take on the
+   accent used only for the board's hairline (the full-strength --verdict-accent
+   stays on the rule, icons and tab indicator). */
+.ampy-bk__block[data-verdict="green"]  { --verdict-accent: rgb(27, 132, 71);  --verdict-wash: rgba(54, 178, 92, 0.08);  --verdict-board-bg: rgba(54, 178, 92, 0.10);  --verdict-board-border: rgba(27, 132, 71, 0.45); } /* leafy family, never reads as the teal CTA */
+.ampy-bk__block[data-verdict="red"]    { --verdict-accent: rgb(122, 22, 35);  --verdict-wash: rgba(214, 64, 64, 0.07);  --verdict-board-bg: rgba(214, 64, 64, 0.06);  --verdict-board-border: rgba(150, 40, 50, 0.4); }
+.ampy-bk__block[data-verdict="yellow"] { --verdict-accent: rgb(135, 101, 7);  --verdict-wash: rgba(245, 175, 25, 0.09);  --verdict-board-bg: rgba(245, 175, 25, 0.08);  --verdict-board-border: rgba(135, 101, 7, 0.4); }
 /* Interior wash: top-anchored, fades to white (never dark) */
 .ampy-bk--hero .ampy-bk__block[data-verdict]::after {
   content: '';
@@ -1303,19 +1321,21 @@ html { font-size: 62.5%; }
 }
 /* v7.1 (D5c): the verdict label returns to a bordered green/red "board" (owner:
    the old bordered treatment beat the giant plain headline). The icon is back.
-   The drama still lives in the full-height accent rule + top wash. */
+   The drama still lives in the full-height accent rule + top wash.
+   v7.2 (§3): softened 1px tinted hairline (was a 1.5px full-accent border that
+   read black/heavy), one type step up, padding grown proportionally. */
 .ampy-bk--hero .ampy-bk__badge {
   display: inline-flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-5) var(--space-6);
-  border: 1.5px solid var(--verdict-accent);
+  padding: var(--space-6) var(--space-8);
+  border: 1px solid var(--verdict-board-border, var(--verdict-accent));
   border-radius: var(--radius-md);
   background: var(--verdict-board-bg);
   color: var(--text-primary);
   font-family: 'Outfit', system-ui, sans-serif;
   font-weight: 700;
-  font-size: var(--fs-20);
+  font-size: var(--fs-22);
   line-height: 1.2;
   letter-spacing: -0.01em;
   max-width: 100%;
@@ -1329,7 +1349,8 @@ html { font-size: 62.5%; }
   color: var(--verdict-accent);
 }
 @media (max-width: 767px) {
-  .ampy-bk--hero .ampy-bk__badge { font-size: var(--fs-15); padding: var(--space-4) var(--space-5); }
+  /* v7.2 (§3): +3px type on mobile too, padding grown in step. */
+  .ampy-bk--hero .ampy-bk__badge { font-size: var(--fs-18); padding: var(--space-5) var(--space-7); }
 }
 /* The lead form sets no data-verdict, so the wash/rule never fire there. */
 
@@ -1388,23 +1409,16 @@ html { font-size: 62.5%; }
   width: 100%; min-height: 4.8rem; padding: var(--space-4) var(--space-5);
   /* 16px floor: iOS Safari auto-zooms on focus for inputs < 16px (the embedded
      layout's --fs-15 is 15px), so pin to 1.6rem to prevent the zoom jump. */
-  font-family: 'Outfit', system-ui, sans-serif; font-size: 1.6rem; color: var(--text-primary);
+  font-family: 'Outfit', system-ui, sans-serif; font-size: var(--fs-16); color: var(--text-primary);
   background: var(--bg-primary); border: 1px solid var(--border-default); border-radius: var(--radius-md);
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 .ampy-bk__lead-input:focus { outline: none; border-color: var(--border-focus); box-shadow: var(--focus-ring); }
 .ampy-bk__lead-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
-.ampy-bk__lead-consent {
-  display: flex; align-items: flex-start; gap: var(--space-3);
-  margin: var(--space-7) 0 0; font-size: var(--fs-13); line-height: 1.5; color: var(--text-secondary);
-}
-.ampy-bk__lead-check { margin-top: 0.3rem; width: 1.8rem; height: 1.8rem; flex-shrink: 0; accent-color: var(--action-primary); }
-.ampy-bk__lead-consent label { cursor: pointer; }
-.ampy-bk__lead-consent a { color: var(--action-primary-text); text-decoration: underline; text-underline-offset: 2px; }
 .ampy-bk__lead-error { margin: var(--space-3) 0 0; font-size: var(--fs-14); font-weight: 500; color: var(--state-error); }
 .ampy-bk__lead-error[hidden] { display: none; }
 .ampy-bk__lead-submit { margin: var(--space-7) 0 0; min-height: 4.8rem; }
-.ampy-bk__lead-submit:disabled { background: rgba(0,122,105,0.7); border-color: rgba(0,122,105,0.7); color: var(--text-inverse); cursor: default; }
+.ampy-bk__lead-submit:disabled { background: var(--action-primary-strong); border-color: var(--action-primary-strong); color: var(--text-inverse); cursor: default; }
 .ampy-bk__lead-success { text-align: center; padding: var(--space-7) var(--space-4); }
 .ampy-bk__lead-success-icon {
   display: inline-flex; align-items: center; justify-content: center;

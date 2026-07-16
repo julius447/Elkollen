@@ -184,20 +184,16 @@
         track('job_selected', { job_id: next.jobId });
       }
       if (next && Object.prototype.hasOwnProperty.call(next, 'answerIndex') && next.answerIndex != null) {
-        // v7: enrich with the chosen option's verdict. On guess forks option 0
-        // encodes the "I may do it myself" (green) hypothesis, option 1 the
-        // "needs an electrician" (red) one; guess_correct = hypothesis === verdict.
+        // Enrich with the chosen option's verdict. (v7.2: the guess-fork
+        // enrichment is gone with the guess jobs themselves — every remaining
+        // question is a genuine scenario fork.)
         const ansJobId = next.jobId || this.state.jobId;
         const ansJob = ansJobId ? this.jobsById[ansJobId] : null;
         const ansOpt = (ansJob && ansJob.options) ? ansJob.options[next.answerIndex] : null;
-        const guess = (ansJob && ansJob.choice_type === 'guess')
-          ? (next.answerIndex === 0 ? 'green' : 'red') : null;
         track('question_answered', {
           job_id: ansJobId,
           answer_index: next.answerIndex,
-          option_verdict: ansOpt ? ansOpt.verdict : null,
-          guess: guess,
-          guess_correct: (guess && ansOpt) ? (guess === ansOpt.verdict) : null
+          option_verdict: ansOpt ? ansOpt.verdict : null
         });
       }
       this.state = { ...this.state, ...next };
@@ -301,11 +297,13 @@
       try {
         headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ampy-header-h')) || 0;
       } catch (e) { /* no-op */ }
-      // v7.1 (M3/§4B): mobile uses a TIGHT band so every transition pulls the
-      // card top to ~8px under the header (no hunt-scroll); desktop keeps a wide
-      // band -> a no-op while the centered column is stable.
+      // v7.2 (§9): mobile lands the card top ~28px under the header so the eye
+      // catches a sliver of page background + the card's rounded top on every
+      // transition (including the lead form); the tight band prevents
+      // hunt-scroll. Desktop keeps a wide band -> a no-op while the centered
+      // column is stable.
       const isMobile = window.matchMedia('(max-width: 767px)').matches;
-      const anchor = headerH + (isMobile ? 8 : 12); // px: target position for the card top
+      const anchor = headerH + (isMobile ? 28 : 12); // px: target position for the card top
       const top = block.getBoundingClientRect().top;
       if (top < anchor - 2 || top > anchor + (isMobile ? 6 : 48)) {
         // INSTANT scroll, deliberately not 'smooth': smooth scrolling is
@@ -377,12 +375,11 @@
       });
       block.appendChild(options);
 
-      // Informationsnotis — alltid synlig; texten varierar per choice_type
-      // (scenario vs guess) och bor i datafilen.
+      // Informationsnotis — alltid synlig; texten bor i datafilen. v7.2: every
+      // remaining question is a scenario fork (the guess forks are gone), so
+      // the info line is always the scenario one.
       const entryStrings = (this.data.meta && this.data.meta.entry) || {};
-      const infoText = (job.choice_type === 'guess')
-        ? (entryStrings.info_guess || 'Beskedet bygger på Elsäkerhetslagen (2016:732), inte på vad som känns rimligt.')
-        : (entryStrings.info_scenario || 'Lagen skiljer på att byta något befintligt och att installera nytt. Ditt svar avgör vilken regel som gäller.');
+      const infoText = entryStrings.info_scenario || 'Lagen skiljer på att byta något befintligt och att installera nytt. Ditt svar avgör vilken regel som gäller.';
       block.appendChild(el('div', { class: 'ampy-bk__info', role: 'note' }, [
         el('span', { class: 'ampy-bk__info-icon', html: icon('info'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
         el('p', { class: 'ampy-bk__info-text' }, infoText)
@@ -404,9 +401,10 @@
       // gives a tighter mobile crumb, else the full label).
       block.appendChild(this.renderCrumb(job.chip_label || job.label));
 
-      // The chosen option (all jobs are conditional, so a verdict is always the
-      // result of a committed choice; deep ?jobb=&svar= links too). Used to
-      // surface option-level green tips (§3F).
+      // The chosen option, when there is one. v7.2: the 10 direct-verdict jobs
+      // are type:fixed again (no question, no options) and land here with
+      // answerIndex == null -> chosenOpt null -> every render path below falls
+      // back to job-level content. Used to surface option-level green tips (§3F).
       const chosenOpt = (this.state.answerIndex != null && job.options && job.options[this.state.answerIndex])
         ? job.options[this.state.answerIndex] : null;
 
@@ -501,8 +499,12 @@
       this.renderTabBody();
       block.appendChild(this.tabBodyNode);
 
-      // CTA-zonen
-      block.appendChild(this.renderCta(job, verdictKey));
+      // CTA-zonen. v7.2 (§7): wrapped in a container with margin-top:auto (CSS)
+      // so the CTA stack pins to the card floor on both desktop and mobile;
+      // slack sits INSIDE the layout above it, never trailing below.
+      const ctaZone = el('div', { class: 'ampy-bk__cta-zone' });
+      ctaZone.appendChild(this.renderCta(job, verdictKey));
+      block.appendChild(ctaZone);
 
       return block;
     }
@@ -530,16 +532,8 @@
       const optIdx = this.state.answerIndex;
       const opt = (optIdx != null && job.options && job.options[optIdx]) ? job.options[optIdx] : null;
       const summary = (opt && opt.summary) || job.summary || (verdictKey === 'green' ? v.caveat_short : job.why_text);
-      // v7: guess-fork options carry a reaction line ("Rätt gissat." / "Nej,
-      // här går lagens gräns.") rendered as a bold lead-in to the summary.
-      const summaryP = el('p', { class: 'ampy-bk__summary' });
-      if (opt && opt.reaction) {
-        summaryP.appendChild(el('strong', {}, opt.reaction));
-        summaryP.appendChild(document.createTextNode(' ' + summary));
-      } else {
-        summaryP.appendChild(document.createTextNode(summary));
-      }
-      wrap.appendChild(summaryP);
+      // v7.2: the guess-fork bold "reaction" lead-in is gone with the guess jobs.
+      wrap.appendChild(el('p', { class: 'ampy-bk__summary' }, summary));
 
       // ✓ DO-rad
       const doText = (opt && opt.do) || job.do;
