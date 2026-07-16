@@ -15,9 +15,12 @@
    Rem base: html font-size 62.5% (= 10 px) — all rem values read on that base.
    Tokens: never raw values in components; only semantic CSS variables.
    ============================================================================ */
-html { font-size: 62.5%; }
-
+/* v7.3.7: @import MUST precede every style rule - an @import after any rule is
+   invalid CSS and silently discarded by all browsers (the font then only loads
+   if the theme happens to enqueue Outfit). Keep this line first. */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+
+html { font-size: 62.5%; }
 
 .ampy-bk {
   /* ---------- Color tokens ---------------------------------------------- */
@@ -163,6 +166,10 @@ html { font-size: 62.5%; }
   .ampy-bk__block,
   .ampy-bk__judgment,
   .ampy-bk__drawer > * { animation: none !important; }
+  /* v7.3.7: the press/hover micro-transforms also move content */
+  .ampy-bk__option:active,
+  .ampy-bk__roomtile:active,
+  .ampy-bk__roomtile:hover { transform: none !important; }
 }
 
 /* ============================================================================
@@ -495,6 +502,9 @@ html { font-size: 62.5%; }
 
 .ampy-bk__row-icon {
   flex-shrink: 0;
+  /* v7.3.7: declared here, not only via the JS inline style, so any markup
+     reproduction (render.php growth, Bricks copy) keeps the centering. */
+  display: inline-flex;
   width: 1.8rem;
   /* Box = one text line tall, glyph centered, so the icon optically aligns to the
      first line of the row text (robust vs a fixed margin-top nudge). */
@@ -529,6 +539,7 @@ html { font-size: 62.5%; }
 }
 .ampy-bk__caveat-icon {
   flex-shrink: 0;
+  display: inline-flex; /* v7.3.7: not only via the JS inline style */
   width: 1.6rem;
   height: calc(var(--fs-14) * 1.55); /* one line tall, glyph centered -> aligns to first line */
   align-items: center;
@@ -563,6 +574,7 @@ html { font-size: 62.5%; }
 }
 .ampy-bk__tip-icon {
   flex-shrink: 0;
+  display: inline-flex; /* v7.3.7: not only via the JS inline style */
   width: 1.8rem;
   height: calc(var(--fs-15) * 1.5); /* one line tall, glyph centered -> aligns to first text line */
   align-items: center;
@@ -684,104 +696,11 @@ html { font-size: 62.5%; }
 /* v7 (F3): the green-only .ampy-bk__cta-row / .ampy-bk__cta-link treatment is
    deleted — every verdict now ends with the same primary + secondary pair. */
 
-.ampy-bk__share-anchor {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-.ampy-bk__share {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 4.4rem;
-  height: 4.4rem;
-  background: none;
-  border: 0;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-  color: var(--text-secondary);
-  border-radius: var(--radius-sm);
-  transition: color 150ms ease, background 150ms ease;
-}
-.ampy-bk__share:hover { color: var(--text-primary); background: var(--bg-secondary); }
-.ampy-bk__share:focus-visible {
-  outline: 2px solid var(--border-focus);
-  outline-offset: 2px;
-}
-.ampy-bk__share svg { width: 1.8rem; height: 1.8rem; }
-
-/* Share popover (desktop / ingen native share) */
-.ampy-bk__share-menu {
-  position: absolute;
-  right: 0;
-  bottom: calc(100% + var(--space-2));
-  z-index: 20;
-  min-width: 17rem;
-  padding: var(--space-2);
-  background: var(--bg-primary);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  animation: ampy-bk-pop 140ms ease both;
-}
-.ampy-bk__share-menu[hidden] { display: none; }
-@keyframes ampy-bk-pop {
-  from { opacity: 0; transform: translateY(4px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ampy-bk__share-menu { animation: none; }
-}
-
-.ampy-bk__share-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  width: 100%;
-  padding: var(--space-3) var(--space-4);
-  background: none;
-  border: 0;
-  border-radius: var(--radius-sm);
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-14);
-  font-weight: 500;
-  color: var(--text-primary);
-  text-decoration: none;
-  text-align: left;
-  cursor: pointer;
-  transition: background 150ms ease;
-  min-height: 4rem;
-}
-.ampy-bk__share-item:hover { background: var(--bg-secondary); }
-.ampy-bk__share-item:focus-visible {
-  outline: 2px solid var(--border-focus);
-  outline-offset: -2px;
-}
-.ampy-bk__share-item-icon {
-  flex-shrink: 0;
-  width: 1.8rem;
-  height: 1.8rem;
-  color: var(--text-secondary);
-}
-.ampy-bk__share-item:hover .ampy-bk__share-item-icon { color: var(--text-primary); }
-
-.ampy-bk__share-status {
-  font-size: var(--fs-12);
-  color: var(--text-success);
-  opacity: 0;
-  transition: opacity 200ms ease;
-  margin-left: var(--space-3);
-}
-.ampy-bk__share-status[data-visible="true"] { opacity: 1; }
-
-/* Trust row (red CTA) — the share icon sits inline on the same row (v5.2) */
-/* (Removed: .ampy-bk__trust-row / .ampy-bk__trust — the RED verdict no longer
-   renders a registration trust line; the RED CTA zone uses .ampy-bk__share-row.) */
+/* v7.3.7: the share subsystem (button, popover, status, trust-row) is REMOVED.
+   The share button was deliberately dropped from the verdict in v7.1 and the
+   whole block had been unreachable dead code since (verified: zero render
+   paths). The matching dead JS (renderShareButton/generateShareImage) is
+   removed in the same release. */
 
 /* ============================================================================
    ENTRY MODE — the picker (approved, keeps the v4 structure)
@@ -874,10 +793,13 @@ html { font-size: 62.5%; }
 .ampy-bk__room svg { width: 1.4rem; height: 1.4rem; color: var(--action-primary); }
 .ampy-bk__room:hover { border-color: var(--action-primary); }
 .ampy-bk__room:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+/* v7.3.7: selected fill uses the STRONG teal - white 13px text on the light
+   teal was ~2.97:1 (WCAG AA fail), and solid light-teal fill is reserved for
+   the primary CTA (hard rule 5). White on strong teal is ~5.3:1. */
 .ampy-bk__room[aria-selected="true"] {
-  background: var(--action-primary);
+  background: var(--action-primary-strong);
   color: var(--text-inverse);
-  border-color: var(--action-primary);
+  border-color: var(--action-primary-strong);
 }
 .ampy-bk__room[aria-selected="true"] svg { color: var(--text-inverse); }
 
@@ -1096,10 +1018,9 @@ html { font-size: 62.5%; }
 .ampy-bk__drawer > * { animation: ampy-bk-fade 200ms ease both; }
 @media (max-width: 767px) {
   /* Mobile drawer flows in the page (the card min-height is 0 on phones). */
-  /* v7.3 (M1): pull the list block up on mobile — no top margin, and the back
-     control tucked up into the card padding (44px tap target preserved via padding). */
   .ampy-bk__drawer { max-height: none; overflow: visible; padding-right: 0; margin-top: 0; }
-  .ampy-bk__drawer-back { min-height: 4rem; margin: calc(var(--space-3) * -1) 0 var(--space-3); }
+  /* NOTE: the mobile .ampy-bk__drawer-back override lives AFTER its base rule
+     below (equal specificity - source order decides; v7.3.7 cascade fix). */
 }
 
 /* Slide-2 header: room title + helper subtitle above the neutral list */
@@ -1141,6 +1062,13 @@ html { font-size: 62.5%; }
 .ampy-bk__drawer-back svg { width: 1.6rem; height: 1.6rem; }
 .ampy-bk__drawer-back:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ampy-bk__drawer-back:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: var(--radius-sm); }
+@media (max-width: 767px) {
+  /* v7.3 (M1): pull the list block up on mobile — the back control tucked up
+     into the card padding (40px control; the tap area is preserved by padding).
+     v7.3.7: moved AFTER the base rule; it used to sit before it in the file, so
+     min-height/margin silently lost the equal-specificity cascade. */
+  .ampy-bk__drawer-back { min-height: 4rem; margin: calc(var(--space-3) * -1) 0 var(--space-3); }
+}
 
 /* Verdict headline block rhythm in hero (16px to the tabs) */
 .ampy-bk--hero .ampy-bk__judgment { margin-bottom: var(--space-7); }

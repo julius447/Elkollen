@@ -5,8 +5,9 @@ maintain **Elkollen**, a WordPress plugin. Read it fully before editing anything
 For depth, follow the pointers to `HANDOVER.md`. For the human install steps, see
 `CHECKLIST.md`. Version history is in `CHANGELOG.md`.
 
-Current version: **5.7.9** (the prototype is feature-complete and pixel-reviewed;
-the remaining work is WordPress/Bricks implementation + the launch gate).
+Current version: **7.3.7** (the prototype is feature-complete, pixel-reviewed and
+has passed a full 5-dimension production review; the remaining work is the
+WordPress/Bricks implementation + the launch gate).
 
 ---
 
@@ -69,12 +70,14 @@ ampy-behorighetskollen.php         Plugin shell: enqueue, [elkollen] shortcode, 
   `layout="hero"` — a compact split-hero variant for the landing page. Hero styles
   are scoped under `.ampy-bk--hero`; the embedded layout is untouched by them.
 - **Three render modes inside the tool** (one mount, `replaceChildren`): `entry`
-  (search + "Välj rum" dropdown + quick-pick chips + "Se alla N jobb" drawer),
-  `question` (conditional jobs), `verdict` (badge + legal source + tabs + CTA).
-  Plus a **lead-form** overlay (`this.leadOpen`) opened from the verdict CTA.
-- **Engine** (`resolve(job, answerIndex)` + `jobGroup(job)`): `fixed` jobs return
-  their `default_verdict`; `conditional` jobs ask a question then return the chosen
-  option's verdict. Pure functions; see `HANDOVER.md` §6.
+  (hero = the room grid "Var i hemmet gäller det?" + the "Alla eljobb" list;
+  embedded = search + room chips), `question` (conditional jobs; job name in the
+  back-crumb), `verdict` (badge board + legal source + tabs + CTA). Plus a
+  **lead-form** overlay (`this.leadOpen`) opened from the verdict CTA.
+- **Engine** (`resolve(job, answerIndex)`; `jobGroup()` is removed - job lists are
+  neutral by design): `fixed` jobs return their `default_verdict`; `conditional`
+  jobs ask a question then return the chosen option's verdict. Unknown/malformed
+  data degrades to the entry screen (v7.3.7 guards). See `HANDOVER.md` §6.
 - **State** = `{jobId, answerIndex}` in the URL (`?jobb=&svar=`); `leadOpen` is
   transient (not in the URL). `render()` moves focus to the new view's
   `[data-focus-target]` heading for a11y.
@@ -110,10 +113,10 @@ to `POST /wp-json/ampy-bk/v1/lead`. Key facts:
 
 Vendor-agnostic `track(event, props)` pushes to `window.dataLayer` (GA4/GTM) AND
 dispatches a DOM `CustomEvent('elkollen:track')`. No-ops if nothing listens. Events:
-`tool_view`, `job_selected`, `question_shown`, `question_answered`, `verdict_shown`
-(job+color), `cta_click`, `lead_form_open`, `lead_submitted`, `verify_company_click`.
-Impression events fire once per distinct view (no double-count on lead open/close or
-Back/Forward).
+`tool_view`, `room_selected`, `see_all`, `list_view`, `job_selected`,
+`question_shown`, `question_answered`, `verdict_shown` (job+color), `cta_click`,
+`lead_form_open`, `lead_submitted`. Impression events fire once per distinct view
+(no double-count on lead open/close or Back/Forward).
 
 ---
 

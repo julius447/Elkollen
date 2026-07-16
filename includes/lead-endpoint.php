@@ -23,7 +23,13 @@ add_action( 'rest_api_init', function () {
         'methods'             => WP_REST_Server::READABLE,
         'permission_callback' => '__return_true',
         'callback'            => function () {
-            return new WP_REST_Response( array( 'nonce' => wp_create_nonce( 'wp_rest' ) ), 200 );
+            $response = new WP_REST_Response( array( 'nonce' => wp_create_nonce( 'wp_rest' ) ), 200 );
+            // v7.3.7: WP only sends nocache headers on REST for logged-in users,
+            // so without this an edge/full-page cache that includes /wp-json/
+            // could serve one stale nonce to every anonymous visitor after its
+            // 12-24h lifetime -> every lead 403s. no-store removes the class.
+            $response->header( 'Cache-Control', 'no-store, max-age=0' );
+            return $response;
         },
     ) );
 

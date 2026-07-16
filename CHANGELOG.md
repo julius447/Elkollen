@@ -2,6 +2,62 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 7.3.7 — Production-readiness review pass (5-agent audit applied)
+A full launch review (JS logic / CSS responsive / PHP-WordPress / data contract /
+cross-file seams) was run and every confirmed finding fixed:
+- **CSS:** the Outfit `@import` sat AFTER a style rule - invalid CSS, silently
+  discarded by every browser - moved first so the font actually loads standalone.
+  Selected room chip fill `--action-primary` -> `--action-primary-strong` (white
+  13px text was ~2.97:1, WCAG AA fail + hard-rule-5 breach). Mobile
+  `.ampy-bk__drawer-back` override moved AFTER its base rule (equal-specificity
+  cascade made min-height/margin silently lose). Press/hover micro-transforms
+  added to the prefers-reduced-motion block. Icon `display:inline-flex` declared
+  in CSS (was only via JS inline style). Dead share CSS removed.
+- **JS (lead flow):** server 400 messages (e.g. "Ange ett giltigt postnummer
+  (5 siffror).") are now surfaced instead of swallowed into the generic error;
+  the fresh-nonce GET no longer sends the stale X-WP-Nonce header (it made the
+  refresh 403 for logged-in sessions - the exact case it exists for); both lead
+  fetches got hard timeouts (8s/15s via AbortController) so a hung mobile radio
+  can't strand the button on "Skickar..." forever.
+- **JS (robustness):** unknown/typo'd verdict keys and missing options arrays in
+  the data file now degrade to the entry screen instead of throwing mid-render
+  with a desynced URL; `--ampy-header-h` is resolved via a probe element (rem/
+  calc values from Bricks now work, not only px); double-boot guard on the async
+  fetch path; a job missing service_page_url skips the read-more link instead of
+  rendering an href-less anchor. Dead share subsystem removed (~150 lines:
+  renderShareButton/generateShareImage/downloadFile + social icons + the
+  shadowed duplicate `x` icon key; the surviving stroke-2 x is what always
+  rendered). The permanently dead green cta_green_note branch removed.
+- **PHP:** OG meta now only emits on pages that carry the tool (was site-wide on
+  any ?jobb= URL; Bricks-aware check + ampy_bk_og_enabled filter); the nonce
+  endpoint sends `Cache-Control: no-store` (an edge cache serving one stale
+  nonce would have 403'd every anonymous lead); plugin header version synced
+  (was 7.2.0); `mb_strtolower` guarded; data-file shape guard (missing `jobs`
+  key degrades gracefully instead of a PHP 8 TypeError).
+- **Data/preview:** dead `verdicts.red.icon` synced `block` -> `ban`;
+  preview/index.html got the missing `?v=` cache-bust.
+- Verified clean by the review: REST/nonce/field-name seams, XSS sinks, state
+  machine, impression dedup, 16px iOS input floor, breakpoint boundaries,
+  overflow guards, escaping/validation in all PHP, the full data contract
+  (26 jobs, icons, reachability, tel canon, no em-dashes in UI).
+- Owner/content items flagged, NOT code: `byta-vagguttag` shares
+  `/elservice/strombrytare/` (the vagguttag page 404s - create it or accept);
+  `utomhusbelysning` job-level tips text contradicts its red fork (dead content,
+  reconcile at the electrician sign-off); OG PNGs still to be dropped in;
+  `meta.last_reviewed` still placeholder (sign-off item).
+
+## 7.3.6 — Owner polish: stay-put scroll + desktop type balance
+- **STAY-PUT scroll contract** (`_syncScroll` rewritten): content swaps no longer
+  move the viewport - the tool swaps in place, so the user is never nudged down
+  and forced to scroll back up between taps. Exactly two cases still scroll, both
+  to the card-top anchor: the LEAD FORM opening (the one intended movement) and
+  the RESCUE when the card top has scrolled out of view above (deep in the
+  "Alla eljobb" list) so the shorter new content can't strand the user.
+- **Desktop type balance** (preview/hero.html, >=1024px): H1 cap 3.7 -> 4.0rem,
+  paragraph 1.8 -> 2rem, trust bullets 1.5 -> 1.7rem (icons 2rem) - better
+  balance against the taller v7.3.5 CTAs. Mobile and the 768-1023 tablet band
+  keep their tuned sizes.
+
 ## 7.3.5 — Hero CTA finesse (taller, space-between, mobile phone-first)
 Owner finesse pass on the two hero CTAs (they read too thin/short before):
 - **Taller body** on both breakpoints (desktop ~58px, mobile ~60px; was ~44px) via

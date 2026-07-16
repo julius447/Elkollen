@@ -3,7 +3,7 @@
  * Plugin Name:       Elkollen (Ampy)
  * Plugin URI:        https://ampy.se/
  * Description:       Elkollen — lead magnet where a homeowner picks an electrical job and gets a GREEN/YELLOW/RED verdict with a legal source. Renders in Bricks via the shortcode [elkollen] (or [behorighetskollen]). UI copy is Swedish by design.
- * Version:           7.2.0
+ * Version:           7.3.7
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Ampy
@@ -23,7 +23,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-define( 'AMPY_BK_VERSION',  '7.3.5' );
+define( 'AMPY_BK_VERSION',  '7.3.7' );
 define( 'AMPY_BK_FILE',     __FILE__ );
 define( 'AMPY_BK_DIR',      plugin_dir_path( __FILE__ ) );
 define( 'AMPY_BK_URL',      plugin_dir_url( __FILE__ ) );
@@ -48,6 +48,10 @@ function ampy_bk_get_data() {
     $raw = file_get_contents( AMPY_BK_DATA );
     $data = json_decode( $raw, true );
     if ( json_last_error() !== JSON_ERROR_NONE ) return null;
+    // v7.3.7 shape guard: valid JSON with the wrong shape (missing/non-array
+    // 'jobs') must degrade to the graceful error, not fatal every consumer
+    // (render.php array_map throws a TypeError on PHP 8 otherwise).
+    if ( ! isset( $data['jobs'] ) || ! is_array( $data['jobs'] ) ) return null;
     $cached = $data;
     return $cached;
 }
@@ -119,6 +123,24 @@ add_shortcode( 'elkollen', 'ampy_bk_shortcode' ); // alias: same tool, newer nam
  */
 function ampy_bk_dynamic_og() {
     if ( empty( $_GET['jobb'] ) ) return;
+    // v7.3.7: only emit OG meta on pages that actually carry the tool. Without
+    // this gate, ANY url on the site with ?jobb= appended (homepage, /kontakt/)
+    // emitted Elkollen og:title/description - misleading share previews and
+    // duplicate-meta noise site-wide. Bricks-aware: Bricks stores the layout in
+    // postmeta (_bricks_page_content_2), not post_content, so both are checked;
+    // the ampy_bk_og_enabled filter is the escape hatch for exotic setups.
+    if ( ! is_singular() ) return;
+    $post = get_post();
+    if ( ! $post ) return;
+    $has_tool = has_shortcode( $post->post_content, 'elkollen' )
+        || has_shortcode( $post->post_content, 'behorighetskollen' );
+    if ( ! $has_tool ) {
+        $bricks = get_post_meta( $post->ID, '_bricks_page_content_2', true );
+        if ( $bricks && false !== strpos( maybe_serialize( $bricks ), 'elkollen' ) ) {
+            $has_tool = true;
+        }
+    }
+    if ( ! apply_filters( 'ampy_bk_og_enabled', $has_tool, $post ) ) return;
     $data = ampy_bk_get_data();
     if ( ! $data ) return;
     $job_id = sanitize_key( wp_unslash( $_GET['jobb'] ) );
@@ -126,7 +148,10 @@ function ampy_bk_dynamic_og() {
         if ( $j['id'] !== $job_id ) continue;
 
         $brand = isset( $data['meta']['product_name'] ) ? $data['meta']['product_name'] : 'Elkollen';
-        $title = sprintf( 'Får jag göra %s själv? | %s', mb_strtolower( $j['label'] ), $brand );
+        // v7.3.7: mb_strtolower guarded - WP core does not polyfill it, and an
+        // mbstring-less host would fatal inside wp_head on any ?jobb= URL.
+        $label_lc = function_exists( 'mb_strtolower' ) ? mb_strtolower( $j['label'] ) : strtolower( $j['label'] );
+        $title = sprintf( 'Får jag göra %s själv? | %s', $label_lc, $brand );
         $desc  = isset( $j['summary'] ) ? wp_strip_all_tags( $j['summary'] ) : wp_strip_all_tags( $j['why_text'] );
 
         // Resolve OG image: per-job override → per-verdict fallback → none.

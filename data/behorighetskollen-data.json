@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "7.3.5",
+    "version": "7.3.7",
     "product_name": "Elkollen",
     "page_heading": "Koppla elen",
     "page_lead": "Se direkt vilka eljobb du får göra själv.",
@@ -98,7 +98,7 @@
     },
     "red": {
       "label": "Det här kräver elektriker",
-      "icon": "block",
+      "icon": "ban",
       "token": "--state-error",
       "caveat": "Detta är elinstallationsarbete och får enligt lag bara utföras av ett registrerat elinstallationsföretag.",
       "consequence": "Att utföra elinstallationsarbete utan behörighet är ett brott enligt Elsäkerhetslagen (48 §). Straffet är böter eller fängelse i upp till ett år, oavsett om jobbet blir tekniskt rätt. Din hemförsäkring kan dessutom sätta ned eller neka ersättning om en skada beror på arbete som inte gjorts fackmannamässigt.",

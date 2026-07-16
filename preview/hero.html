@@ -6,7 +6,7 @@
   <title>Får du göra eljobbet själv? | Elkollen, Ampy</title>
   <meta name="description" content="Välj eljobbet du funderar på och få ett tydligt besked direkt, byggt på Elsäkerhetslagen." />
 
-  <link rel="stylesheet" href="../assets/behorighetskollen.css?v=735" />
+  <link rel="stylesheet" href="../assets/behorighetskollen.css?v=737" />
 
   <style>
     /* ====================================================================
@@ -26,7 +26,7 @@
     /* PREVIEW ONLY: the QA bar is a sticky ~4.4rem header, so tell the tool's
        scroll-anchor to land the card below it. In production Bricks sets
        --ampy-header-h to the real sticky-header height (0 if none). Never ships. */
-    :root { --ampy-header-h: 44px; } /* px, not rem: the JS reads it with parseFloat */
+    :root { --ampy-header-h: 44px; } /* any CSS length works (v7.3.7: the JS resolves it via a probe element, so rem/calc are safe too) */
     body {
       margin: 0;
       font-family: 'Outfit', system-ui, -apple-system, sans-serif;
@@ -118,8 +118,10 @@
     .hero__h1 {
       font-family: 'Outfit', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
       /* v7.0.1 (owner H1a): capped so the 50-char H1 breaks on TWO lines in the
-         desktop column (~25ch/line), not three. Mobile keeps the 3.4rem floor. */
-      font-size: clamp(3.4rem, 3vw, 3.7rem);
+         desktop column (~25ch/line), not three. Mobile keeps the 3.4rem floor.
+         v7.3.6 (owner): desktop cap 3.7->4.0rem (+3px) for better balance against
+         the taller CTAs; mobile floor and the tablet override are untouched. */
+      font-size: clamp(3.4rem, 3.2vw, 4rem);
       font-weight: 600;
       line-height: 1.18; /* v7.1 (D4): airier */
       letter-spacing: -.015em;
@@ -146,6 +148,15 @@
     .hero__trust { list-style:none; padding:0; margin:0 0 2.8rem; display:flex; flex-direction:column; gap:1.6rem; } /* v7.1 (D4): larger gap between bullets */
     .hero__trust li { display:flex; align-items:flex-start; gap:1.2rem; font-size:1.5rem; line-height:1.45; font-weight:500; color: var(--pg-ink-2); }
     .hero__trust svg { width:1.8rem; height:1.8rem; min-width:1.8rem; margin-top:.2rem; color: var(--pg-teal); flex-shrink:0; }
+    /* v7.3.6 (owner): DESKTOP-ONLY +2px on the paragraph and the three trust
+       bullets (icons follow) for better balance against the taller CTAs.
+       >=1024px so mobile ("perfect") and the narrow 768-1023 tablet column keep
+       their tuned sizes. */
+    @media (min-width: 1024px) {
+      .hero__sub { font-size: 2rem; }
+      .hero__trust li { font-size: 1.7rem; }
+      .hero__trust svg { width: 2rem; height: 2rem; min-width: 2rem; }
+    }
 
     /* v7.2 (§4): TRUE ampy.se 1:1 button recipe (recovered from the v5/v6
        hero's .ampy-btn): gradient fill, NO border, soft white glow shadow,
@@ -390,7 +401,7 @@
     </header>
   </div>
 
-  <script src="../assets/behorighetskollen.js?v=735"></script>
+  <script src="../assets/behorighetskollen.js?v=737"></script>
   <!-- Prototype-only theme toggle (never ships). Flips the A/B fork point. -->
   <script>
     (function () {
@@ -409,7 +420,7 @@
        truth so an owner copy swap never touches code. -->
   <script>
     (function () {
-      fetch('../data/behorighetskollen-data.json?v=735', { credentials: 'same-origin' })
+      fetch('../data/behorighetskollen-data.json?v=737', { credentials: 'same-origin' })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (data) {
           var hero = data && data.meta && data.meta.hero;

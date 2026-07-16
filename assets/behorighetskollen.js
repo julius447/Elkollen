@@ -12,7 +12,7 @@
   /* ---------- Icon library (inline SVG, stroke-based) ------------------- */
   const ICONS = {
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>',
-    x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    /* ('x' lives at the end of the map - see the v7.3.7 note there) */
     alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>',
     ban: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>',
     info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
@@ -22,7 +22,6 @@
     /* v7: drill-in chevron for the neutral job list (navigation, not action) */
     chevronRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg>',
     external: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4 10 14"/><path d="M19 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6"/></svg>',
-    share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>',
     search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
 
     /* Job icons */
@@ -62,13 +61,12 @@
     inspect: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M9 13l2 2 4-4"/></svg>',
     grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>',
 
-    /* Share / social icons */
-    facebook: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>',
-    x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-    xtwitter: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24h-6.66l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>',
-    reddit: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm5.01 9.21c.026.18.04.365.04.55 0 2.8-3.262 5.07-7.286 5.07-4.024 0-7.286-2.27-7.286-5.07 0-.19.014-.378.042-.562a1.412 1.412 0 0 1-.65-1.187 1.42 1.42 0 0 1 2.408-1.018 7.157 7.157 0 0 1 3.864-1.21l.737-3.468a.3.3 0 0 1 .357-.23l2.434.518a1.01 1.01 0 1 1-.117.562l-2.155-.458-.66 3.11a7.15 7.15 0 0 1 3.806 1.205 1.42 1.42 0 1 1 1.715 2.205zM8.5 11.75a1.06 1.06 0 1 0 2.12 0 1.06 1.06 0 0 0-2.12 0zm5.69 2.92c-.74.74-2.27.8-2.69.8-.42 0-1.95-.06-2.69-.8a.27.27 0 0 1 .38-.38c.46.46 1.45.63 2.31.63.86 0 1.85-.17 2.31-.63a.27.27 0 1 1 .38.38zm-.13-1.86a1.06 1.06 0 1 1 0-2.12 1.06 1.06 0 0 1 0 2.12z"/></svg>',
-    mail: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
-    link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>'
+    /* v7.3.7: the social/share icon set (facebook, xtwitter, reddit, mail, link,
+       share) is removed with the dead share subsystem. NOTE: this x is the live
+       "dont"-row cross; it used to be a DUPLICATE key shadowing an earlier
+       stroke-2.2 variant near the top of the map (removed) - this stroke-2
+       version is what has always actually rendered. */
+    x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
   };
   ICONS.search_icon = ICONS.search;
   // Alias: data uses 'search' for the felsökning (troubleshooting) job
@@ -99,6 +97,10 @@
     if (!job) return { kind: 'unknown' };
     if (job.type === 'fixed') return { kind: 'verdict', verdictKey: job.default_verdict };
     if (job.type === 'conditional') {
+      // v7.3.7 guard: the data file is the non-dev editing surface. A conditional
+      // job whose options array was lost must degrade to the entry screen, not
+      // throw mid-render (renderQuestionBlock iterates options).
+      if (!Array.isArray(job.options) || !job.options.length) return { kind: 'unknown' };
       if (answerIndex == null || !job.options[answerIndex]) return { kind: 'ask' };
       return { kind: 'verdict', verdictKey: job.options[answerIndex].verdict };
     }
@@ -240,6 +242,13 @@
 
       const job = this.state.jobId ? this.jobsById[this.state.jobId] : null;
       const result = resolve(job, this.state.answerIndex);
+      // v7.3.7 guard: a typo'd verdict key in the data file (e.g. "gren") must
+      // degrade to the entry screen, not throw mid-render - the URL has already
+      // been pushed by navigate(), so a throw here freezes the old view with a
+      // desynced URL and every subsequent tap on that job dead.
+      if (result.kind === 'verdict' && !(this.data.verdicts && this.data.verdicts[result.verdictKey])) {
+        result.kind = 'unknown';
+      }
 
       let block;
       if (this.leadOpen && job && result.kind === 'verdict') {
@@ -293,26 +302,39 @@
       this._booted = true;
     }
 
-    /* v7 (M2): one scroll rule for every transition. The TOOL-CARD TOP is the
-       anchor; a tolerance band prevents jarring micro-scrolls when the card is
-       already near the top (desktop no-op most of the time). --ampy-header-h is
-       the sticky-header hook for the Bricks page; 0 in the static prototype. */
+    /* v7.3.6 (owner): STAY-PUT scroll contract. Content swaps must NOT move the
+       viewport - the tool swaps in place, so the user is never nudged down and
+       forced to scroll back up between taps. Exactly two cases still scroll,
+       both to the card-top anchor (--ampy-header-h is the Bricks sticky-header
+       hook; 0 in the static prototype):
+       1) the LEAD FORM opening - the one intended movement: the form takes
+          over the view ("Boka kostnadsfri radgivning" covers the card);
+       2) the RESCUE - the card top has scrolled out of view ABOVE (deep in a
+          long list like "Alla eljobb"); without it the shorter new content
+          would strand the user below the card. */
     _syncScroll() {
       const block = this.mount.firstElementChild;
       if (!block) return;
+      // v7.3.7: resolve --ampy-header-h via a probe element instead of
+      // parseFloat on the raw value. Custom properties come back as AUTHORED
+      // (parseFloat('8rem') = 8, parseFloat('calc(...)') = NaN), so a Bricks
+      // header set in rem silently anchored ~10x too high. The probe lets the
+      // browser resolve any unit/calc to px. Falls back to 0 on any failure.
       let headerH = 0;
       try {
-        headerH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ampy-header-h')) || 0;
+        const probe = document.createElement('div');
+        probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;height:var(--ampy-header-h,0px);';
+        document.body.appendChild(probe);
+        headerH = probe.getBoundingClientRect().height || 0;
+        probe.remove();
       } catch (e) { /* no-op */ }
-      // v7.2 (§9): mobile lands the card top ~28px under the header so the eye
-      // catches a sliver of page background + the card's rounded top on every
-      // transition (including the lead form); the tight band prevents
-      // hunt-scroll. Desktop keeps a wide band -> a no-op while the centered
-      // column is stable.
       const isMobile = window.matchMedia('(max-width: 767px)').matches;
       const anchor = headerH + (isMobile ? 28 : 12); // px: target position for the card top
       const top = block.getBoundingClientRect().top;
-      if (top < anchor - 2 || top > anchor + (isMobile ? 6 : 48)) {
+      const wantsAnchor = this.leadOpen                 // case 1: lead form takeover
+        ? (top < anchor - 2 || top > anchor + (isMobile ? 6 : 48))
+        : (top < anchor - 2);                           // case 2: rescue only (never scroll DOWN to the card)
+      if (wantsAnchor) {
         // INSTANT scroll, deliberately not 'smooth': smooth scrolling is
         // rAF-driven and silently stalls in occluded/background tabs, and it
         // can be preempted by the view swap. An instant anchor is reliable on
@@ -634,14 +656,13 @@
       ]);
 
       // v7 (F3): ONE CTA hierarchy for every verdict — solid teal advice CTA
-      // on top + outline "Läs mer om ..." below. GREEN gets a framing line
-      // above the pair (a safety-net double-check, never contradicting the
-      // verdict); RED gets no extra line (the law box already does the push).
-      if (verdictKey === 'green' && this.data.meta.cta_green_note) {
-        wrap.appendChild(el('p', { class: 'ampy-bk__cta-note' }, this.data.meta.cta_green_note));
-      }
+      // on top + outline "Läs mer om ..." below. (v7.3.7: the old GREEN framing
+      // line branch is removed - the owner deleted meta.cta_green_note in
+      // v7.3.1, so the branch was permanently dead.)
       wrap.appendChild(adviceBtn('ampy-bk__cta-primary ampy-bk__cta-primary--solid'));
-      wrap.appendChild(readMore('ampy-bk__cta-secondary'));
+      // v7.3.7 guard: a job missing service_page_url must not render an
+      // href-less (dead, unfocusable) link - skip the secondary CTA instead.
+      if (job.service_page_url) wrap.appendChild(readMore('ampy-bk__cta-secondary'));
 
       return wrap;
     }
@@ -786,16 +807,30 @@
             try { t.focus({ preventScroll: true }); } catch (e2) { try { t.focus(); } catch (e3) {} }
           }
           this._syncScroll();
-        }).catch(() => {
+        }).catch((err) => {
           submit.disabled = false;
           submit.textContent = f.submit || 'Boka kostnadsfri rådgivning';
-          errorBox.textContent = f.error_send || 'Något gick fel. Ring oss på 010-265 79 79 så hjälper vi dig.';
+          // v7.3.7: prefer the endpoint's specific Swedish validation message
+          // (already owner-approved copy, set server-side) over the generic one.
+          errorBox.textContent = (err && err.serverMessage) ||
+            f.error_send || 'Något gick fel. Ring oss på 010-265 79 79 så hjälper vi dig.';
           errorBox.hidden = false;
         });
       });
 
       block.appendChild(form);
       return block;
+    }
+
+    /* v7.3.7: fetch with a hard timeout. On mobile radio a request can hang at
+       the TCP level without erroring, which would leave the submit button stuck
+       on "Skickar..." forever. Abort turns the hang into a catchable error. */
+    _fetchT(url, opts, ms) {
+      if (typeof AbortController === 'undefined') return fetch(url, opts);
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), ms);
+      return fetch(url, Object.assign({}, opts, { signal: ctrl.signal }))
+        .finally(() => clearTimeout(t));
     }
 
     submitLead(job, verdictKey, fields) {
@@ -808,125 +843,38 @@
       // Fetch a FRESH nonce right before POST. The nonce baked into the page can be
       // stale if the page is served from full-page cache; this uncached GET avoids
       // a 403 on submit. Falls back to the localized nonce if the GET fails.
+      // v7.3.7: NO X-WP-Nonce header on this public GET - core validates any
+      // present nonce header for cookie-authenticated requests, so sending the
+      // stale nonce made the refresh 403 for logged-in sessions (the exact case
+      // the refresh exists for). The route is public; the header was never needed.
       const nonceUrl = cfg.restUrl.replace(/\/lead\/?$/, '/nonce');
-      const freshNonce = fetch(nonceUrl, { headers: { 'X-WP-Nonce': cfg.restNonce || '' } })
+      const freshNonce = this._fetchT(nonceUrl, {}, 8000)
         .then(r => (r.ok ? r.json() : null))
         .then(j => (j && j.nonce) || cfg.restNonce || '')
         .catch(() => cfg.restNonce || '');
-      return freshNonce.then(nonce => fetch(cfg.restUrl, {
+      return freshNonce.then(nonce => this._fetchT(cfg.restUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': nonce },
         body: JSON.stringify(payload)
-      })).then(r => { if (!r.ok) throw new Error('bad status'); return r.json(); });
-    }
-
-    renderShareButton(job, verdictKey) {
-      const status = el('span', { class: 'ampy-bk__share-status', role: 'status', 'aria-live': 'polite' });
-      const shareUrl = window.location.origin + window.location.pathname +
-        '?jobb=' + encodeURIComponent(job.id) +
-        (this.state.answerIndex != null ? '&svar=' + this.state.answerIndex : '');
-      const shareTitle = `Elkollen: ${job.label}`;
-      const shareText = `${job.label}. ${this.data.verdicts[verdictKey].label}.`;
-
-      const flash = (msg, color = '--text-success') => {
-        status.textContent = msg;
-        status.style.color = `var(${color})`;
-        status.dataset.visible = 'true';
-        clearTimeout(this._flashT);
-        this._flashT = setTimeout(() => { status.dataset.visible = 'false'; }, 2400);
-      };
-
-      // Anchor that holds the button + popover (relative positioning context).
-      const anchor = el('span', { class: 'ampy-bk__share-anchor' });
-
-      // The popover menu (desktop / no native share). Built lazily on first open.
-      const menu = el('div', { class: 'ampy-bk__share-menu', role: 'menu', 'aria-label': 'Dela resultatet', hidden: true });
-      const enc = encodeURIComponent;
-      const shareTargets = [
-        { key: 'facebook', label: 'Facebook', icon: 'facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${enc(shareUrl)}` },
-        { key: 'x',        label: 'X',        icon: 'xtwitter', href: `https://twitter.com/intent/tweet?url=${enc(shareUrl)}&text=${enc(shareText)}` },
-        { key: 'reddit',   label: 'Reddit',   icon: 'reddit',   href: `https://www.reddit.com/submit?url=${enc(shareUrl)}&title=${enc(shareText)}` },
-        { key: 'mail',     label: 'E-post',   icon: 'mail',     href: `mailto:?subject=${enc(shareTitle)}&body=${enc(shareText + ' ' + shareUrl)}` }
-      ];
-      shareTargets.forEach(t => {
-        menu.appendChild(el('a', {
-          class: 'ampy-bk__share-item',
-          role: 'menuitem',
-          href: t.href,
-          target: '_blank',
-          rel: 'noopener noreferrer',
-          onclick: () => { track('share_completed', { job_id: job.id, verdict: verdictKey, channel: t.key }); closeMenu(); }
-        }, [
-          el('span', { class: 'ampy-bk__share-item-icon', html: icon(t.icon), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-          el('span', {}, t.label)
-        ]));
+      }, 15000)).then(r => {
+        if (!r.ok) {
+          // v7.3.7: surface the endpoint's specific Swedish message (e.g. "Ange
+          // ett giltigt postnummer (5 siffror).") instead of swallowing it into
+          // the generic network-fail text - a fixable typo must not read as an
+          // outage on the load-bearing lead flow.
+          return r.json().catch(() => null).then(j => {
+            const err = new Error('bad status');
+            if (j && typeof j.message === 'string' && j.message) err.serverMessage = j.message;
+            throw err;
+          });
+        }
+        return r.json();
       });
-      // Copy link row
-      menu.appendChild(el('button', {
-        class: 'ampy-bk__share-item',
-        type: 'button',
-        role: 'menuitem',
-        onclick: async () => {
-          try { await navigator.clipboard.writeText(shareUrl); flash('Länk kopierad.'); track('share_completed', { job_id: job.id, verdict: verdictKey, channel: 'copy' }); }
-          catch (e) { flash('Kopiera länken manuellt.', '--state-warning'); }
-          closeMenu();
-        }
-      }, [
-        el('span', { class: 'ampy-bk__share-item-icon', html: icon('link'), 'aria-hidden': 'true', style: 'display:inline-flex' }),
-        el('span', {}, 'Kopiera länk')
-      ]));
-
-      const closeMenu = () => {
-        menu.hidden = true;
-        btn.setAttribute('aria-expanded', 'false');
-        document.removeEventListener('click', onDocClick, true);
-        document.removeEventListener('keydown', onKey, true);
-      };
-      const openMenu = () => {
-        menu.hidden = false;
-        btn.setAttribute('aria-expanded', 'true');
-        document.addEventListener('click', onDocClick, true);
-        document.addEventListener('keydown', onKey, true);
-      };
-      const onDocClick = (e) => { if (!anchor.contains(e.target)) closeMenu(); };
-      const onKey = (e) => { if (e.key === 'Escape') { closeMenu(); btn.focus(); } };
-
-      const btn = el('button', {
-        class: 'ampy-bk__share',
-        type: 'button',
-        'aria-label': 'Dela resultatet',
-        'aria-haspopup': 'menu',
-        'aria-expanded': 'false',
-        title: 'Dela resultatet',
-        onclick: async () => {
-          track('share_opened', { job_id: job.id, verdict: verdictKey });
-          // Touch-enheter (mobil/platta): native share sheet — ger Instagram,
-          // Messages, etc. Desktop ALWAYS gets our popover (Web Share exists on
-          // desktop Chrome/Edge/Safari but gives inconsistent UX there). Detect
-          // via pekare: 'coarse' = touch.
-          const isTouch = typeof window.matchMedia === 'function' &&
-                          window.matchMedia('(pointer: coarse)').matches;
-          if (navigator.share && isTouch) {
-            let file = null;
-            try { file = await this.generateShareImage(job, verdictKey, shareUrl); } catch (e) {}
-            try {
-              const payload = { title: shareTitle, text: shareText, url: shareUrl };
-              if (file && navigator.canShare && navigator.canShare({ files: [file] })) payload.files = [file];
-              await navigator.share(payload);
-              track('share_completed', { job_id: job.id, verdict: verdictKey, channel: 'native' });
-              return;
-            } catch (e) { /* the user cancelled or the share failed → fall back to the menu */ }
-          }
-          // Desktop (eller ingen native share): toggla popover med sociala val.
-          if (menu.hidden) openMenu(); else closeMenu();
-        }
-      }, el('span', { html: icon('share'), 'aria-hidden': 'true', style: 'display:inline-flex' }));
-
-      anchor.appendChild(btn);
-      anchor.appendChild(menu);
-      anchor.appendChild(status);
-      return anchor;
     }
+
+    /* v7.3.7: renderShareButton REMOVED - the share button was deliberately
+       dropped from the verdict in v7.1 and the function had been unreachable
+       dead code since (with generateShareImage/downloadFile and the share CSS). */
 
     /* ===================================================================
        ENTRY MODE — approved v4 structure, lightly trimmed to v5 tokens
@@ -1223,111 +1171,17 @@
       return (opt && opt.source) || job.source || v.source || fallback;
     }
 
-    /* ===================================================================
-       Canvas-based shareable verdict card (PNG)
-       =================================================================== */
-    async generateShareImage(job, verdictKey, urlStr) {
-      const W = 1200, H = 630;
-      const canvas = document.createElement('canvas');
-      canvas.width = W; canvas.height = H;
-      const ctx = canvas.getContext('2d');
-
-      const palette = {
-        bg: '#090b32',
-        green: { bg: '#5DCAA5', fg: '#04342C' },
-        yellow: { bg: '#F5C97A', fg: '#3D2A00' },
-        red: { bg: '#F09595', fg: '#501313' }
-      };
-      const accent = palette[verdictKey] || palette.green;
-
-      ctx.fillStyle = palette.bg; ctx.fillRect(0, 0, W, H);
-      const grad = ctx.createRadialGradient(W-200, 100, 0, W-200, 100, 600);
-      grad.addColorStop(0, 'rgba(0,169,145,0.22)');
-      grad.addColorStop(1, 'rgba(0,169,145,0)');
-      ctx.fillStyle = grad; ctx.fillRect(0, 0, W, H);
-
-      ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.font = '500 22px "Outfit", system-ui, sans-serif';
-      ctx.fillText('AMPY · Elkollen', 80, 90);
-
-      ctx.fillStyle = 'rgba(255,255,255,0.78)';
-      ctx.font = '600 26px "Outfit", system-ui, sans-serif';
-      ctx.fillText(job.label, 80, 175);
-
-      const v = this.data.verdicts[verdictKey];
-      ctx.font = '500 44px "Outfit", system-ui, sans-serif';
-      const labelW = ctx.measureText(v.label).width;
-      const padX = 32, badgeH = 84, iconBox = 50;
-      const badgeW = Math.min(W - 160, iconBox + 16 + labelW + padX * 2);
-      const badgeX = 80, badgeY = 230;
-
-      ctx.fillStyle = accent.bg;
-      this._roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 42); ctx.fill();
-      ctx.fillStyle = accent.fg;
-      ctx.font = '700 38px "Outfit", system-ui, sans-serif';
-      ctx.textBaseline = 'middle';
-      const glyph = verdictKey === 'green' ? '✓' : (verdictKey === 'red' ? '✕' : '!');
-      ctx.fillText(glyph, badgeX + padX, badgeY + badgeH/2 + 2);
-      ctx.font = '500 36px "Outfit", system-ui, sans-serif';
-      ctx.fillText(v.label, badgeX + padX + iconBox, badgeY + badgeH/2 + 2);
-      ctx.textBaseline = 'alphabetic';
-
-      const optSummary = (this.state.answerIndex != null && job.options && job.options[this.state.answerIndex])
-        ? job.options[this.state.answerIndex].summary : null;
-      const summary = optSummary || job.summary || (verdictKey === 'green' ? v.caveat_short : job.why_text);
-
-      ctx.fillStyle = 'rgba(255,255,255,0.96)';
-      ctx.font = '500 30px "Outfit", system-ui, sans-serif';
-      this._wrap(ctx, summary, 80, 390, W - 160, 38);
-
-      ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.font = '500 22px "Outfit", system-ui, sans-serif';
-      ctx.fillText(this._resolveSource(job, verdictKey).text, 80, H - 110);
-
-      ctx.fillStyle = 'rgba(255,255,255,0.55)';
-      ctx.font = '500 20px "Outfit", system-ui, sans-serif';
-      ctx.fillText(urlStr.replace(/^https?:\/\//, ''), 80, H - 70);
-
-      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 0.92));
-      if (!blob) return null;
-      const filename = `elkollen-${job.id}${this.state.answerIndex!=null?'-svar'+this.state.answerIndex:''}.png`;
-      return new File([blob], filename, { type: 'image/png' });
-    }
-
-    _roundRect(ctx, x, y, w, h, r) {
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-      ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-      ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-      ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y);
-      ctx.closePath();
-    }
-
-    _wrap(ctx, text, x, y, maxW, lineH) {
-      const words = String(text || '').split(/\s+/);
-      let line = '', yy = y;
-      for (let i = 0; i < words.length; i++) {
-        const test = line ? line + ' ' + words[i] : words[i];
-        if (ctx.measureText(test).width > maxW && line) {
-          ctx.fillText(line, x, yy); line = words[i]; yy += lineH;
-        } else { line = test; }
-      }
-      if (line) ctx.fillText(line, x, yy);
-    }
-
-    downloadFile(file) {
-      const url = URL.createObjectURL(file);
-      const a = document.createElement('a');
-      a.href = url; a.download = file.name;
-      document.body.appendChild(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 500);
-    }
   }
 
   /* ---------- Boot ------------------------------------------------------- */
   function boot(mount) {
-    if (!mount || mount.dataset.booted === 'true') return;
+    // v7.3.7: dataset.booted is only set inside render(), so on the async fetch
+    // path two boot() calls while the fetch is pending would both pass the guard
+    // and create TWO app instances (doubled popstate listeners + analytics).
+    // dataset.booting closes that window; cleared on fetch failure so a retry
+    // boot stays possible.
+    if (!mount || mount.dataset.booted === 'true' || mount.dataset.booting === 'true') return;
+    mount.dataset.booting = 'true';
 
     const injected = (window.AmpyBK && window.AmpyBK.data) || null;
     if (injected) {
@@ -1345,6 +1199,7 @@
       })
       .catch(err => {
         console.error('[Elkollen] Could not load data:', err);
+        delete mount.dataset.booting;
         mount.innerHTML = '<div class="ampy-bk__block"><p class="ampy-bk__loading">Kunde inte ladda eljobben just nu.</p></div>';
       });
   }
