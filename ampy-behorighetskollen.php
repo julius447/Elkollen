@@ -23,7 +23,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
-define( 'AMPY_BK_VERSION',  '7.2.1' );
+define( 'AMPY_BK_VERSION',  '7.3.1' );
 define( 'AMPY_BK_FILE',     __FILE__ );
 define( 'AMPY_BK_DIR',      plugin_dir_path( __FILE__ ) );
 define( 'AMPY_BK_URL',      plugin_dir_url( __FILE__ ) );

@@ -6,7 +6,7 @@
   <title>Får du göra eljobbet själv? | Elkollen, Ampy</title>
   <meta name="description" content="Välj eljobbet du funderar på och få ett tydligt besked direkt, byggt på Elsäkerhetslagen." />
 
-  <link rel="stylesheet" href="../assets/behorighetskollen.css?v=721" />
+  <link rel="stylesheet" href="../assets/behorighetskollen.css?v=731" />
 
   <style>
     /* ====================================================================
@@ -94,12 +94,13 @@
     .hero__tool { grid-area: tool; }
     .hero__foot { grid-area: foot; align-self: start; }
     @media (min-width: 768px) {
-      /* v7.1 (D4): vertically center the left column against the card via a
-         4-row grid (spacer / head / foot / spacer), held stable by the card's
-         56rem min-height. Sticky is removed — centering + the card floor hold it. */
+      /* v7.3 (owner): the left column is PINNED, not re-centered. The top spacer
+         is a FIXED 9.6rem (matching its home-view centered position on the 56rem
+         card), so even when the right card grows taller between slides the left
+         column stays exactly where it started. The bottom 1fr just absorbs slack. */
       .hero__grid {
         grid-template-columns: minmax(38rem, 44fr) minmax(46rem, 56fr);
-        grid-template-rows: 1fr auto auto 1fr;
+        grid-template-rows: 9.6rem auto auto 1fr;
         grid-template-areas:
           ".    tool"
           "head tool"
@@ -110,7 +111,7 @@
         align-items: start;
       }
       .hero__head { position: static; }
-      .hero__foot { margin-top: 2.8rem; } /* v7.2 (§5): a touch tighter paragraph->bullets */
+      .hero__foot { margin-top: 2.6rem; } /* v7.3 (D2): 2px tighter paragraph->bullets */
     }
 
     /* v7 (H1a): Outfit 600, one size step down, opened leading, wider measure */
@@ -123,7 +124,7 @@
       line-height: 1.18; /* v7.1 (D4): airier */
       letter-spacing: -.015em;
       color: var(--pg-ink);
-      margin: 0 0 1.6rem; /* v7.2 (§5): a touch tighter H1->paragraph */
+      margin: 0 0 1.4rem; /* v7.3 (D2): 2px tighter H1->paragraph */
       text-wrap: balance;
     }
     /* v7.2 (QC): tablet step-down — the left column narrows to ~272-330px in the
@@ -369,7 +370,7 @@
           <p class="hero__foot-ask" id="hero-foot-ask">Hellre prata med en elektriker direkt?</p>
           <div class="hero__actions">
             <a class="hero__btn hero__btn--primary" id="hero-btn-primary" href="https://ampy.se/offert/"><span id="hero-btn-primary-label">Kontakta oss</span><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M5.13916 12.75L12.4808 5.25M12.4808 5.25H5.13916M12.4808 5.25V12.75" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-            <a class="hero__btn hero__btn--secondary" id="hero-btn-secondary" href="tel:+46102657979"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span id="hero-btn-secondary-label">Ring 010-265 79 79</span></a>
+            <a class="hero__btn hero__btn--secondary" id="hero-btn-secondary" href="tel:+46102657979"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span id="hero-btn-secondary-label">010-265 79 79</span></a>
           </div>
         </div>
 
@@ -377,7 +378,7 @@
     </header>
   </div>
 
-  <script src="../assets/behorighetskollen.js?v=721"></script>
+  <script src="../assets/behorighetskollen.js?v=731"></script>
   <!-- Prototype-only theme toggle (never ships). Flips the A/B fork point. -->
   <script>
     (function () {
@@ -396,7 +397,7 @@
        truth so an owner copy swap never touches code. -->
   <script>
     (function () {
-      fetch('../data/behorighetskollen-data.json?v=721', { credentials: 'same-origin' })
+      fetch('../data/behorighetskollen-data.json?v=731', { credentials: 'same-origin' })
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (data) {
           var hero = data && data.meta && data.meta.hero;

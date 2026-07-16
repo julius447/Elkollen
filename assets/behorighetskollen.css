@@ -179,7 +179,7 @@ html { font-size: 62.5%; }
 }
 @media (max-width: 767px) {
   /* v7.1 (M4): pull the crumb up into the card's top padding on mobile. */
-  .ampy-bk__crumb { margin: calc(var(--space-3) * -1) 0 var(--space-5); }
+  .ampy-bk__crumb { margin: calc(var(--space-4) * -1) 0 var(--space-6); } /* v7.3 (M1): sits higher */
 }
 
 .ampy-bk__crumb-back {
@@ -474,7 +474,7 @@ html { font-size: 62.5%; }
    v7.2 (§7): margin-bottom 2rem = the guaranteed minimum gap before the pinned
    CTA zone (collapses with the tab content's own last margin, never stacks). */
 .ampy-bk__tab-body { display: block; padding-left: var(--space-4); margin-bottom: var(--space-9); }
-@media (max-width: 767px) { .ampy-bk__tab-body { padding-left: var(--space-5); } }
+@media (max-width: 767px) { .ampy-bk__tab-body { padding-left: var(--space-5); margin-bottom: var(--space-6); } }
 
 /* v7.2 (§7): the verdict CTA stack (note + primary + secondary) pins to the
    card floor on BOTH desktop and mobile — remaining slack sits inside the
@@ -1076,14 +1076,18 @@ html { font-size: 62.5%; }
 }
 @media (max-width: 767px) {
   .ampy-bk--hero .ampy-bk__block {
-    /* v7.2 (§7): the svh fill is gone (it manufactured dead space under the
-       source line / CTAs on tall phones). A plain 50rem floor + the pinned
-       bottom elements (source line on S1/S2, CTA zone on the verdict) put the
-       slack INSIDE the slide instead of trailing below it. */
-    min-height: 50rem;
+    /* v7.3: mobile card is CONTENT-SIZED (no min-height floor). Owner wanted the
+       internal caveat->CTA slack gone; with the scroll-anchor pinning the card
+       top, a content-height card gives tight spacing and no gap above OR below
+       the CTA. A tiny floor only so an ultra-short slide isn't awkward. */
+    min-height: 30rem;
     /* v7: 16px side padding buys one extra word per line at 375px */
-    padding: var(--space-9) var(--space-7);
+    padding: var(--space-7) var(--space-7) var(--space-9);
   }
+  /* v7.3: on mobile the CTA flows right after the content (no floor-pin), so the
+     caveat/tips -> CTA gap is tight; desktop keeps the pin. */
+  .ampy-bk--hero .ampy-bk__block .ampy-bk__cta-zone { margin-top: 0; }
+  .ampy-bk--hero .ampy-bk__block .ampy-bk__source-line { margin-top: var(--space-9); }
 }
 
 /* v7: quick-pick chips, the "Välj rum" dropdown, commonwrap and "Se alla" CSS
@@ -1101,7 +1105,10 @@ html { font-size: 62.5%; }
 .ampy-bk__drawer > * { animation: ampy-bk-fade 200ms ease both; }
 @media (max-width: 767px) {
   /* Mobile drawer flows in the page (the card min-height is 0 on phones). */
-  .ampy-bk__drawer { max-height: none; overflow: visible; padding-right: 0; }
+  /* v7.3 (M1): pull the list block up on mobile — no top margin, and the back
+     control tucked up into the card padding (44px tap target preserved via padding). */
+  .ampy-bk__drawer { max-height: none; overflow: visible; padding-right: 0; margin-top: 0; }
+  .ampy-bk__drawer-back { min-height: 4rem; margin: calc(var(--space-3) * -1) 0 var(--space-3); }
 }
 
 /* Slide-2 header: room title + helper subtitle above the neutral list */
@@ -1112,7 +1119,7 @@ html { font-size: 62.5%; }
   line-height: 1.25;
   letter-spacing: -0.01em;
   color: var(--text-primary);
-  margin: 0 0 0.2rem;
+  margin: 0 0 var(--space-3); /* v7.3 (M2): a touch more air title -> subtitle */
 }
 .ampy-bk__drawer-title:focus { outline: none; }
 .ampy-bk__list-subtitle {
@@ -1149,7 +1156,7 @@ html { font-size: 62.5%; }
 @media (min-width: 768px) {
   /* v7.2 (§7): with the CTA stack pinned to the card floor, give the desktop
      verdict a touch more top rhythm — crumb->board and board->tabs each +4px. */
-  .ampy-bk--hero .ampy-bk__block[data-verdict] .ampy-bk__crumb { margin-bottom: var(--space-8); }
+  .ampy-bk--hero .ampy-bk__block[data-verdict] .ampy-bk__crumb { margin-bottom: var(--space-6); }
   .ampy-bk--hero .ampy-bk__block[data-verdict] .ampy-bk__judgment { margin-bottom: var(--space-9); }
 }
 

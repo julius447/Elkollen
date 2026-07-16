@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "7.2.1",
+    "version": "7.3.1",
     "product_name": "Elkollen",
     "page_heading": "Koppla elen",
     "page_lead": "Se direkt vilka eljobb du får göra själv.",
@@ -56,14 +56,13 @@
     ],
     "_authored_questions_note": "[GAP] 5 authored two-option scenario questions remain after the v7.2 reversion (byta-gloldlampa, byta-armatur-dcl, jordfelsbrytare, badrum, koksrenovering): every option-to-verdict mapping is derived from the job's own summary/do/dont/why_text/tips and must be re-signed by the auktoriserad elinstallatör together with the existing matrix sign-off. The 10 v7 guess forks were removed in v7.2 (direct-verdict jobs again); no previously-fixed job that stays conditional carries a question flag.",
     "source_line": "Källa: Elsäkerhetsverket & Elsäkerhetslagen (2016:732). Vägledning, inte juridisk rådgivning.",
-    "cta_green_note": "Vill du dubbelkolla innan du börjar? En behörig elektriker ringer upp, helt kostnadsfritt.",
     "hero": {
       "h1": "Får du göra eljobbet själv? Kolla innan du kopplar.",
       "h1_key": "Kolla innan du kopplar.",
       "sub": "Välj installationen du funderar på och få ett tydligt besked direkt!",
       "button_primary": "Kontakta oss",
       "button_primary_url": "https://ampy.se/offert/",
-      "button_secondary": "Ring 010-265 79 79",
+      "button_secondary": "010-265 79 79",
       "button_secondary_url": "tel:+46102657979",
       "mobile_ask": "Hellre prata med en elektriker direkt?",
       "mobile_trust": "_deprecated",
