@@ -1,6 +1,6 @@
 {
   "meta": {
-    "version": "7.3.2",
+    "version": "7.3.4",
     "product_name": "Elkollen",
     "page_heading": "Koppla elen",
     "page_lead": "Se direkt vilka eljobb du får göra själv.",
@@ -879,7 +879,7 @@
     {
       "id": "utomhusbelysning",
       "label": "Utomhusbelysning",
-      "icon": "outdoor",
+      "icon": "lantern",
       "service_page_url": "https://ampy.se/elservice/utomhusbelysning/",
       "type": "conditional",
       "question": "Vad gäller för belysningen?",

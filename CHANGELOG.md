@@ -2,6 +2,35 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 7.3.4 — Desktop lead-form spacing + three job-icon redraws
+- **Lead form (desktop only, <=767px untouched):** the hero card reserves 56rem, so
+  on desktop the submit sat only 16px under the fields while ~114px of dead space
+  pooled below the fine print. The lead group is now centered in the card
+  (`display:flex; justify-content:center`) so the slack balances top+bottom (~66/66),
+  and the fields->submit gap opens to 32px so the action reads as its own step.
+- **Job icons (glyphs redrawn to the 24-grid house style):**
+  - `spotlight` -> three recessed downlights on a ceiling rail (was a circle+rays
+    that read like a sun/creature).
+  - `splice` -> two cables into an inline coupler with a centre seam (was a box with
+    noisy diagonal ticks).
+  - New `lantern` glyph (classic hanging lantern) for the "Utomhusbelysning" job;
+    the job's `icon` moved `outdoor` -> `lantern`. The shared `outdoor` glyph (the
+    "Utomhus" room tile) is deliberately left unchanged.
+
+## 7.3.3 — Choice-step crumb consistency + Picasso CTA alignment
+- **Question step (S3):** the job name now lives in the back-crumb
+  (`← Tillbaka · {jobb}`), identical to the verdict step, so the choice and verdict
+  screens read consistently as the user moves forward. The old uppercase
+  `.ampy-bk__q-kicker` is retired (CSS rule removed).
+- **Hero CTAs:** the two left-column buttons ("Kontakta oss" + phone) are re-cut 1:1
+  to the ampy.se button recipe from the Picasso reference repo
+  (`elements/buttons/`): radius 16px, Outfit 400, line-height 1, ink #0d0d0d,
+  centered label+icon with a 3.96rem gap, soft light glow, translateY(-1px)+saturate
+  hover; primary = 120° green→teal with a 16×16 arrow-up-right, phone = 141°
+  light-blue→teal with the 19×20 phone glyph (stroke #212121). Mobile = full-width
+  stacked with the Picasso mobile padding clamp. Dark theme keeps the elevation
+  shadow for legibility on the near-black stage.
+
 ## 5.7.9 — Launch-readiness QA pass (6-agent audit applied)
 Applied the launch QA findings across JS/CSS/PHP/markup:
 - **Lead form:** field-specific `autocomplete` tokens (name/email/tel/postal-code)

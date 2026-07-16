@@ -220,18 +220,9 @@ html { font-size: 62.5%; }
 /* ============================================================================
    QUESTION MODE — mellansteget
    ============================================================================ */
-/* v7: neutral kicker above the question — the job name, NEVER verdict-tinted
-   here (the choice step must not leak the answer). */
-.ampy-bk__q-kicker {
-  font-family: 'Outfit', system-ui, sans-serif;
-  font-size: var(--fs-12);
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-tertiary);
-  margin: 0 0 var(--space-2);
-}
-
+/* v7.3.3: the job name now lives in the crumb (.ampy-bk__crumb-job), identical
+   to the verdict step, so the choice and verdict screens read consistently.
+   The old uppercase .ampy-bk__q-kicker is retired. */
 .ampy-bk__q-title {
   font-family: 'Outfit', system-ui, sans-serif;
   font-size: var(--fs-22);
@@ -1426,6 +1417,22 @@ html { font-size: 62.5%; }
 .ampy-bk__lead-error[hidden] { display: none; }
 .ampy-bk__lead-submit { margin: var(--space-7) 0 0; min-height: 4.8rem; }
 .ampy-bk__lead-submit:disabled { background: var(--action-primary-strong); border-color: var(--action-primary-strong); color: var(--text-inverse); cursor: default; }
+
+/* v7.3.4 — DESKTOP-ONLY lead-form spacing (mobile <=767px is untouched, it is
+   already right). The hero card reserves 56rem; on desktop the lead content is
+   shorter, so the submit button sat only 16px under the fields ("extremt nära")
+   while ~114px of dead space pooled below the fine print. Fix: center the form
+   group in the card so the leftover slack balances top+bottom instead of dumping
+   at the bottom, and open the fields->submit gap to 32px so the action reads as
+   its own step (2x the 16px inter-row gap). */
+@media (min-width: 768px) {
+  .ampy-bk--hero .ampy-bk__lead {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .ampy-bk--hero .ampy-bk__lead .ampy-bk__lead-submit { margin-top: var(--space-13); }
+}
 .ampy-bk__lead-success { text-align: center; padding: var(--space-7) var(--space-4); }
 .ampy-bk__lead-success-icon {
   display: inline-flex; align-items: center; justify-content: center;

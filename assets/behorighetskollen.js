@@ -30,7 +30,9 @@
     lamp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v3"/><path d="M5 10 12 5l7 5-3 6H8l-3-6Z"/><path d="M12 16v6"/><path d="M9 22h6"/></svg>',
     pendant: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3h18"/><path d="M12 3v6"/><path d="M7 15a5 5 0 1 0 10 0c0-3-2-5-5-6-3 1-5 3-5 6Z"/><path d="M10 21h4"/></svg>',
     ceiling: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h18"/><circle cx="12" cy="13" r="6"/><circle cx="12" cy="13" r="2.2"/><path d="M12 4v3"/></svg>',
-    spotlight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="5"/><path d="M7 14l-3 7"/><path d="M17 14l3 7"/><path d="M9 14l1 7"/><path d="M15 14l-1 7"/></svg>',
+    /* v7.3.4: three recessed downlights on a ceiling rail (reads as "spotlights",
+       plural; the old circle+rays glyph read like a sun/creature). */
+    spotlight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18"/><circle cx="6.5" cy="8" r="1.5"/><circle cx="12" cy="8" r="1.5"/><circle cx="17.5" cy="8" r="1.5"/><path d="M6.5 11v3.4"/><path d="M12 11v3.4"/><path d="M17.5 11v3.4"/></svg>',
     switch: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><rect x="9" y="7" width="6" height="10" rx="1"/><line x1="12" y1="9" x2="12" y2="13"/></svg>',
     outlet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="11" r="1.2"/><circle cx="15" cy="11" r="1.2"/><path d="M9 16h6"/></svg>',
     panel: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>',
@@ -38,6 +40,9 @@
     stove: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="9" r="2"/><circle cx="15.5" cy="9" r="2"/><circle cx="8.5" cy="16" r="2"/><circle cx="15.5" cy="16" r="2"/></svg>',
     appliance: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="14" r="5"/><circle cx="12" cy="14" r="1.6"/><line x1="7" y1="6" x2="9" y2="6"/></svg>',
     outdoor: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22V12"/><path d="M8 12l4-9 4 9"/><path d="M5 22h14"/><circle cx="12" cy="9" r="2"/></svg>',
+    /* v7.3.4: dedicated glyph for the "Utomhusbelysning" job (a classic hanging
+       lantern) so it no longer borrows the room-tile 'outdoor' pyramid. */
+    lantern: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2"/><path d="M8.5 8.5 12 5l3.5 3.5"/><path d="M9 8.5l-.6 8.5h7.2L15 8.5"/><circle cx="12" cy="12.4" r="1.5"/><path d="M10 20h4"/></svg>',
     smart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.55a11 11 0 0 1 14 0"/><path d="M8.5 16.05a6 6 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1.2"/><path d="M2 8.82a15 15 0 0 1 20 0"/></svg>',
     heatpump: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="10" rx="2"/><path d="M6 19c1-1 2-1 3 0s2 1 3 0 2-1 3 0 2 1 3 0"/><line x1="6" y1="9" x2="18" y2="9"/><line x1="6" y1="12" x2="18" y2="12"/></svg>',
     heat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14c2-2 4-2 6 0s4 2 6 0 4-2 4-2"/><path d="M4 18c2-2 4-2 6 0s4 2 6 0 4-2 4-2"/><path d="M12 4v6"/><path d="M9 7l3-3 3 3"/></svg>',
@@ -45,7 +50,9 @@
     renovate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4l6 6-8 8H6v-6Z"/><path d="M3 21h7"/></svg>',
     bath: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h20v5a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3v-5Z"/><path d="M6 12V5a2 2 0 0 1 4 0"/><line x1="4" y1="20" x2="4" y2="22"/><line x1="20" y1="20" x2="20" y2="22"/></svg>',
     cable: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v6a4 4 0 0 0 4 4h0a4 4 0 0 1 4 4v2"/><path d="M20 20v-6a4 4 0 0 0-4-4h0a4 4 0 0 1-4-4V4"/><rect x="2" y="2" width="4" height="4"/><rect x="18" y="18" width="4" height="4"/></svg>',
-    splice: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h6"/><path d="M15 12h6"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 9l-1.5-1.5"/><path d="M15 15l1.5 1.5"/></svg>',
+    /* v7.3.4: two cables into an inline coupler with a centre seam (= a skarv /
+       extension). The old glyph's diagonal ticks read as noise. */
+    splice: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h6"/><path d="M16 12h6"/><rect x="8" y="9" width="8" height="6" rx="3"/><path d="M12 9.5v5"/></svg>',
     kitchen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V8h16v13"/><path d="M4 13h16"/><circle cx="8" cy="10.5" r="0.6"/><circle cx="12" cy="10.5" r="0.6"/><path d="M9 17h3v3H9z"/><path d="M15 16v3"/></svg>',
     /* v7: redrawn sofa on the 24-grid (the old glyph read weak at tile size) */
     sofa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11V8a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v3"/><path d="M2 13a2 2 0 0 1 4 0v1h12v-1a2 2 0 0 1 4 0v3a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2Z"/><path d="M5 19v2"/><path d="M19 19v2"/></svg>',
@@ -345,11 +352,10 @@
     renderQuestionBlock(job) {
       const block = el('div', { class: 'ampy-bk__block', role: 'region', 'aria-labelledby': 'ampy-bk-q' });
 
-      block.appendChild(this.renderCrumb());
-
-      // v7: neutral kicker carries the job name (deliberately never
-      // verdict-tinted on the choice step, so nothing leaks).
-      block.appendChild(el('p', { class: 'ampy-bk__q-kicker' }, job.label.toUpperCase()));
+      // v7.3.3: the job name lives in the crumb (identical to the verdict step),
+      // so the choice and verdict screens read consistently. The old uppercase
+      // kicker is removed. Neutral (never verdict-tinted) so nothing leaks.
+      block.appendChild(this.renderCrumb(job.chip_label || job.label));
 
       // The question
       block.appendChild(el('p', { class: 'ampy-bk__q-title', id: 'ampy-bk-q', 'data-focus-target': '' }, job.question));
