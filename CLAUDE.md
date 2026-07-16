@@ -5,9 +5,11 @@ maintain **Elkollen**, a WordPress plugin. Read it fully before editing anything
 For depth, follow the pointers to `HANDOVER.md`. For the human install steps, see
 `CHECKLIST.md`. Version history is in `CHANGELOG.md`.
 
-Current version: **7.3.7** (the prototype is feature-complete, pixel-reviewed and
+Current version: **7.3.8** (the prototype is feature-complete, pixel-reviewed and
 has passed a full 5-dimension production review; the remaining work is the
-WordPress/Bricks implementation + the launch gate).
+WordPress/Bricks implementation + the launch gate). Deep implementation docs for
+Chris live in `docs/` (CSS · HTML · JS references + the Bricks/FluentSnippets
+handover).
 
 ---
 

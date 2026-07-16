@@ -19,7 +19,7 @@
 
 ## 0. TL;DR (if you read only one thing)
 
-- Current version **7.3.7** (see CHANGELOG.md). The prototype is feature-complete and pixel-reviewed;
+- Current version **7.3.8** (see CHANGELOG.md). The prototype is feature-complete and pixel-reviewed;
   remaining work is Bricks/WordPress implementation + the launch gate.
 - This is a **standalone WordPress plugin** exposing a shortcode `[elkollen]`
   (alias `[behorighetskollen]`); `[elkollen layout="hero"]` is the split-hero
