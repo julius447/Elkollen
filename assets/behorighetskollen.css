@@ -15,10 +15,16 @@
    Rem base: html font-size 62.5% (= 10 px) — all rem values read on that base.
    Tokens: never raw values in components; only semantic CSS variables.
    ============================================================================ */
-/* v7.3.7: @import MUST precede every style rule - an @import after any rule is
-   invalid CSS and silently discarded by all browsers (the font then only loads
-   if the theme happens to enqueue Outfit). Keep this line first. */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap');
+/* v7.3.8: NO @import here - fonts are deliberately the HOST PAGE's job.
+   History: an @import for Outfit static weights sat below (after a style rule =
+   invalid CSS, silently discarded by every browser), so this stylesheet has in
+   practice never loaded a font. In v7.3.7 the import was "fixed" (moved first)
+   and the activated static weights CHANGED the approved rendering across the
+   whole tool - the owner rejected it and the import is now removed for good.
+   The pixel-approved reference look is the host page's font stack. At WordPress
+   time the theme/Bricks (or the FluentSnippets self-hosted woff2 per the
+   delivery contract) provides Outfit - verify the result against the approved
+   previews with the owner before launch. */
 
 html { font-size: 62.5%; }
 

@@ -2,6 +2,18 @@
 
 All UI text is in Swedish, sentence case. No em-dashes in the UI.
 
+## 7.3.8 — REVERT the v7.3.7 font @import activation (owner)
+The v7.3.7 "fix" that made the Outfit @import valid changed the rendered font
+weights across the whole tool: preview/hero.html has NO font link of its own, so
+the (invalid, silently-discarded) import meant the tool had ALWAYS rendered in
+the system font stack - and that rendering is what the owner has pixel-approved
+through every version. Activating real Outfit static weights therefore changed
+the approved look, and the owner rejected it. The @import is now REMOVED for
+good: fonts are deliberately the host page's job. IMPORTANT for launch: when
+Bricks/FluentSnippets self-hosts Outfit in production, the tool WILL render in
+Outfit - the owner must approve that rendering (or the production font stack)
+against the approved previews before go-live.
+
 ## 7.3.7 — Production-readiness review pass (5-agent audit applied)
 A full launch review (JS logic / CSS responsive / PHP-WordPress / data contract /
 cross-file seams) was run and every confirmed finding fixed:
